@@ -1,0 +1,25 @@
+[project]
+name = "mc-nonpo-agent"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "anthropic>=1.12.0",
+    "fastapi>=0.142.2",
+    "httpx>=0.28.1",
+    "psycopg[binary]>=3.3.6",
+    "pydantic>=2.13.5",
+    "python-multipart>=0.0.32",
+    "rapidfuzz>=3.14.6",
+    "uvicorn[standard]>=0.54.0",
+]
+
+[dependency-groups]
+dev = [
+    "jinja2>=3.1.6",
+    "playwright>=1.63.0",
+    "pytest>=9.1.1",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

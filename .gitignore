@@ -1,0 +1,43 @@
+# Secrets
+.env
+.env*
+!.env.example
+*.pem
+*.key
+*.p12
+credentials*.json
+secrets*.json
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+
+# Node / web
+node_modules/
+web/dist/
+*.tsbuildinfo
+.vite/
+npm-debug.log*
+pnpm-debug.log*
+
+# Deploy
+.vercel/
+
+# Local state / runtime
+data/state.db
+data/state.db-*
+data/cache/*.tmp
+*.log
+
+# Editor / OS / agent
+.DS_Store
+.idea/
+.vscode/
+.claude/settings.local.json
