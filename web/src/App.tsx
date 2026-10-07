@@ -12,6 +12,7 @@ import Review from './screens/Review'
 import { TOUR, type TourStep } from './walkthrough'
 
 const Insights = lazy(() => import('./screens/Insights'))
+const Architecture = lazy(() => import('./screens/Architecture'))
 
 export default function App() {
   const [meta, setMeta] = useState<Json | null>(null)
@@ -102,6 +103,7 @@ export default function App() {
           <NavLink to="/" end>Invoice queue {pending > 0 && <span className="count">{pending}</span>}</NavLink>
           <NavLink to="/anomalies">Anomaly layer</NavLink>
           <NavLink to="/insights">Value & procurement</NavLink>
+          <NavLink to="/architecture">Architecture & workflows</NavLink>
           <a href="/requester" target="_blank" rel="noreferrer">Requester phone view</a>
           <div className="sep" />
           <div className="tools">
@@ -121,6 +123,7 @@ export default function App() {
             <Route path="/invoice/:id" element={<Review />} />
             <Route path="/anomalies" element={<Anomalies />} />
             <Route path="/insights" element={<Suspense fallback={<p className="muted">Loading charts…</p>}><Insights /></Suspense>} />
+            <Route path="/architecture" element={<Suspense fallback={<p className="muted">Loading…</p>}><Architecture /></Suspense>} />
           </Routes>
         </main>
       </div>
