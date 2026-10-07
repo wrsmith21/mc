@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Pathwise Learning invoice to account 6910 (Training), cost centre CC8120, with a confidence of 0.921. This matches a prior Pathwise Learning e-learning library licence (May 2026) and two similar licences from Skillforge Learning and Cadence Learning (Sep 2026), all booked to 6910. No flags were raised, and the invoice is awaiting confirmation from Simon Zimmer as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2434
+ }
+}

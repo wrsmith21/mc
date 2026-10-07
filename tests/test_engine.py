@@ -117,3 +117,16 @@ def test_override_teaches_the_next_invoice(svc):
                {"account": "6360", "cost_centre": "CC4410"})
     after = svc.result(second)["coding"]["lines"][0]["rec"]
     assert after["cost_centre"] == "CC4410" and after["confidence"] > before["confidence"]
+
+
+def test_every_invoice_opens_from_cache(svc):
+    """Opening an invoice must not wait on a live model call: run `scripts.precompute` with a key after any change."""
+    svc.reset()
+    misses = []
+    for iid in svc.items:
+        r = svc.result(iid)
+        if r["explanation_meta"]["source"] != "cache":
+            misses.append((iid, "reason"))
+        if r.get("pdf") and r["extraction"]["source"] != "cache":
+            misses.append((iid, "extraction"))
+    assert not misses, f"{len(misses)} uncached model calls, e.g. {misses[:5]}"

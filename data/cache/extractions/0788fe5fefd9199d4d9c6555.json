@@ -1,0 +1,44 @@
+{
+ "fields": {
+  "vendor_name": "Hartwell & Pryce LLP",
+  "vendor_tax_id": "11-8751465",
+  "invoice_num": "0098",
+  "invoice_date": "2026-10-02",
+  "due_date": "2026-11-01",
+  "currency": "USD",
+  "bill_to": "Accounts Payable \u2013 US Operating Entity (US01), GBSC Finance, O'Fallon, MO",
+  "po_reference": null,
+  "service_period_start": "2026-08-01",
+  "service_period_end": "2026-09-30",
+  "matter": "M-2207 \u2014 Supplier contract review",
+  "named_contact": "J. Ortiz",
+  "remit_account_last4": "0571",
+  "remit_routing_number": "042976480",
+  "lines": [
+   {
+    "description": "Professional fees \u2013 contract review, Aug\u2013Sep 2026 (118.5 hrs)",
+    "qty": 1,
+    "unit_price": 84950.0,
+    "amount": 84950.0
+   },
+   {
+    "description": "Disbursements \u2013 courier and filing",
+    "qty": 1,
+    "unit_price": 1550.0,
+    "amount": 1550.0
+   }
+  ],
+  "subtotal": 86500.0,
+  "tax": 0.0,
+  "total": 86500.0,
+  "notes": "Professional fees of $84,950.00 for 118.5 hrs implies ~$716.88/hr effective rate; billed as single lump-sum line. Detailed time entries available on request. Terms: NET30. Please quote the invoice number with payment."
+ },
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 5526,
+  "input_tokens": 3161,
+  "output_tokens": 442,
+  "request_id": "req_011CfoYRYLV7bVYdczyqqbDJ"
+ }
+}

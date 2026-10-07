@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Riverbend Maintenance Co. invoice to account 6430 (Facilities Services), cost centre CC5200, with 96.5% confidence. All three prior HVAC preventive maintenance invoices from this supplier (May, August and September 2026) were coded to 6430, and no policy flags were raised. Approval routes to Ana Gallagher (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2042
+ }
+}

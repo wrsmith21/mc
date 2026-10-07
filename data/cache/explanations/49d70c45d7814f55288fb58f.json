@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Pathwise Training Group invoice to account 6910 (Training) under cost centre CC7170, with a confidence of 0.962. The evidence is three similar invoices for \"Facilitated workshop \u2013 Agile Product Ownership\" from other vendors (Skillforge Training Group, Cadence Learning and Mentorly Institute, May\u2013August 2026), all coded to 6910. No flags were raised, and the recommendation is awaiting confirmation from Hana Zhang (Cost-centre owner).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2647
+ }
+}

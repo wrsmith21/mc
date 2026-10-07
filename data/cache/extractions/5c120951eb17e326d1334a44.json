@@ -1,0 +1,56 @@
+{
+ "fields": {
+  "vendor_name": "Harbourview Facility Services",
+  "vendor_tax_id": "BE0969412555",
+  "invoice_num": "INV000614",
+  "invoice_date": "2026-10-04",
+  "due_date": "2026-12-03",
+  "currency": "EUR",
+  "bill_to": "Accounts Payable \u2013 European Entity (EU01), GBSC Finance, Waterloo, Belgium",
+  "po_reference": null,
+  "service_period_start": "2026-09-01",
+  "service_period_end": "2026-09-30",
+  "matter": null,
+  "named_contact": null,
+  "remit_account_last4": "2636",
+  "remit_routing_number": null,
+  "lines": [
+   {
+    "description": "Janitorial services \u2013 Kansas City data centre \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 4891.02,
+    "amount": 4891.02
+   },
+   {
+    "description": "Pest control \u2013 Waterloo office \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 1879.09,
+    "amount": 1879.09
+   },
+   {
+    "description": "Landscaping and grounds \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 852.96,
+    "amount": 852.96
+   },
+   {
+    "description": "On-site HVAC repair \u2013 New York office",
+    "qty": 1,
+    "unit_price": 747.39,
+    "amount": 747.39
+   }
+  ],
+  "subtotal": 8370.46,
+  "tax": 1757.8,
+  "total": 10128.26,
+  "notes": "Belgian VAT 21% (BE-VAT21) applied, including on services at US locations (Kansas City data centre, New York office). Terms: NET60. Payment by IBAN BE46 \u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022 2636. Dates printed DD/MM/YYYY. Service period inferred from 'Sep 2026' line descriptions; HVAC line has no period stated."
+ },
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 5936,
+  "input_tokens": 3222,
+  "output_tokens": 550,
+  "request_id": "req_011CfoYduDvKbYzDzCFEUCnw"
+ }
+}

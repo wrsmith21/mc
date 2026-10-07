@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Cornerstone Property Services invoice to account 6430 (Facilities Services), cost centre CC5210, with 92.9% confidence and no policy flags raised. The recommendation rests on three recent comparable invoices for janitorial services at the Kansas City data centre, from Pinecrest (Sep 2026), Harbourview (Aug 2026) and Riverbend (Jul 2026), all coded to 6430. Approval routes to Gabriel Kulkarni as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2132
+ }
+}

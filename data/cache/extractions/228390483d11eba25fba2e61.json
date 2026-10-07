@@ -1,0 +1,56 @@
+{
+ "fields": {
+  "vendor_name": "Clearwave Telecom",
+  "vendor_tax_id": "59-4825366",
+  "invoice_num": "007803",
+  "invoice_date": "2026-10-08",
+  "due_date": "2026-11-07",
+  "currency": "USD",
+  "bill_to": "Accounts Payable \u2013 US Operating Entity (US01), GBSC Finance, O'Fallon, MO",
+  "po_reference": null,
+  "service_period_start": null,
+  "service_period_end": null,
+  "matter": null,
+  "named_contact": null,
+  "remit_account_last4": "2418",
+  "remit_routing_number": "136382964",
+  "lines": [
+   {
+    "description": "Mobile data pooled plan \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 9137.2,
+    "amount": 9137.2
+   },
+   {
+    "description": "Dedicated internet access 10Gbps \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 3500.15,
+    "amount": 3500.15
+   },
+   {
+    "description": "International roaming charges \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 6376.0,
+    "amount": 6376.0
+   },
+   {
+    "description": "Device protection plan \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 1589.79,
+    "amount": 1589.79
+   }
+  ],
+  "subtotal": 20603.14,
+  "tax": 0.0,
+  "total": 20603.14,
+  "notes": "Terms: NET30. Line items reference Sep 2026 service; no explicit service period dates printed."
+ },
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 4717,
+  "input_tokens": 3141,
+  "output_tokens": 447,
+  "request_id": "req_011CfoYyj6mudx1QcURPnCLj"
+ }
+}

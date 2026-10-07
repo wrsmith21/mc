@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Greenleaf Kitchens invoice to account 6720 (Meals & Catering) under cost centre CC5230, with a confidence of 0.887. All three prior Greenleaf Kitchens invoices on record, each a Chicago office cafeteria subsidy, were coded to 6720, and no policy flags were raised. The recommendation awaits confirmation and will route to Chris Calloway (Cost-centre owner) for approval.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1880
+ }
+}

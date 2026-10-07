@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Brightpath Advisory invoice to account 6510 (Professional Fees \u2013 Consulting), cost centre CC7100, with 98% confidence, because the three prior Brightpath invoices for finance process-mapping workshops (April, August and September 2026) were all coded to 6510. Diana Moreno is the requester, so for separation of duties the approval was routed to Grace Okafor (VP, Finance Operations).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2445
+ }
+}

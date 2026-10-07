@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Reliant Managed Services invoice to account 6420 (Repairs & Maintenance), cost centre CC4420, with 0.98 confidence. All three prior invoices from this supplier, storage array support renewals dated August to September 2026, were coded to 6420, and no policy flags were raised. Approval routes to Shreya Singh (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 4077
+ }
+}

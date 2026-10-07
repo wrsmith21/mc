@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Fresh Fork Food Services invoice to account 6720 (Meals & Catering) under cost centre CC5250, with 95.6% confidence. Three prior invoices from this supplier for the same \"Working lunch \u2013 Fintech Week Europe\" description, dated August 2025, December 2025 and May 2026, were all coded to 6720. No flags were raised, and approval routes to Alejandro Larsen as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 3965
+ }
+}

@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Pinecrest Facility Services invoice to account 6430 (Facilities Services), cost centre CC5200, with 96.7% confidence. The three prior invoices on record, dated 25 Feb, 2 May and 22 Aug 2026, were all window cleaning at the Kansas City data centre and all coded to 6430. No policy flags were raised, and the invoice routes to Ana Gallagher (Director) for approval.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2110
+ }
+}

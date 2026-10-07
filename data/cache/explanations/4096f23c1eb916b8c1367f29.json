@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Printcraft Print invoice to account 6480 (Printing & Reprographics) under cost centre CC6100, with a confidence of 0.922. All three prior Printcraft Print invoices on record, for business cards dated 10 April, 25 May and 30 September 2026, were coded to 6480. No policy flags were raised, and the invoice awaits confirmation from Nikhil Khan as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1797
+ }
+}

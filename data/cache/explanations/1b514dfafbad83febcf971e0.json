@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Maplewood Maintenance Co. invoice to account 6430 (Facilities Services) under cost centre CC5200, with 98% confidence. The three most recent Maplewood invoices for HVAC preventive maintenance (April, June and August 2026) were all coded to 6430, and no policy flags were raised. The invoice routes to Ana Gallagher (Director) for approval.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2761
+ }
+}

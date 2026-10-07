@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Cornerstone Facility Services invoice to account 6430 (Facilities Services), cost centre CC5250, with 97% confidence. The three most recent invoices from this supplier, for monthly HVAC preventive maintenance from May to July 2026, were all coded to 6430, and no policy flags were raised. Approval routes to Alejandro Larsen as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1897
+ }
+}

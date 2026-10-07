@@ -1,0 +1,38 @@
+{
+ "fields": {
+  "vendor_name": "Brightpath Advisory",
+  "vendor_tax_id": "16-4523120",
+  "invoice_num": "BPA-3391",
+  "invoice_date": "2026-10-05",
+  "due_date": "2026-11-04",
+  "currency": "USD",
+  "bill_to": "Accounts Payable \u2013 US Operating Entity (US01), GBSC Finance, O'Fallon, MO",
+  "po_reference": null,
+  "service_period_start": null,
+  "service_period_end": null,
+  "matter": null,
+  "named_contact": "Diana Moreno, Director, Finance GBSC",
+  "remit_account_last4": "4562",
+  "remit_routing_number": "022228378",
+  "lines": [
+   {
+    "description": "Finance process-mapping workshop \u2013 Sep 2026 (2 days, 3 consultants)",
+    "qty": 1,
+    "unit_price": 14200.0,
+    "amount": 14200.0
+   }
+  ],
+  "subtotal": 14200.0,
+  "tax": 0.0,
+  "total": 14200.0,
+  "notes": "Engagement: Finance transformation. Terms: NET30. No PO number printed."
+ },
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 3995,
+  "input_tokens": 3088,
+  "output_tokens": 336,
+  "request_id": "req_011CfoYqXnv2Gs6c73JSE3jv"
+ }
+}

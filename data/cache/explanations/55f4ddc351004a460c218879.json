@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Northstar IT Services invoice to account 6420 (Repairs & Maintenance), cost centre CC4450, with 98% confidence. This matches the three most recent Northstar invoices for desk-side support time and materials (12 Sep, 18 Aug and 12 Jul 2026), all of which were coded to 6420, and no policy flags were raised. The coding is awaiting confirmation from Carlos Walsh, the cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2027
+ }
+}

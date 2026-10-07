@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Heartland Utilities invoice to account 6440 (Utilities), cost centre CC5210, with 98% confidence, consistent with recent electricity supply invoices for the O'Fallon campus. The amount is flagged as unusual: $45,009 is 2.58x this supplier's median comparable invoice of $17,437 across 89 invoices. Confirmation is awaited from Ana Gallagher (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1935
+ }
+}

@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Halloran Beck LLP invoice to account 6610 (Legal Fees) under cost centre CC5100, with 98% confidence. Its three most recent comparable invoices were all coded to 6610: disbursements for matters M-2231 (14 Sep 2026), M-2219 (16 Jun 2026) and M-2177 (21 May 2026). No flags were raised, and the recommended approval chain is Marcus Feld (Legal Operations) followed by Mina Albrecht (cost-centre owner).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2090
+ }
+}

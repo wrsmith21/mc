@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Prestige Facility Services invoice to account 6430 (Facilities Services), cost centre CC5210, with 96.1% confidence and no policy flags raised. The three most recent invoices from this supplier (3, 19 and 25 September 2026) were all coded to 6430, each described as \"Landscaping and grounds \u2013 Aug 2026.\" Approval routes to Ana Gallagher (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 4839
+ }
+}

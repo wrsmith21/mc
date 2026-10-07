@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Ledgerpoint Markets invoice to account 6370 (Market Data Services) under cost centre CC9140, with 97.4% confidence and no flags raised. All three prior Ledgerpoint Markets invoices for market data terminal licences (June and July 2026) were coded to 6370. Approval is routed to Elena Castillo as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2237
+ }
+}

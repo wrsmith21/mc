@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Saffron Kitchens invoice to account 6720 (Meals & Catering) under cost centre CC5230, with a confidence of 93.6%. All three prior Saffron Kitchens invoices on file (August 4, September 1 and September 10, 2026), each for meeting catering, were coded to 6720, and no policy flags were raised. Approval is routed to Chris Calloway as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1700
+ }
+}

@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Everclean Building Services invoice to account 6430 (Facilities Services) under cost centre CC5230, with a confidence of 0.92 and no policy flags raised. Three prior \"Window cleaning \u2013 New York office\" invoices were all coded to 6430: one from Everclean Building Services, one from Everclean Facility Services and one from Harbourview Property Services. Approval routes to Chris Calloway as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1890
+ }
+}

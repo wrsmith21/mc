@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Harvest Table Catering invoice to account 6720 (Meals & Catering), cost centre CC6120, with 98% confidence. All three prior invoices from this supplier, monthly cafeteria subsidies for the Chicago office (Apr, May and Jul 2026), were coded to 6720, and no policy flags were raised. The recommendation is awaiting confirmation, with approval routed to Hana Becker (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 3048
+ }
+}

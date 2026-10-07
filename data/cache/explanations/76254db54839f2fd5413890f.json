@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Inkwell Print invoice to account 6480 (Printing & Reprographics) under cost centre CC5250, with 93.9% confidence. Three prior large-format printing invoices for Pune GBSC were coded to 6480: one from Inkwell Print and one each from Sharpline Press and Printcraft Print. No policy flags were raised, and the recommendation is awaiting confirmation from Alejandro Larsen as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2227
+ }
+}

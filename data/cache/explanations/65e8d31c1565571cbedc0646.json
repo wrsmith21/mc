@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Brightmind Academy invoice to account 6910 (Training) under cost centre CC7170, with a confidence of 0.972 and no policy flags raised. This matches Brightmind Academy's own prior \"Advanced Excel for Finance\" course from 2026-01-06, which was coded to 6910. It also matches the same course billed by Cadence Institute and Learnwell Academy, both coded to 6910. The only approval required is from Hana Zhang as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2436
+ }
+}

@@ -1,0 +1,8 @@
+{
+ "text": "The agent **recommends** coding this Bluehaven Data Centers invoice to account 6340 (Cloud & Hosting Services) under cost centre CC4430, with 95.7% confidence. All three prior Bluehaven invoices for managed database services (Dec 2025, Jan 2026 and Aug 2026) were coded to 6340, and no policy flags were raised. The recommendation is awaiting confirmation and routes to Ethan Eriksen (VP) for approval.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2533
+ }
+}

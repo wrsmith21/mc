@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Proactive Support Services invoice to account 6420 (Repairs & Maintenance), cost centre CC4420, with 97.5% confidence. All three prior invoices from this supplier for on-site break/fix support (Jun\u2013Aug 2026) were coded to 6420, and no policy flags were raised. The recommended approver is Shreya Singh (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2269
+ }
+}

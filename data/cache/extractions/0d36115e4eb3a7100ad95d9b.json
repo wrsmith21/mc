@@ -1,0 +1,50 @@
+{
+ "fields": {
+  "vendor_name": "Everclean Facility Services",
+  "vendor_tax_id": "BE0984278992",
+  "invoice_num": "EFS-08797",
+  "invoice_date": "2026-10-02",
+  "due_date": "2026-11-01",
+  "currency": "EUR",
+  "bill_to": "Accounts Payable \u2013 European Entity (EU01), GBSC Finance, Waterloo, Belgium",
+  "po_reference": null,
+  "service_period_start": null,
+  "service_period_end": null,
+  "matter": null,
+  "named_contact": null,
+  "remit_account_last4": "8090",
+  "remit_routing_number": null,
+  "lines": [
+   {
+    "description": "Waste and recycling collection \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 3797.69,
+    "amount": 3797.69
+   },
+   {
+    "description": "HVAC preventive maintenance \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 1479.86,
+    "amount": 1479.86
+   },
+   {
+    "description": "Elevator maintenance contract \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 2515.02,
+    "amount": 2515.02
+   }
+  ],
+  "subtotal": 7792.57,
+  "tax": 1636.44,
+  "total": 9429.01,
+  "notes": "BE-VAT21 (21% Belgian VAT). Terms: NET30. Payment by IBAN BE34 \u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022 8090. Line items reference Sep 2026 service month, but no explicit service period dates printed."
+ },
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 5084,
+  "input_tokens": 3199,
+  "output_tokens": 450,
+  "request_id": "req_011CfoYSXk3yZdTJP8QPGk9z"
+ }
+}

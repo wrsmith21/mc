@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Ironbridge Support Services invoice to account 6420 (Repairs & Maintenance), cost centre CC4410, with 93.8% confidence. All three prior Ironbridge invoices on file, each for UPS preventive maintenance at the Purchase and Kansas City data centres, were coded to 6420, and no policy flags were raised. Approval routes to Tariq Sen (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2647
+ }
+}

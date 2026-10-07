@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Northline Communications invoice to account 6310 (Telecommunications), cost centre CC4420, with 97.5% confidence. The three prior Northline invoices shown (monthly mobile service for Jan, Mar and Jul 2026) were all coded to 6310, and no policy flags were raised. Approval routes to Shreya Singh (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1639
+ }
+}

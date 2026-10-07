@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends holding this $86,500.00 invoice from Hartwell & Pryce LLP as a likely duplicate. It matches invoice 0098, received 2026-10-05, on amount, invoice date and service period, and the invoice numbers differ only in format (0098 vs. INV-0098). If it is confirmed as not a duplicate, the agent recommends coding it to 6610 Legal Fees, cost centre CC5100 (confidence 0.973), consistent with this vendor's prior disbursement invoices, for approval by Marcus Feld (Legal Operations) and Hannah Leclerc (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2274
+ }
+}

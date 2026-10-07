@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Clearprice Information Services invoice to account 6370 (Market Data Services) under cost centre CC9130, with a confidence of 0.98. All three prior Clearprice invoices on file for the BIN and issuer data feed (January, April and May 2026) were coded to 6370, and no policy flags were raised. Approval routes to Pooja Castillo as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2599
+ }
+}

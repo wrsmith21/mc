@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Ampliqo Analytics invoice to account 6350 (Software Subscriptions), cost centre CC9130, with 90% confidence. The evidence is three comparable \"API usage overage \u2013 Aug 2026\" charges from other vendors (Ledgerly Technologies, Vantix Analytics and Vantix Labs), all booked to 6350 in early September 2026. No policy flags were raised, and the recommendation is awaiting confirmation from Amara Torres (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2621
+ }
+}

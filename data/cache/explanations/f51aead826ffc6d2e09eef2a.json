@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Quantia Cloud invoice to account 6350 (Software Subscriptions) under cost centre CC9110, with 0.9 confidence. The recommendation is based on three recent comparable invoices for \"Additional storage add-on \u2013 Aug 2026\" from Quantia Technologies, Brightlane Labs and Pivotra Software, all coded to 6350. No flags were raised, and the invoice awaits confirmation from Amara Torres (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2255
+ }
+}

@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Ironwatch Security invoice to account 6450 (Security Services), cost centre CC5240, with a confidence of 0.897. The three most recent Ironwatch invoices, for alarm monitoring in May, June and August 2026, were all coded to 6450, and no policy flags were raised. Approval routes to Paolo Doyle (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1523
+ }
+}

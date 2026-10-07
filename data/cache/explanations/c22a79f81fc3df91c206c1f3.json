@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Fixwell Technical Services invoice to account 6420 (Repairs & Maintenance), cost centre CC4480, with 95% confidence and no policy flags raised. All three prior Fixwell invoices for printer fleet managed service were coded to 6420, and approval routes to Shreya Singh (Director). Note that two of those prior invoices (dated 1 and 9 August 2026) both describe July 2026 service, which the reviewer may want to check.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2857
+ }
+}

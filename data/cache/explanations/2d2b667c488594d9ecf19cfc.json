@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Mentorly Training Group invoice to account 6910 (Training), cost centre CC8120, with a confidence of 0.906. The recommendation rests on three prior invoices for certification exam vouchers, all coded to 6910: Mentorly Training Group (40 vouchers, 2025-04-25), Mentorly Academy (120 vouchers, 2026-09-24) and Learnwell Academy (20 vouchers, 2026-09-10). No flags were raised, and the invoice awaits confirmation and approval by Ruth Lewis (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2596
+ }
+}

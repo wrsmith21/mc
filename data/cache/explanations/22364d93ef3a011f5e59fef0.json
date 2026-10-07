@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Bluehaven Infrastructure invoice to account 6340 (Cloud & Hosting Services), cost centre CC4430, with 98% confidence. All three prior Bluehaven invoices on file (object storage for Feb, Apr and Aug 2026) were coded to 6340, and no policy flags were raised. Approval routes to Shreya Singh (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1844
+ }
+}

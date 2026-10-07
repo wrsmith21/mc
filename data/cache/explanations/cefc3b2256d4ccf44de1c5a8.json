@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Harvest Table Catering invoice to account 6720 (Meals & Catering), cost centre CC6120, with 98% confidence. The three prior invoices shown from this supplier, monthly Chicago office cafeteria subsidies dated May through August 2026, were all coded to 6720, and no policy flags were raised. Approval routes to Hana Becker (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2193
+ }
+}

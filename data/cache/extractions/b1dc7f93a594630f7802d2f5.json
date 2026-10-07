@@ -1,0 +1,38 @@
+{
+ "fields": {
+  "vendor_name": "Cloudline Analytics",
+  "vendor_tax_id": "59-1023892",
+  "invoice_num": "CLA-2026-114",
+  "invoice_date": "2026-09-28",
+  "due_date": "2026-10-28",
+  "currency": "USD",
+  "bill_to": "Accounts Payable \u2013 US Operating Entity (US01), GBSC Finance, O'Fallon, MO",
+  "po_reference": null,
+  "service_period_start": "2026-10-01",
+  "service_period_end": "2027-09-30",
+  "matter": null,
+  "named_contact": null,
+  "remit_account_last4": "6420",
+  "remit_routing_number": "086056162",
+  "lines": [
+   {
+    "description": "Annual platform subscription 1 Oct 2026 \u2013 30 Sep 2027 (125 analyst seats)",
+    "qty": 1,
+    "unit_price": 120000.0,
+    "amount": 120000.0
+   }
+  ],
+  "subtotal": 120000.0,
+  "tax": 0.0,
+  "total": 120000.0,
+  "notes": "Order form OF-2026-114 referenced (no PO number printed). Annual subscription renewal, 125 analyst seats, billed annually in advance. Terms: NET30."
+ },
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 4208,
+  "input_tokens": 3128,
+  "output_tokens": 368,
+  "request_id": "req_011CfoYbZWx6gXzPzrGaXjuk"
+ }
+}

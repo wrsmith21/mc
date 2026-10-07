@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends holding this $9,870 Summit Facility Services invoice for vendor master review before payment. The amount is 2.63x the supplier's median comparable invoice ($3,753 across 18 invoices). Bank details were changed 2 days ago by email from summitfaci1ity.example, a domain 1 character off the registered summitfacility.example, and call-back verification has not been completed. The invoice also asks for payment in 7 days against agreed NET30 terms. If the invoice is cleared, the agent recommends coding it to account 6430 (Facilities Services), cost centre CC5200, at 0.609 confidence based on matching janitorial invoices, with approval by Hana Vogel (Cost-centre owner).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2876
+ }
+}

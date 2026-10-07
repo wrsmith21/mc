@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Tickstream Information Services invoice to account 6370 (Market Data Services), cost centre CC7120, with 0.98 confidence. All 3 prior Tickstream invoices for the BIN and issuer data feed (Jul\u2013Aug 2026) were coded to 6370, and no policy flags were raised. The history includes two entries for the Aug 2026 period (dated 2026-09-03 and 2026-09-11), and approval is routed to Joel Tan (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 4429
+ }
+}

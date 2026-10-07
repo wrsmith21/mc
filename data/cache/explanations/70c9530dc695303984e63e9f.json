@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Precision IT Services invoice to account 6420 (Repairs & Maintenance), cost centre CC4420, with 98% confidence. All three prior invoices from this vendor in the evidence, storage array support renewals dated 2026-02-01, 2026-02-12 and 2026-08-10, were coded to 6420, and no policy flags were raised. Approval routes to Shreya Singh (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 3157
+ }
+}

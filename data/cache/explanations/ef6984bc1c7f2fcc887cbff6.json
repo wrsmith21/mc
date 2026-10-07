@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Lakeland Water Authority invoice to account 6440 (Utilities), cost centre CC5200, with 95.6% confidence. The three prior water and sewer invoices from this supplier for the Arlington office, dated August 2025 to August 2026, were all coded to 6440. No policy flags were raised, so only cost-centre owner Hana Vogel needs to approve.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1704
+ }
+}

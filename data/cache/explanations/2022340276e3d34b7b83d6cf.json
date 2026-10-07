@@ -1,0 +1,8 @@
+{
+ "text": "The agent **recommends fast-tracking** this Northgate Connect invoice to account 6310 (Telecommunications), cost centre CC9100, with 95% confidence. All three prior Northgate Connect invoices for SIP trunk service were coded to 6310, and no policy flags were raised. Approval is routed to Dmitri Alvarez (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2908
+ }
+}

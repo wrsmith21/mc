@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Fieldmark Software invoice to account 6350 (Software Subscriptions), cost centre CC7110, with a confidence of 0.956 and no flags raised. The three most recent comparable Fieldmark invoices for additional storage add-ons (Jul 2025, Sep 2025 and Mar 2026) were all coded to account 6350. Approval routes to Diana Moreno (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2037
+ }
+}

@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Proactive Support Services invoice to account 6420 (Repairs & Maintenance), cost centre CC4420, with 97.5% confidence. This matches the three most recent invoices from this supplier, each for on-site break/fix support (June, July and August 2026), all coded to 6420, and no flags were raised. The recommendation is awaiting confirmation and routes to Shreya Singh (Director) for approval.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2794
+ }
+}

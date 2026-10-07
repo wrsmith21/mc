@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding the Skyloft Analytics invoice to account 6350 (Software Subscriptions) under cost centre CC4450, with a confidence score of 0.786. The three closest matching invoices were all coded to 6350: user licence charges from Clearbook Labs, Nimbusly Technologies and Signalpath Labs for August 2026. No flags were raised, and the recommendation goes to Carlos Walsh, the cost-centre owner, for approval.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1912
+ }
+}

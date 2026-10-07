@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Deskright Business Products invoice to 6360 IT Consumables (below capitalisation threshold), cost centre CC5250, with 0.706 confidence. This overrides the vendor default 6460 Office Supplies, which covers Deskright's breakroom coffee service (54 invoices). The 4 past invoices for these items, USB-C chargers, were all coded to 6360. Approval routes to Alejandro Larsen as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2554
+ }
+}

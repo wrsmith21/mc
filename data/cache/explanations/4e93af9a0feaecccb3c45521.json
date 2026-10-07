@@ -1,0 +1,8 @@
+{
+ "text": "The agent **recommends fast-tracking** this Oakmont Property Services invoice to account 6430 (Facilities Services), cost centre CC5250, with 97.9% confidence and no policy flags raised. All three prior Oakmont invoices on record, described as elevator maintenance contract charges, were coded to 6430. Note that two of those prior entries (2026-08-12 and 2026-08-19) are both labelled \"Jul 2026.\" Approval routes to Alejandro Larsen as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 3723
+ }
+}

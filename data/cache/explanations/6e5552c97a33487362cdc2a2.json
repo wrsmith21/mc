@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Continuum Managed Services invoice to account 6420 (Repairs & Maintenance), cost centre CC4420, with 98% confidence. All three prior invoices from this vendor (August\u2013September 2026), each a hardware maintenance contract, were coded to 6420, and no policy flags were raised. Approval routes to Shreya Singh (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2725
+ }
+}

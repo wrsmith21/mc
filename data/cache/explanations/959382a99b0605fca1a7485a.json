@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Harbourview Facility Services invoice to account 6430 (Facilities Services), cost centre CC5220, with 0.88 confidence. All three prior Harbourview invoices for janitorial services at the Kansas City data centre (June 2025, June 2026 and July 2026) were coded to 6430, and no policy flags were raised. The invoice routes to Ana Gallagher (Director) for approval.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2878
+ }
+}

@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Ledgerpoint Information Services invoice to account 6370 (Market Data Services) under cost centre CC9140, with a confidence of 0.919 and no flags raised. Ledgerpoint's own March 2026 FX rates feed was coded to 6370. The same FX rates feed service from Tickstream and Indexa in August 2026 also went to 6370. Approval routes to Elena Castillo as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2527
+ }
+}

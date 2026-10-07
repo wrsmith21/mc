@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Uptime Technical Services invoice to account 6420 (Repairs & Maintenance), cost centre CC4470, with 0.98 confidence. All three prior desk-side support time-and-materials invoices from this supplier (April, May and September 2026) were coded to 6420. Because Olu Anand is the requester, separation-of-duties rules route approval to Tariq Sen (Director, IT \u2013 Workplace Technology).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2021
+ }
+}

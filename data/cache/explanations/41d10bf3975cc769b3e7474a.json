@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Inkwell Graphics invoice to account 6480 (Printing & Reprographics) under cost centre CC6100, with a confidence of 0.928 and no flags raised. All three matching historical invoices for large-format printing at the Waterloo office were coded to 6480, including two recent ones billed under the name \"Inkwell Print.\" Approval is routed to Nikhil Khan as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 4443
+ }
+}

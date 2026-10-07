@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Ironbridge Managed Services invoice to account 6420 (Repairs & Maintenance), cost centre CC4470, with a confidence of 0.889. This matches the three most recent Ironbridge invoices for printer fleet managed service (August and September 2026), all coded to 6420, and no policy flags were raised. The recommendation is awaiting confirmation from Olu Anand, the cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2993
+ }
+}

@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this invoice to account 6420 (Repairs & Maintenance) under cost centre CC4470, with 89% confidence. The three prior Uptime Support Services invoices for laptop screen and keyboard repairs, from July to September 2026, were all coded to 6420, and no policy flags were raised. The recommendation routes to Olu Anand (Cost-centre owner) for approval.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2266
+ }
+}

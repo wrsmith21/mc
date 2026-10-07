@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Vance Holloway & Partners LLP invoice to account 6610 (Legal Fees), cost centre CC5100, with 98% confidence and no flags raised. The three prior invoices shown from this supplier, dated September 2025 to July 2026, were all disbursements on legal matters (M-2156, M-2216, M-2165) and were all coded to 6610. Approval would route to Marcus Feld (Legal Operations) and then Hannah Leclerc (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2073
+ }
+}

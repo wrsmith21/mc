@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Vigil Security Group invoice to account 6450 (Security Services), cost centre CC5240, with a confidence of 0.951. This matches three prior Vigil Security Group invoices for manned guarding at the Chicago office (May 2025, September 2025 and February 2026), all coded to 6450. No flags were raised, and the invoice routes to Paolo Doyle (Director) for approval.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1871
+ }
+}

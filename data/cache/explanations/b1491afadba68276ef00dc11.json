@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Frontline Support Services invoice to account 6420 (Repairs & Maintenance), cost centre CC4420, with 97.3% confidence. All three prior invoices from this supplier for on-site break/fix support (May and August 2026) were coded to 6420, and no policy flags were raised. The recommendation is awaiting confirmation from Sean Santos as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2031
+ }
+}

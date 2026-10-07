@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Tristate Connect invoice to account 6310 (Telecommunications), cost centre CC4420, with 0.98 confidence. The three prior Tristate Connect invoices for the mobile data pooled plan (May, July and August 2026) were all coded to 6310, and no policy flags were raised. Approval routes to Shreya Singh (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2164
+ }
+}

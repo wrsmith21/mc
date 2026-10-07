@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends routing this invoice to vendor onboarding, because Quickfix Plumbing LLC is not in the vendor master. Onboarding (KYC, sanctions screening and bank verification) must be completed first, so no GL account, cost centre or approval chain is proposed at this stage.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1780
+ }
+}

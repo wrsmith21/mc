@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Clearwave Telecom invoice to account 6310 (Telecommunications), cost centre CC4420, with 98% confidence. The three prior Clearwave Telecom invoices for \"Mobile data pooled plan \u2013 Aug 2026\" in the history were all coded to 6310, and no policy flags were raised. Approval is routed to Shreya Singh (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2384
+ }
+}

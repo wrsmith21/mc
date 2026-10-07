@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Riverbend Facility Services invoice to account 6430 (Facilities Services), cost centre CC5220, with 94.7% confidence. All three prior invoices from this supplier for window cleaning at the Waterloo office (October 2025, May 2026 and August 2026) were coded to 6430, and no policy flags were raised. Approval routes to Ana Gallagher (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2174
+ }
+}

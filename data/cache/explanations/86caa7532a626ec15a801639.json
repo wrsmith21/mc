@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Allied Managed Services invoice to account 6420 (Repairs & Maintenance), cost centre CC4470, with 93.8% confidence and no policy flags. The three most recent Allied Managed Services invoices for storage array support renewals were all coded to 6420. Approval routes to Tariq Sen (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 8381
+ }
+}

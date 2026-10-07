@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Dell Technologies invoice to 1540 Computer Hardware (cost centre CC4410) with 94.4% confidence, overriding the vendor default of 6420 Repairs & Maintenance. 55 past invoices for these items were coded to 1540, while 6420 has been used only for the ProSupport hardware service contract (5 invoices), and 3 past lines keyed to the default were reclassified at close an average of 40 days later. The invoice was not raised against a required PO and has been logged to the procurement non-compliance report. It is also routed to Fixed Asset Accounting (10 units \u00d7 $1,845.00; $20,009.03 incl. tax), which keeps the capitalisation decision.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 3658
+ }
+}

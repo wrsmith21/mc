@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Fresh Fork Kitchens invoice to account 6720 (Meals & Catering), cost centre CC5220, with 97.9% confidence. Three prior meeting catering invoices from this supplier were coded to 6720: June, August, and September 2026, covering May through August services. No flags were raised, and the invoice routes to Ana Gallagher (Director) for approval.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2182
+ }
+}

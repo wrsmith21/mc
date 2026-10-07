@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Skyloft Software invoice to account 6350 (Software Subscriptions), cost centre CC4440, with 92.2% confidence and no flags raised. This matches Skyloft's two prior annual platform subscriptions (May 2025 and May 2026), both coded to 6350, and a similar Vantix Analytics platform subscription also booked to 6350. Approval routes to Laura Gallagher (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1882
+ }
+}

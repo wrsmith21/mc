@@ -1,0 +1,8 @@
+{
+ "text": "The agent **recommends** coding this Synapsis Software invoice to account 6350 (Software Subscriptions), cost centre CC9130, with 94.4% confidence. Approval goes to Amara Torres (Director). Note that the two prior Synapsis annual platform subscriptions (May 2025 and May 2026) were coded to account 1310, not 6350; the 6350 match comes from a monthly Vantix Analytics subscription, so the reviewer should confirm which account applies.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 3125
+ }
+}

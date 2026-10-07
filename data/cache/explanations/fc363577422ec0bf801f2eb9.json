@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Oakmont Property Services invoice to account 6430 (Facilities Services), cost centre CC5250, with 97.9% confidence and no policy flags. The three most recent Oakmont invoices, all elevator maintenance contract charges, were posted to 6430. The invoice is awaiting confirmation from Alejandro Larsen (Cost-centre owner); note that the history includes two separate postings for the July 2026 elevator maintenance contract (12 Aug and 19 Aug).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 3321
+ }
+}

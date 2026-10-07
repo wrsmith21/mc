@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Copper Kettle Catering invoice to account 6720 (Meals & Catering) under cost centre CC5250, with 98% confidence. The three prior invoices from this supplier for meeting catering (dated 2026-07-08, 2026-09-02 and 2026-09-10) were all coded to 6720, and no policy flags were raised. Approval routes to Alejandro Larsen as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1736
+ }
+}

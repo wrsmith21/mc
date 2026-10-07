@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Inkwell Print invoice to account 6480 (Printing & Reprographics) under cost centre CC5250, with a confidence of 0.939 and no flags raised. The recommendation is supported by three prior \"Large-format printing \u2013 Pune GBSC\" invoices, from Inkwell Print, Sharpline Press and Printcraft Print, all coded to 6480. Approval is routed to Alejandro Larsen as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1909
+ }
+}

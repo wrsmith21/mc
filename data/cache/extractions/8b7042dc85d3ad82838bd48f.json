@@ -1,0 +1,50 @@
+{
+ "fields": {
+  "vendor_name": "Precision IT Services",
+  "vendor_tax_id": "89-8724699",
+  "invoice_num": "INV-2026-07327",
+  "invoice_date": "2026-10-11",
+  "due_date": "2026-11-10",
+  "currency": "USD",
+  "bill_to": "Accounts Payable \u2013 US Operating Entity (US01), GBSC Finance, O'Fallon, MO",
+  "po_reference": null,
+  "service_period_start": null,
+  "service_period_end": null,
+  "matter": null,
+  "named_contact": null,
+  "remit_account_last4": "2472",
+  "remit_routing_number": "380481996",
+  "lines": [
+   {
+    "description": "Storage array support renewal \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 13754.3,
+    "amount": 13754.3
+   },
+   {
+    "description": "Desk-side support T&M \u2013 12 hours",
+    "qty": 1,
+    "unit_price": 7879.91,
+    "amount": 7879.91
+   },
+   {
+    "description": "Laptop screen and keyboard repairs (60 units)",
+    "qty": 1,
+    "unit_price": 5181.99,
+    "amount": 5181.99
+   }
+  ],
+  "subtotal": 26816.2,
+  "tax": 0,
+  "total": 26816.2,
+  "notes": "Terms: 2/10 NET30. No PO reference printed."
+ },
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 4523,
+  "input_tokens": 3112,
+  "output_tokens": 391,
+  "request_id": "req_011CfoYuufAG7NRpXqF71BJm"
+ }
+}

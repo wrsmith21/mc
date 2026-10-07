@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Brightmind Training Group invoice to account 6910 (Training), cost centre CC4440, with 97.9% confidence. All three prior Brightmind invoices on record were coded to 6910. They are dated May 2025, August 2025 and February 2026, and each was a Cloud Security Essentials course or facilitated workshop. No policy flags were raised, and the invoice is awaiting confirmation from Nathan Barros as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1995
+ }
+}

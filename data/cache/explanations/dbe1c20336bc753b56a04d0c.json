@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Papermill Supplies invoice to account 6460 (Office Supplies) under cost centre CC5200, with a confidence of 0.98. This follows three prior breakroom coffee service invoices from this supplier (June, July and August 2026), all coded to 6460, and no policy flags were raised. The recommendation is awaiting confirmation from Hana Vogel, the cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2279
+ }
+}

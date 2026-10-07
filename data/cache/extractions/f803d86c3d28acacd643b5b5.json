@@ -1,0 +1,44 @@
+{
+ "fields": {
+  "vendor_name": "Copper Kettle Catering",
+  "vendor_tax_id": "77-6915249",
+  "invoice_num": "004476",
+  "invoice_date": "2026-10-08",
+  "due_date": "2026-11-07",
+  "currency": "USD",
+  "bill_to": "Accounts Payable \u2013 US Operating Entity (US01), GBSC Finance, O'Fallon, MO",
+  "po_reference": null,
+  "service_period_start": null,
+  "service_period_end": null,
+  "matter": null,
+  "named_contact": null,
+  "remit_account_last4": "4223",
+  "remit_routing_number": "238264702",
+  "lines": [
+   {
+    "description": "Meeting catering \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 1649.3,
+    "amount": 1649.3
+   },
+   {
+    "description": "Executive dining \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 985.92,
+    "amount": 985.92
+   }
+  ],
+  "subtotal": 2635.22,
+  "tax": 0.0,
+  "total": 2635.22,
+  "notes": "Terms: NET30"
+ },
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 4290,
+  "input_tokens": 3066,
+  "output_tokens": 320,
+  "request_id": "req_011CfoYZ3fXrxSvyxDkKjKwP"
+ }
+}

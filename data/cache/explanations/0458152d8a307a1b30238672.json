@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Skillforge Academy invoice to account 6910 (Training), cost centre CC8120, with a confidence of 0.969. The recommendation follows the supplier's history: the three prior Skillforge Academy invoices, all for certification exam vouchers (July, October and December 2025), were coded to 6910. No flags were raised, and the invoice is awaiting confirmation from Ruth Lewis (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2474
+ }
+}

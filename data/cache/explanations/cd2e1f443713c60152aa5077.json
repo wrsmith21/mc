@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding the Bastion Protective Services invoice to account 6450 (Security Services) under cost centre CC5240, with a confidence of 0.764. The basis is three prior invoices from other vendors (Ironwatch, Guardline and Vigil Security Group) for CCTV maintenance at the Kansas City data centre, all coded to 6450 between June and September 2026. No policy flags were raised, and the recommended approver is Paolo Doyle (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1748
+ }
+}

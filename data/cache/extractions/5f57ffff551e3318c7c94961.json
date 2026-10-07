@@ -1,0 +1,50 @@
+{
+ "fields": {
+  "vendor_name": "Northline Communications",
+  "vendor_tax_id": "79-1607998",
+  "invoice_num": "INV-2026-0917",
+  "invoice_date": "2026-10-01",
+  "due_date": "2026-10-31",
+  "currency": "USD",
+  "bill_to": "Accounts Payable \u2013 US Operating Entity (US01), GBSC Finance, O'Fallon, MO",
+  "po_reference": null,
+  "service_period_start": "2026-09-01",
+  "service_period_end": "2026-09-30",
+  "matter": null,
+  "named_contact": null,
+  "remit_account_last4": "0826",
+  "remit_routing_number": "328519697",
+  "lines": [
+   {
+    "description": "Monthly mobile service \u2013 Sep 2026 (1,212 lines)",
+    "qty": 1,
+    "unit_price": 26840.2,
+    "amount": 26840.2
+   },
+   {
+    "description": "Mobile data pooled plan \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 11215.35,
+    "amount": 11215.35
+   },
+   {
+    "description": "International roaming charges \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 4255.0,
+    "amount": 4255.0
+   }
+  ],
+  "subtotal": 42310.55,
+  "tax": 0.0,
+  "total": 42310.55,
+  "notes": "Titled 'Statement / Invoice'. Account NL-0048817; 1,212 active lines; Autopay: not enrolled. Taxes & surcharges shown as included ($0.00). Terms: NET30. Vendor address ZIP 63486 listed with Kansas City, MO."
+ },
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 4244,
+  "input_tokens": 3196,
+  "output_tokens": 482,
+  "request_id": "req_011CfoYS6YEDoQPvPiBBBAT6"
+ }
+}

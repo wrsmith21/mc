@@ -1,0 +1,8 @@
+{
+ "text": "The agent **recommends fast-tracking** this Allied IT Services invoice to account 6420 (Repairs & Maintenance), cost centre CC4480, with 97.3% confidence and no policy flags raised. This matches the three most recent invoices from this supplier, all for printer fleet managed service and all coded to 6420. Approval routes to Shreya Singh (Director); note that two of those prior invoices (2026-09-03 and 2026-09-11) carry the same \"Aug 2026\" description.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 4817
+ }
+}

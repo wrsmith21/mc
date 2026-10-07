@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Haldane Analytics invoice to account 6350 (Software Subscriptions), cost centre CC6110, with 0.97 confidence. All three prior Haldane Analytics API usage overage invoices (Aug 2025, Nov 2025 and Jan 2026) were coded to 6350, and no policy flags were raised. Approval routes to Ana Sorensen (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1826
+ }
+}

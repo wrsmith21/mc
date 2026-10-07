@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Learnwell Academy invoice to account 6910 (Training) under cost centre CC8120, with 98% confidence. All three prior Learnwell Academy invoices for leadership programme cohorts (June, July and September 2026) were coded to 6910, and no policy flags were raised. The recommendation is awaiting confirmation and routes to Ruth Lewis (Director) for approval.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 3187
+ }
+}

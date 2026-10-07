@@ -1,0 +1,50 @@
+{
+ "fields": {
+  "vendor_name": "Inkwell Press",
+  "vendor_tax_id": "59-1510139",
+  "invoice_num": "007795",
+  "invoice_date": "2026-10-02",
+  "due_date": "2026-12-01",
+  "currency": "USD",
+  "bill_to": "Accounts Payable \u2013 US Operating Entity (US01), GBSC Finance, O'Fallon, MO",
+  "po_reference": null,
+  "service_period_start": null,
+  "service_period_end": null,
+  "matter": null,
+  "named_contact": null,
+  "remit_account_last4": "3789",
+  "remit_routing_number": "198893983",
+  "lines": [
+   {
+    "description": "Event signage \u2013 Customer Advisory Board",
+    "qty": 1,
+    "unit_price": 1217.47,
+    "amount": 1217.47
+   },
+   {
+    "description": "Large-format printing \u2013 Arlington office",
+    "qty": 1,
+    "unit_price": 153.68,
+    "amount": 153.68
+   },
+   {
+    "description": "Business cards (25 sets)",
+    "qty": 1,
+    "unit_price": 710.07,
+    "amount": 710.07
+   }
+  ],
+  "subtotal": 2081.22,
+  "tax": 175.86,
+  "total": 2257.08,
+  "notes": "Terms: NET60. Sales tax charged at MO 8.45%."
+ },
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 4253,
+  "input_tokens": 3095,
+  "output_tokens": 373,
+  "request_id": "req_011CfoYXA8vYmjmv1duyxbeC"
+ }
+}

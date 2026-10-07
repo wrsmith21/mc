@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Hartwell & Pryce LLP invoice to account 6610 (Legal Fees), cost centre CC5100, with 97.8% confidence. This matches the three prior invoices from this supplier for professional fees (matters M-2207, M-2174 and M-2179, dated October 2025 to March 2026), all coded to 6610, and no flags were raised. It is awaiting confirmation and routes for approval to Marcus Feld (Legal Operations) and Hannah Leclerc (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2331
+ }
+}

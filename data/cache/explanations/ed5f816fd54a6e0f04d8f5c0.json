@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Fixwell Managed Services invoice to account 6420 (Repairs & Maintenance) under cost centre CC4470, with 0.89 confidence. All three prior Fixwell invoices for desk-side support time-and-materials work (8, 20 and 60 hours, dated April through August 2026) were coded to 6420, and no policy flags were raised. The recommendation awaits confirmation from Olu Anand as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1832
+ }
+}

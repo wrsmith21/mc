@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Learnwell Academy invoice to account 6910 (Training) under cost centre CC8120, with 98% confidence and no flags raised. All three prior Learnwell Academy invoices on file were for leadership programme cohorts and were coded to 6910, most recently on 2026-09-04. Approval is routed to Ruth Lewis (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1937
+ }
+}

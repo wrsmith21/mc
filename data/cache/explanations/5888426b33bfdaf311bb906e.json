@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding the Mentorly Academy invoice to account 6910 (Training), cost centre CC8120, with 93% confidence. Three comparable IFRS 16 Leases courses from Learnwell Training Group, Pathwise Academy and Brightmind Academy were all posted to 6910, and no policy flags were raised. The recommendation is awaiting confirmation, with approval routed to Ruth Lewis (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1673
+ }
+}

@@ -1,0 +1,50 @@
+{
+ "fields": {
+  "vendor_name": "Harvest Table Catering",
+  "vendor_tax_id": "72-4154593",
+  "invoice_num": "INV-2026-00361",
+  "invoice_date": "2026-10-06",
+  "due_date": "2026-11-05",
+  "currency": "USD",
+  "bill_to": "Accounts Payable \u2013 US Operating Entity (US01), GBSC Finance, O'Fallon, MO",
+  "po_reference": null,
+  "service_period_start": null,
+  "service_period_end": null,
+  "matter": null,
+  "named_contact": null,
+  "remit_account_last4": "7316",
+  "remit_routing_number": "079992453",
+  "lines": [
+   {
+    "description": "Cafeteria subsidy \u2013 Chicago office \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 5421.54,
+    "amount": 5421.54
+   },
+   {
+    "description": "Meeting catering \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 3093.95,
+    "amount": 3093.95
+   },
+   {
+    "description": "Executive dining \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 2094.56,
+    "amount": 2094.56
+   }
+  ],
+  "subtotal": 10610.05,
+  "tax": 0.0,
+  "total": 10610.05,
+  "notes": "Terms: NET30. Line items reference Sep 2026 but no explicit service period dates printed."
+ },
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 3694,
+  "input_tokens": 3109,
+  "output_tokens": 405,
+  "request_id": "req_011CfoYKthg1FmzAuHToQZSe"
+ }
+}
