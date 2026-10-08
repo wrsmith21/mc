@@ -65,3 +65,14 @@
 
 ### Task 10: Hardening and release
 **Files:** `backend/store.py`, `vercel.json`, `.github/workflows/ci.yml`, `web/e2e/*`, `web/src/screens/Operations.tsx`, `web/src/walkthrough.ts`, `docs/RUNBOOK.md`.
+
+---
+
+## Progress (updated 7 Oct, late)
+
+Done and committed: Task 1 (seed), 2 (runtime), 3 (process depth), 4 (investigator), 5 (DS: train.py, model.py, metrics; history noise on a separate RNG), 6 (cases), 7 (roles, policies, audit, SOX pack), 8 (front-end rebuild: SignIn, Inbox, Review + RunConsole, Close, Model, Policies, Audit, Operations; App shell). 79 tests pass; `test_every_invoice_opens_from_cache` waits for the final live precompute.
+
+Remaining:
+- Task 9: Architecture page rebuild — `/api/agents` catalogue (tools grouped by agent), container diagrams with numbered flows + trust boundaries (as-built, Bedrock, Foundry), agent topology, 12 operational sequence diagrams (lifelines, request/return arrows, alt/opt/loop frames, timers, notes) with step-through and operational panels (trigger, SLA, RACI, SOX controls, KPIs, exceptions, systems).
+- Task 10: Neon shared state on Vercel; cold start (lazy-load journals/cash/AR already cached_property; warm cron in vercel.json); GitHub Actions CI (pytest + tsc + lint); Playwright e2e of storyboard; walkthrough rewrite for new flow (sign-in, mailbox, console, Close, Model); RUNBOOK; live precompute (`uv run --env-file .env python -m scripts.precompute`) then deploy.
+- Precompute must also warm investigations (storyboard holds) and should run after all logic changes.
