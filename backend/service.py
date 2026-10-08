@@ -37,6 +37,22 @@ def _key(desc):
     return re.sub(r"\(\d+\)", "", desc.lower()).strip()
 
 
+def _brief(r):
+    """The few fields the queue, inbox and KPIs need: full run records stay out of list views."""
+    c = r.get("coding") or {}
+    return {"intake_id": r["intake_id"], "received_at": r["received_at"], "channel": r["channel"],
+            "vendor": {k: (r.get("vendor") or {}).get(k) for k in ("name", "vendor_id")} if r.get("vendor") else None,
+            "document": {k: r["document"].get(k) for k in ("invoice_num", "currency", "total", "entity", "vendor_name")},
+            "total_usd": r.get("total_usd"), "agent_status": r["agent_status"],
+            "status_after_receipt": r.get("status_after_receipt"),
+            "coding": {k: c.get(k) for k in ("account", "account_name", "cost_centre", "confidence", "band")}
+            | {"default_contrast": bool(c.get("default_contrast"))} if c else None,
+            "flags": [{"code": f["code"], "severity": f["severity"], "title": f["title"]} for f in r["flags"]],
+            "storyboard_key": r.get("storyboard_key"), "scene": r.get("scene"), "pdf": r.get("pdf"),
+            "run": {"started_at": r["run"]["started_at"], "trigger": r["run"]["trigger"]} if r.get("run") else None,
+            "minutes": r.get("minutes")}
+
+
 def _run_summary(r):
     c = r.get("coding") or {}
     run = r["run"]
@@ -171,6 +187,7 @@ class DemoService:
         runs = st.get(f"runs:{iid}") or []
         runs.append(_run_summary(r))
         st.put(f"result:{iid}", r)
+        st.put(f"brief:{iid}", _brief(r))
         st.put(f"runs:{iid}", runs[-20:])
 
     def run(self, intake_id, trigger="manual", actor="E34120", on_event=None, live=True):
@@ -290,10 +307,13 @@ class DemoService:
     def _results(self):
         return {k.split(":", 1)[1]: v for k, v in self.state.prefix("result:").items()}
 
+    def _briefs(self):
+        return {k.split(":", 1)[1]: v for k, v in self.state.prefix("brief:").items()}
+
     def queue(self):
         decisions = self.state.prefix("decision:")
         receipts = self.state.prefix("receipt:")
-        results = self._results()
+        results = self._briefs()
         rows = []
         for iid, item in self.all_items().items():
             r = results.get(iid) or self._skeleton(item)
@@ -321,7 +341,7 @@ class DemoService:
 
     def summary(self):
         rows = self.queue()
-        results = self._results()
+        results = self._briefs()
         worked = [r for r in rows if r["status"] != "NEW"]
         decisions = self.state.prefix("decision:")
         approved = [d for d in decisions.values() if d["status"] == "APPROVED"]
@@ -683,14 +703,15 @@ class DemoService:
     # ---------- work queues: vendor master, onboarding, procurement ----------
     def work(self):
         rows = self.queue()
-        results = self._results()
         callbacks = self.state.prefix("callback:")
         vendor_review, onboarding = [], []
         for r in rows:
-            full = results.get(r["intake_id"])
-            if not full or r["status"] in ("APPROVED", "REJECTED"):
+            if r["status"] in ("APPROVED", "REJECTED", "NEW"):
                 continue
             codes = {f["code"] for f in r["flags"]}
+            if "PAYMENT_RISK" not in codes and r["agent_status"] != "VENDOR_ONBOARDING":
+                continue
+            full = self.latest(r["intake_id"])
             if "PAYMENT_RISK" in codes:
                 vid = r["vendor_id"]
                 change = (self.s.vendors[vid]["bank_change_log"] or [{}])[-1]
