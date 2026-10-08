@@ -9,6 +9,8 @@ import threading
 from datetime import datetime, timezone
 from pathlib import Path
 
+from . import clock
+
 DATABASE_URL = os.environ.get("DATABASE_URL")
 _default_db = Path("/tmp/mc-demo-state.db") if os.environ.get("VERCEL") else \
     Path(__file__).resolve().parent.parent / "data" / "state.db"
@@ -18,7 +20,7 @@ _lock = threading.Lock()
 
 
 def now_iso():
-    return datetime.now(timezone.utc).isoformat(timespec="seconds")
+    return clock.now_iso()
 
 
 class SqliteState:

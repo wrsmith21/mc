@@ -1,19 +1,23 @@
-"""Run the agent over the whole intake queue once and cache the results (fast cold starts on Vercel).
+"""Run the agent the way the overnight batch would, then warm every model cache the demo can touch.
 
-    uv run --env-file .env python -m scripts.precompute          # live: warms Claude extraction/explanation caches
+    uv run --env-file .env python -m scripts.precompute          # live: Claude reads and explains, results cached
     DEMO_MODE=replay uv run python -m scripts.precompute         # offline: deterministic template reasons
+
+1. Invoices received before this morning's mailbox are worked as the overnight batch and saved as their first run.
+2. A throwaway demo state is reset and every invoice is run as a reviewer would run it, so opening or re-running any
+   invoice is served from cache. The storyboard follow-ups (receipt confirmed, a correction learned) are run too.
 """
 import json
 import os
 import tempfile
 import time
 
-# The warm pass below seeds a throwaway state store, never the local or shared demo state.
+# The warm pass seeds a throwaway state store, never the local or shared demo state.
 os.environ["STATE_DB"] = os.path.join(tempfile.mkdtemp(), "state.db")
 os.environ.pop("DATABASE_URL", None)
 
-from backend.engine.pipeline import Agent  # noqa: E402
-from backend.service import DemoService  # noqa: E402
+from backend.agents.supervisor import Supervisor  # noqa: E402
+from backend.service import MAILBOX_CUTOFF, DemoService  # noqa: E402
 from backend.state import BufferedState  # noqa: E402
 from backend.store import CACHE, get_store  # noqa: E402
 
@@ -25,27 +29,30 @@ class _Empty:
 
 def main():
     s = get_store()
-    agent = Agent(s, BufferedState(_Empty()))
+    agent = Supervisor(s, BufferedState(_Empty()))
     t = time.time()
     results = {}
     for item in s.intake:
-        results[item["intake_id"]] = agent.process(item, live=bool(item.get("storyboard_key")))
+        if item["received_at"] < MAILBOX_CUTOFF:
+            results[item["intake_id"]] = agent.process(item, live=bool(item.get("storyboard_key")), trigger="batch")
     CACHE.mkdir(parents=True, exist_ok=True)
     (CACHE / "agent_results.json").write_text(json.dumps(results, default=str))
-    sources = {}
-    for r in results.values():
-        sources[r["extraction"]["source"]] = sources.get(r["extraction"]["source"], 0) + 1
-    print(f"{len(results)} results in {time.time() - t:.1f}s · extraction sources {sources}")
+    print(f"overnight batch: {len(results)} invoices in {time.time() - t:.1f}s")
 
-    # Seeded receipts and corrections change some findings, so warm the cache from the state the demo starts in.
     t = time.time()
     svc = DemoService()
     svc.reset()
-    reasons = {}
+    sources = {}
     for iid in svc.items:
-        src = svc.result(iid)["explanation_meta"]["source"]
-        reasons[src] = reasons.get(src, 0) + 1
-    print(f"warmed {len(svc.items)} invoices from the starting state in {time.time() - t:.1f}s · reason sources {reasons}")
+        src = svc.run(iid, "manual")["explanation_meta"]["source"]
+        sources[src] = sources.get(src, 0) + 1
+    legal, l1, l2 = svc.by_key["legal"], svc.by_key["learning_1"], svc.by_key["learning_2"]
+    svc.confirm_receipt(legal, svc.latest(legal)["requester"]["person"]["id"], "Contract review delivered")
+    svc.run(legal)
+    svc.submit(l1, "override", "E34120", "Chargers are for IT end-user laptops",
+               {"account": "6360", "cost_centre": "CC4410"})
+    svc.run(l2)
+    print(f"warmed {len(svc.items)} invoices from the starting state in {time.time() - t:.1f}s · reason sources {sources}")
 
 
 if __name__ == "__main__":

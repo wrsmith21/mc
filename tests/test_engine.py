@@ -19,7 +19,7 @@ def svc():
 
 @pytest.fixture(scope="module")
 def story(svc):
-    return {k: svc.result(iid) for k, iid in svc.by_key.items()}
+    return {k: svc.run(iid) for k, iid in svc.by_key.items()}
 
 
 def codes(r):
@@ -112,10 +112,11 @@ def test_receipt_approval_and_export_flow(svc):
 
 def test_override_teaches_the_next_invoice(svc):
     first, second = svc.by_key["learning_1"], svc.by_key["learning_2"]
-    before = svc.result(second)["coding"]["lines"][0]["rec"]
+    before = svc.run(second)["coding"]["lines"][0]["rec"]
     svc.submit(first, "override", "E34120", "Chargers are for IT end-user laptops",
                {"account": "6360", "cost_centre": "CC4410"})
-    after = svc.result(second)["coding"]["lines"][0]["rec"]
+    assert svc.result(second)["stale"], "the earlier run must say a correction was learned after it"
+    after = svc.run(second)["coding"]["lines"][0]["rec"]
     assert after["cost_centre"] == "CC4410" and after["confidence"] > before["confidence"]
 
 
@@ -124,7 +125,7 @@ def test_every_invoice_opens_from_cache(svc):
     svc.reset()
     misses = []
     for iid in svc.items:
-        r = svc.result(iid)
+        r = svc.run(iid)
         if r["explanation_meta"]["source"] != "cache":
             misses.append((iid, "reason"))
         if r.get("pdf") and r["extraction"]["source"] != "cache":

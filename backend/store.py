@@ -32,6 +32,13 @@ class Store:
         self.coa = {a["account"]: a for a in self.reference["chart_of_accounts"]}
         self.matters = {m["matter"]: m for m in self.reference["legal_matters"]}
         self.demo_date = self.reference["demo_date"]
+        self.receipt_evidence = _load("receipt_evidence")
+        self.contracts = _load("contracts")
+        self.letters = {e["engagement_letter"]: e for e in self.contracts["engagement_letters"]}
+        self.letters_by_vendor = {e["vendor_id"]: e for e in self.contracts["engagement_letters"]}
+        self.matter_budgets = {m["matter"]: m for m in self.contracts["matter_budgets"]}
+        self.sows = {s["sow"]: s for s in self.contracts["statements_of_work"]}
+        self.entities = {e["code"]: e for e in self.reference["entities"]}
 
         self.history_by_vendor = defaultdict(list)
         self.lines = []  # flattened history lines with invoice context, final (corrected) coding

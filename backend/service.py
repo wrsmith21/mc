@@ -1,29 +1,26 @@
-"""Demo service: queue, live runs, human decisions, audit trail, KPIs, anomaly layer, exports."""
+"""Demo service: intake, agent runs, human decisions, audit trail, KPIs, anomaly layer, exports."""
 import json
+import queue as queue_mod
 import re
+import threading
 import time
 import uuid
 from collections import Counter, defaultdict
 from datetime import datetime, timedelta
 
+from . import clock
+from .agents.supervisor import STATUS_LABEL, Supervisor
 from .engine import exports
 from .engine.anomaly import AnomalyLayer
-from .engine.pipeline import STATUS_LABEL, Agent
 from .state import BufferedState, get_state, now_iso
 from .store import CACHE, get_store
 
-STATUS_LABEL = {**STATUS_LABEL, "IN_APPROVAL": "In approval"}
-NOT_APPROVABLE = {"HELD", "MATCH_TO_PO", "VENDOR_ONBOARDING", "AWAITING_CONFIRMATION"}
+NOT_APPROVABLE = {"HELD", "MATCH_TO_PO", "VENDOR_ONBOARDING", "AWAITING_CONFIRMATION", "ROUTED_OUT", "NEW"}
 LIVE_DAY = "2026-10-14"  # invoices received from this day on are still open at the start of the demo
-
-# Storyboard state at the start of the demo: which receipts are already confirmed, and by whom/when.
+MAILBOX_CUTOFF = "2026-10-15T06:00"  # received after this: this morning's mailbox, not yet worked by the agent
+# Storyboard state at the start of the demo for invoices the agent worked before today.
 STORYBOARD_RECEIPTS = {
-    "dell": ("2026-10-08T15:20", "Delivery received at Building 2 Dock B; serials scanned into asset register."),
-    "saas": ("2026-10-09T16:45", "Renewal order form OF-2026-114 signed; service continuing."),
-    "sod": ("2026-10-13T17:30", "Workshop delivered 22–23 Sep; outputs received."),
-    "po_breach_marketing": ("2026-10-09T15:05", "Q4 creative delivered and in market."),
     "learning_1": ("2026-10-13T18:40", "Chargers received by IT End-User Services."),
-    "learning_2": ("2026-10-14T09:10", "Chargers received by IT End-User Services."),
 }
 
 
@@ -35,37 +32,83 @@ def _key(desc):
     return re.sub(r"\(\d+\)", "", desc.lower()).strip()
 
 
+def _run_summary(r):
+    c = r.get("coding") or {}
+    run = r["run"]
+    return {"run_id": run["run_id"], "trigger": run["trigger"], "actor": run["actor"],
+            "started_at": run["started_at"], "ms": run.get("ms"), "tool_calls": run.get("tool_calls"),
+            "status": r["agent_status"], "account": c.get("account"), "cost_centre": c.get("cost_centre"),
+            "confidence": c.get("confidence"), "flags": sorted(f["code"] for f in r["flags"]),
+            "chain": [s["person"]["name"] for s in (r.get("approval") or {}).get("steps", [])],
+            "receipt_rule": (r.get("receipt") or {}).get("rule"), "explanation_source":
+                (r.get("explanation_meta") or {}).get("source")}
+
+
 class DemoService:
     def __init__(self):
         self.s = get_store()
         self.state = get_state()
-        self.agent = Agent(self.s, self.state)
+        self.agent = Supervisor(self.s, self.state)
         self.anomaly_layer = AnomalyLayer(self.s, self.agent.rec)
         self.items = {q["intake_id"]: q for q in self.s.intake}
         self.by_key = {q["storyboard_key"]: q["intake_id"] for q in self.s.intake if q.get("storyboard_key")}
-        self.base = self._load_base()
         self._anomaly = None
+        self._lock = threading.Lock()
         if not self.state.get("meta:seeded"):
             self.reset()
+        clock.set_offset_hours((self.state.get("meta:clock") or {}).get("offset_hours", 0))
 
-    # ---------- base results ----------
-    def _load_base(self):
+    # ---------- results & runs ----------
+    def _batch_results(self):
         path = CACHE / "agent_results.json"
         if path.exists():
             return json.loads(path.read_text())
-        return {iid: self.agent.process(item) for iid, item in self.items.items()}
+        return {iid: self.agent.process(item, trigger="batch")
+                for iid, item in self.items.items() if item["received_at"] < MAILBOX_CUTOFF}
 
     def all_items(self):
         items = dict(self.items)
-        for k, w in self.state.prefix("wildcard:").items():
+        for w in self.state.prefix("wildcard:").values():
             items[w["intake_id"]] = w
         return items
 
-    def result(self, intake_id, live=False):
+    def latest(self, intake_id):
+        return self.state.get(f"result:{intake_id}")
+
+    def _usd(self, amount, currency):
+        if currency == "USD":
+            return round(amount, 2)
+        eur, inr = self.s.reference["fx_monthly"]["2026-10"]
+        return round(amount * eur, 2) if currency == "EUR" else round(amount / inr, 2)
+
+    def _skeleton(self, item):
+        doc = item["document"]
+        return {"intake_id": item["intake_id"], "received_at": item["received_at"], "channel": item["channel"],
+                "sender": item["sender"], "subject": item["subject"], "storyboard_key": item.get("storyboard_key"),
+                "scene": item.get("scene"), "pdf": item.get("pdf"), "document": doc, "extraction": None,
+                "total_usd": self._usd(doc["total"], doc["currency"]), "agent_status": "NEW", "status": "NEW",
+                "status_label": STATUS_LABEL["NEW"], "flags": [], "trace": [], "run": None, "coding": None,
+                "explanation": None, "explanation_meta": None, "next_action": "Run the agent to work this invoice."}
+
+    def result(self, intake_id):
         item = self.all_items()[intake_id]
-        r = self.agent.process(item, live=live)
-        self.base[intake_id] = r
-        return self._overlay(r)
+        r = self.latest(intake_id) or self._skeleton(item)
+        out = self._overlay(r)
+        out["runs"] = self.state.get(f"runs:{intake_id}") or []
+        out["stale"] = self._stale(r)
+        return out
+
+    def _stale(self, r):
+        """Why the latest run may no longer reflect the facts: something changed after it finished."""
+        run = r.get("run")
+        if not run or not r.get("vendor") or not r["vendor"].get("vendor_id"):
+            return None
+        done = run.get("finished_at") or run["started_at"]
+        for lesson in self.state.prefix(f"learned:{r['vendor']['vendor_id']}:").values():
+            if lesson["at"] >= done and lesson.get("source_invoice") != r["document"].get("invoice_num"):
+                return f"A correction for this supplier was learned at {lesson['at'][11:16]}, after this run. " \
+                       f"Re-run the agent to apply it."
+        return None
 
     def _overlay(self, r, decisions=None, receipts=None):
         iid = r["intake_id"]
@@ -81,15 +124,110 @@ class DemoService:
         out["decision"], out["receipt_task"] = decision, task
         return out
 
+    def _diff(self, prev, new):
+        if not prev or not prev.get("run"):
+            return []
+        a, b = _run_summary(prev), _run_summary(new)
+        labels = {"status": "Status", "account": "Account", "cost_centre": "Cost centre", "confidence": "Confidence",
+                  "flags": "Flags", "chain": "Approval chain", "receipt_rule": "Receipt"}
+        out = []
+        for k, label in labels.items():
+            if a[k] != b[k]:
+                out.append({"field": label, "before": a[k], "after": b[k]})
+        if not out:
+            return [{"field": "No change", "before": None, "after": None,
+                     "cause": "Same inputs, same policy, same result."}]
+        task = self.state.get(f"receipt:{new['intake_id']}")
+        vid = (new.get("vendor") or {}).get("vendor_id")
+        learned = [l for l in self.state.prefix(f"learned:{vid}:").values() if l["at"] > prev["run"]["started_at"]] \
+            if vid else []
+        if task and task.get("status") == "confirmed" and task["confirmed_at"] > prev["run"]["started_at"]:
+            cause = f"Receipt confirmed by {task['confirmed_by_name']} at {task['confirmed_at'][11:16]}"
+        elif learned:
+            cause = f"Correction learned from invoice {learned[-1]['source_invoice']} ({learned[-1]['by']})"
+        else:
+            cause = "Inputs or reference data changed since the last run"
+        for d in out:
+            d["cause"] = cause
+        return out
+
+    def _save(self, r, state=None):
+        st = state or self.state
+        iid = r["intake_id"]
+        runs = st.get(f"runs:{iid}") or []
+        runs.append(_run_summary(r))
+        st.put(f"result:{iid}", r)
+        st.put(f"runs:{iid}", runs[-20:])
+
+    def run(self, intake_id, trigger="manual", actor="E34120", on_event=None, live=True):
+        item = self.all_items()[intake_id]
+        with self._lock:
+            prev = self.latest(intake_id)
+            r = self.agent.process(item, live=live, trigger=trigger, actor=actor, on_event=on_event)
+            r["run"]["previous_run_id"] = prev["run"]["run_id"] if prev and prev.get("run") else None
+            r["run"]["diff"] = self._diff(prev, r)
+            self._save(r)
+            self.state.add_event(intake_id, actor if trigger == "manual" else "AGENT", "RUN_COMPLETED", {
+                "run_id": r["run"]["run_id"], "trigger": trigger, "ms": r["run"]["ms"],
+                "tool_calls": r["run"]["tool_calls"], "status": r["agent_status"]})
+            self._log_run(r)
+        return self.result(intake_id)
+
+    def run_events(self, intake_id, actor="E34120", live=True):
+        """Stream the run as it happens: each step and tool call is sent the moment it completes."""
+        events = queue_mod.Queue()
+
+        def work():
+            try:
+                events.put({"type": "result", "result": self.run(intake_id, "manual", actor, events.put, live)})
+            except Exception as e:  # surfaced to the client, never swallowed
+                events.put({"type": "error", "message": f"{type(e).__name__}: {e}"})
+            finally:
+                events.put(None)
+
+        yield {"type": "start", "intake_id": intake_id, "steps": ["intake", "read", "supplier", "validity", "po",
+                                                                   "coding", "treatment", "receipt", "risk",
+                                                                   "approval", "decide"]}
+        threading.Thread(target=work, daemon=True).start()
+        while True:
+            ev = events.get()
+            if ev is None:
+                return
+            yield ev
+
+    def new_invoices(self):
+        return sorted([iid for iid in self.all_items() if not self.latest(iid)],
+                      key=lambda i: self.all_items()[i]["received_at"])
+
+    def run_mailbox(self, actor="E34120"):
+        """Work every invoice still waiting in the mailbox, streaming one event per invoice."""
+        todo = self.new_invoices()
+        yield {"type": "start", "count": len(todo)}
+        t = time.perf_counter()
+        for iid in todo:
+            try:
+                r = self.run(iid, "mailbox", actor)
+                yield {"type": "invoice", "intake_id": iid, "status": r["status"], "status_label": r["status_label"],
+                       "ms": r["run"]["ms"], "tool_calls": r["run"]["tool_calls"],
+                       "vendor": (r.get("vendor") or {}).get("name") or r["document"].get("vendor_name")}
+            except Exception as e:
+                yield {"type": "error", "intake_id": iid, "message": f"{type(e).__name__}: {e}"}
+        yield {"type": "done", "count": len(todo), "ms": round((time.perf_counter() - t) * 1000)}
+
+    def agents(self):
+        return {"tools": self.agent.registry.describe()}
+
     # ---------- queue & summary ----------
+    def _results(self):
+        return {k.split(":", 1)[1]: v for k, v in self.state.prefix("result:").items()}
+
     def queue(self):
         decisions = self.state.prefix("decision:")
         receipts = self.state.prefix("receipt:")
+        results = self._results()
         rows = []
-        items = self.all_items()
-        for iid in items:
-            r = self.base.get(iid) or self.agent.process(items[iid])
-            self.base[iid] = r
+        for iid, item in self.all_items().items():
+            r = results.get(iid) or self._skeleton(item)
             o = self._overlay(r, decisions, receipts)
             c = o.get("coding") or {}
             rows.append({"intake_id": iid, "received_at": o["received_at"], "channel": o["channel"],
@@ -103,32 +241,37 @@ class DemoService:
                          "band": c.get("band"), "flags": [{"code": f["code"], "severity": f["severity"],
                                                            "title": f["title"]} for f in o["flags"]],
                          "storyboard_key": o.get("storyboard_key"), "scene": o.get("scene"),
-                         "pdf": bool(o.get("pdf")), "wildcard": iid.startswith("WC-")})
+                         "pdf": bool(o.get("pdf")), "wildcard": iid.startswith("WC-"),
+                         "worked_at": (o.get("run") or {}).get("started_at"),
+                         "trigger": (o.get("run") or {}).get("trigger")})
         rows.sort(key=lambda x: x["received_at"], reverse=True)
         return rows
 
     def summary(self):
         rows = self.queue()
+        results = self._results()
+        worked = [r for r in rows if r["status"] != "NEW"]
         decisions = self.state.prefix("decision:")
         approved = [d for d in decisions.values() if d["status"] == "APPROVED"]
         touchless = [d for d in approved if not d.get("override")]
         by_status = Counter(r["status"] for r in rows)
-        agent_status = Counter(r["agent_status"] for r in rows)
-        base = sum(self.base[r["intake_id"]]["minutes"]["baseline"] for r in rows)
-        agent = sum(self.base[r["intake_id"]]["minutes"]["agent"] for r in rows)
+        agent_status = Counter(r["agent_status"] for r in worked)
+        base = sum(results[r["intake_id"]]["minutes"]["baseline"] for r in worked)
+        agent = sum(results[r["intake_id"]]["minutes"]["agent"] for r in worked)
         held = [r for r in rows if r["status"] in ("HELD", "VENDOR_ONBOARDING")]
-        prevented = [r for r in rows if (self.base[r["intake_id"]].get("coding") or {}).get("default_contrast")]
+        prevented = [r for r in worked if (results[r["intake_id"]].get("coding") or {}).get("default_contrast")]
         breaches = [r for r in rows if any(f["code"] == "PO_POLICY" for f in r["flags"])]
         cycle = []
         for iid, d in decisions.items():
             if d["status"] == "APPROVED" and d.get("approvals"):
-                rec = self.base.get(iid.split(":", 1)[1])
+                rec = results.get(iid.split(":", 1)[1])
                 if rec:
                     t0 = datetime.fromisoformat(rec["received_at"])
                     t1 = datetime.fromisoformat(d["approvals"][-1]["at"][:16])
                     cycle.append((t1 - t0).total_seconds() / 86400)
         return {
-            "processed": len(rows), "by_status": by_status, "agent_status": agent_status,
+            "processed": len(worked), "received": len(rows), "new": by_status["NEW"],
+            "by_status": by_status, "agent_status": agent_status,
             "fast_tracked": agent_status["FAST_TRACK"], "held": len(held),
             "held_value_usd": round(sum(r["total_usd"] for r in held), 2),
             "approved": len(approved), "touchless": len(touchless),
@@ -136,7 +279,7 @@ class DemoService:
             "miscodings_prevented": len(prevented),
             "miscodings_prevented_value": round(sum(r["total_usd"] for r in prevented), 2),
             "po_policy_breaches": len(breaches), "po_breach_value": round(sum(r["total_usd"] for r in breaches), 2),
-            "open_po_matches": agent_status["MATCH_TO_PO"],
+            "open_po_matches": agent_status["MATCH_TO_PO"], "routed_out": agent_status["ROUTED_OUT"],
             "awaiting_confirmation": by_status["AWAITING_CONFIRMATION"],
             "hours_saved": round((base - agent) / 60, 1), "baseline_hours": round(base / 60, 1),
             "avg_cycle_days": round(sum(cycle) / len(cycle), 1) if cycle else None, "baseline_cycle_days": 6.5,
@@ -146,32 +289,9 @@ class DemoService:
                         "receipts": len(self.s.receipts)},
         }
 
-    # ---------- live run (SSE) ----------
-    def run_events(self, intake_id, pace=1.0, actor="E34120"):
-        item = self.all_items()[intake_id]
-        yield {"type": "start", "intake_id": intake_id, "steps": ["intake", "read", "supplier", "validity", "po",
-                                                                   "coding", "treatment", "receipt", "risk", "approval"]}
-        yield {"type": "stage", "key": "read", "status": "running",
-               "label": "Reading the invoice" + (" with Claude" if item.get("pdf") else "")}
-        t = time.time()
-        r = self.agent.process(item, live=True)
-        self.base[intake_id] = r
-        elapsed = time.time() - t
-        delays = {"intake": 0.35, "read": 0.9, "supplier": 0.8, "validity": 0.8, "po": 0.6, "coding": 1.3,
-                  "treatment": 0.7, "receipt": 0.8, "risk": 0.8, "approval": 0.8}
-        for step in r["trace"]:
-            d = delays.get(step["key"], 0.5) * pace
-            if step["key"] == "read":
-                d = max(0.0, d - elapsed)
-            time.sleep(d)
-            yield {"type": "step", **step}
-        self._log_run(r, actor)
-        time.sleep(0.3 * pace)
-        yield {"type": "result", "result": self._overlay(r)}
-
-    def _log_run(self, r, actor, ts=None):
+    def _log_run(self, r, ts=None):
         iid = r["intake_id"]
-        ex = r["extraction"]
+        ex = r.get("extraction") or {}
         self.state.add_event(iid, "AGENT", "EXTRACTED", {
             "source": ex.get("source"), "model": ex.get("model"), "latency_ms": ex.get("latency_ms"),
             "fields": {k: r["document"].get(k) for k in ("vendor_name", "invoice_num", "invoice_date", "currency",
@@ -193,7 +313,9 @@ class DemoService:
 
     # ---------- receipt confirmation ----------
     def request_receipt(self, intake_id, actor="AGENT", ts=None):
-        r = self.base.get(intake_id) or self.result(intake_id)
+        r = self.latest(intake_id)
+        if not r:
+            raise ValueError("Run the agent before requesting receipt")
         person = (r.get("requester") or {}).get("person")
         if not person:
             raise ValueError("No requester identified")
@@ -228,7 +350,10 @@ class DemoService:
 
     # ---------- human decisions ----------
     def _current(self, intake_id, seeding):
-        return self._overlay(self.base[intake_id]) if seeding else self.result(intake_id)
+        r = self.latest(intake_id)
+        if not r:
+            raise ValueError("Run the agent first: this invoice has not been worked")
+        return self._overlay(r) if seeding else self.result(intake_id)
 
     def submit(self, intake_id, action, actor, reason=None, override=None, ts=None):
         seeding = ts is not None
@@ -352,7 +477,8 @@ class DemoService:
     # ---------- exports ----------
     def export_ap(self):
         approved = [iid.split(":", 1)[1] for iid, d in self.state.prefix("decision:").items() if d["status"] == "APPROVED"]
-        results = [self._overlay(self.base[i]) for i in approved if i in self.base and self.base[i].get("coding")]
+        results = self._results()
+        results = [self._overlay(results[i]) for i in approved if i in results and results[i].get("coding")]
         return exports.ap_interface(self.s, results)
 
     def export_amortisation(self, intake_id):
@@ -365,7 +491,7 @@ class DemoService:
         return exports.gl_reclass(self.s, self.anomalies()["journals"]["flags"])
 
     def export_procurement(self):
-        return exports.procurement_report([self.base[i] for i in self.base if self.base[i].get("coding")])
+        return exports.procurement_report([r for r in self._results().values() if r.get("coding")])
 
     # ---------- wildcard (live, uncached) ----------
     def add_wildcard(self, pdf_bytes, filename, received_by="EMAIL"):
@@ -388,7 +514,7 @@ class DemoService:
         if fields.get("service_period_start") and fields.get("service_period_end"):
             doc["service_period"] = {"start": fields["service_period_start"], "end": fields["service_period_end"]}
         iid = f"WC-{uuid.uuid4().hex[:6].upper()}"
-        item = {"intake_id": iid, "received_at": datetime.now().isoformat(timespec="minutes"), "channel": received_by,
+        item = {"intake_id": iid, "received_at": clock.now_iso()[:16], "channel": received_by,
                 "sender": "Live upload", "subject": filename, "storyboard_key": "wildcard", "scene": None,
                 "vendor_hint": None, "pdf": None, "document": doc,
                 "extraction_override": {**meta, "fields": fields}}
@@ -401,16 +527,33 @@ class DemoService:
         real = self.state
         real.reset()
         self._anomaly = None
-        self.base = {k: v for k, v in self._load_base().items()}
+        clock.set_offset_hours(0)
         buffered = BufferedState(real)
-        self.state = self.agent.state = buffered
+        self.state = buffered
+        self.agent.bind_state(buffered)
         try:
-            for r in sorted(self.base.values(), key=lambda x: x["received_at"]):
-                if not r["intake_id"].startswith("WC-"):
-                    self._seed(r)
+            batch = self._batch_results()
+            for item in sorted(self.items.values(), key=lambda q: q["received_at"]):
+                iid = item["intake_id"]
+                recv = datetime.fromisoformat(item["received_at"])
+                self.state.add_event(iid, "AGENT", "RECEIVED", {"channel": item["channel"], "from": item["sender"],
+                                                                 "subject": item["subject"]},
+                                     recv.isoformat(timespec="minutes"))
+                r = batch.get(iid)
+                if not r or item["received_at"] >= MAILBOX_CUTOFF:
+                    continue
+                at = (recv + timedelta(minutes=1)).isoformat(timespec="seconds")
+                r["run"].update(trigger="batch", actor="AGENT", started_at=at, finished_at=at,
+                                previous_run_id=None, diff=[])
+                self._save(r)
+                self.state.add_event(iid, "AGENT", "RUN_COMPLETED", {
+                    "run_id": r["run"]["run_id"], "trigger": "batch", "ms": r["run"]["ms"],
+                    "tool_calls": r["run"]["tool_calls"], "status": r["agent_status"]}, at[:16])
+                self._seed(r)
             buffered.put("meta:seeded", {"at": now_iso()})
         finally:
-            self.state = self.agent.state = real
+            self.state = real
+            self.agent.bind_state(real)
         buffered.flush()
 
     def _alternate_cc(self, r):
@@ -424,10 +567,8 @@ class DemoService:
         iid, key = r["intake_id"], r.get("storyboard_key")
         recv = datetime.fromisoformat(r["received_at"])
         ts = lambda h: (recv + timedelta(hours=h)).isoformat(timespec="minutes")
-        self.state.add_event(iid, "AGENT", "RECEIVED", {"channel": r["channel"], "from": r["sender"],
-                                                         "subject": r["subject"]}, ts(0))
-        self._log_run(r, "AGENT", ts(0.02))
-        if r["agent_status"] in ("HELD", "MATCH_TO_PO", "VENDOR_ONBOARDING"):
+        self._log_run(r, ts(0.02))
+        if r["agent_status"] in ("HELD", "MATCH_TO_PO", "VENDOR_ONBOARDING", "ROUTED_OUT"):
             return
         needs_receipt = (r.get("receipt") or {}).get("required")
         if key:

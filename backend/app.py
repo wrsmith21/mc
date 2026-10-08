@@ -95,18 +95,36 @@ def invoice(intake_id: str):
         raise HTTPException(404, "Unknown invoice")
 
 
-@app.get("/api/invoices/{intake_id}/run")
-def run(intake_id: str, pace: float = 1.0):
-    s = svc()
-    if intake_id not in s.all_items():
-        raise HTTPException(404, "Unknown invoice")
-
+def _sse(events):
     def stream():
-        for ev in s.run_events(intake_id, pace=max(0.0, min(pace, 3.0))):
+        for ev in events:
             yield f"data: {json.dumps(ev, default=str)}\n\n"
 
     return StreamingResponse(stream(), media_type="text/event-stream",
                              headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+
+
+@app.get("/api/invoices/{intake_id}/run")
+def run(intake_id: str, actor: str = "E34120"):
+    s = svc()
+    if intake_id not in s.all_items():
+        raise HTTPException(404, "Unknown invoice")
+    return _sse(s.run_events(intake_id, actor=actor))
+
+
+@app.get("/api/invoices/{intake_id}/runs")
+def runs(intake_id: str):
+    return svc().state.get(f"runs:{intake_id}") or []
+
+
+@app.get("/api/mailbox/run")
+def run_mailbox(actor: str = "E34120"):
+    return _sse(svc().run_mailbox(actor=actor))
+
+
+@app.get("/api/agents")
+def agents():
+    return svc().agents()
 
 
 @app.get("/api/invoices/{intake_id}/audit")
