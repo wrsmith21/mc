@@ -157,9 +157,11 @@ export default function App() {
           </div>
           <div className="spacer" />
           <span className="clock" title="Demo clock">{meta?.now ? `${meta.now.slice(0, 10)} ${meta.now.slice(11, 16)}` : ''}</span>
-          <span className={`mode ${meta?.mode === 'live' ? '' : 'replay'}`} title={meta?.model}>
-            {meta?.mode === 'live' ? 'Live · Claude connected' : 'Replay mode'}
-          </span>
+          {meta?.mode && (
+            <span className={`mode ${meta.mode === 'live' ? '' : 'replay'}`} title={meta.model}>
+              {meta.mode === 'live' ? 'Live · Claude connected' : 'Replay mode'}
+            </span>
+          )}
           <label className="pace" title="Spaces out agent events on screen for presenting. The agent itself never waits.">
             <input type="checkbox" checked={slow} onChange={toggleSlow} /> Presentation pace
           </label>
