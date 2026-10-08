@@ -38,8 +38,15 @@ class Recommender:
         self.key_lines = [groups[k] for k in self.keys]
         self.index = TfIdfIndex(self.keys)
         pol = store.policies
-        self.cap_rules = {r["account"]: r for r in pol["capitalisation"]["rules"]}
-        self.prepaid = pol["prepaid"]
+
+
+    @property
+    def cap_rules(self):  # read live: an admin can change the threshold
+        return {r["account"]: r for r in self.s.policies["capitalisation"]["rules"]}
+
+    @property
+    def prepaid(self):
+        return self.s.policies["prepaid"]
 
     # ---------- evidence ----------
     def similar_lines(self, vendor_id, description):

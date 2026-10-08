@@ -10,7 +10,7 @@ import io
 import re
 from datetime import date, datetime, timedelta
 
-from . import clock
+from . import auth, clock
 from .engine.exports import GL_COLS
 from .state import now_iso
 
@@ -181,6 +181,7 @@ class Cases:
 
     def prepare(self, case_id, by, note="", account=None):
         c = self.get(case_id)
+        self.svc.authorize(by, f"case_prepare_{c['source']}", case_id)
         if c["status"] != "Open":
             raise ValueError(f"Case is {c['status'].lower()}, not open")
         original = c["finding"].get("created_by") or c["finding"].get("applied_by")
@@ -195,6 +196,7 @@ class Cases:
 
     def approve(self, case_id, by, note=""):
         c = self.get(case_id)
+        self.svc.authorize(by, f"case_approve_{c['source']}", case_id)
         if c["status"] != "Pending approval":
             raise ValueError("Only a prepared case can be approved")
         names = {c["preparer"]: "prepared this correction"}
@@ -210,6 +212,7 @@ class Cases:
 
     def send_back(self, case_id, by, reason):
         c = self.get(case_id)
+        self.svc.authorize(by, f"case_approve_{c['source']}", case_id)
         if c["status"] != "Pending approval":
             raise ValueError("Only a prepared case can be sent back")
         c.update(status="Open", preparer=None)
@@ -221,6 +224,9 @@ class Cases:
         if reason not in DISMISS_REASONS:
             raise ValueError("Unknown dismissal reason")
         c = self.get(case_id)
+        if not (auth.allowed(self.s, by, f"case_prepare_{c['source']}") or
+                auth.allowed(self.s, by, f"case_approve_{c['source']}")):
+            self.svc.authorize(by, f"case_prepare_{c['source']}", case_id)
         if c["status"] not in ("Open", "Pending approval"):
             raise ValueError(f"Case is {c['status'].lower()}")
         c.update(status="Dismissed", dismissed={"reason": reason, "label": DISMISS_REASONS[reason], "note": note})
@@ -258,6 +264,7 @@ class Cases:
 
     # ---------- export to the ledger ----------
     def export(self, kind, by):
+        self.svc.authorize(by, f"case_export_{kind}")
         cases = [c for c in self.all() if c["status"] == "Approved" and
                  (c["source"] in ("journals", "ap_ledger") if kind == "gl" else c["source"] == "cash")
                  and c["fix"]["lines"]]

@@ -6,9 +6,10 @@ import os
 
 from fastapi import Body, FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse, StreamingResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTextResponse, StreamingResponse
 
-from . import clock, llm
+from . import auth, clock, llm
+from . import model as ds
 from .integrations import external
 from .service import DemoService
 from .store import ROOT
@@ -38,6 +39,21 @@ async def passcode(request: Request, call_next):
         if not hmac.compare_digest(supplied, TOKEN):
             return JSONResponse({"detail": "passcode required"}, status_code=401)
     return await call_next(request)
+
+
+@app.exception_handler(PermissionError)
+async def forbidden(request: Request, exc: PermissionError):
+    return JSONResponse({"detail": str(exc)}, status_code=403)
+
+
+def who(request: Request, fallback=None):
+    """The signed-in person acts; a body or query actor is only used when nobody is signed in (scripts, tests)."""
+    user = auth.verify(request.cookies.get("mc_user"))
+    if user:
+        return user
+    if fallback:
+        return fallback
+    raise HTTPException(401, "Sign in as a named person first")
 
 
 def _bad(e: Exception):
@@ -106,8 +122,10 @@ def _sse(events):
 
 
 @app.get("/api/invoices/{intake_id}/run")
-def run(intake_id: str, actor: str = "E34120"):
+def run(intake_id: str, request: Request, actor: str | None = None):
     s = svc()
+    actor = who(request, actor)
+    s.authorize(actor, "run_agent", intake_id)
     if intake_id not in s.all_items():
         raise HTTPException(404, "Unknown invoice")
     return _sse(s.run_events(intake_id, actor=actor))
@@ -119,7 +137,9 @@ def runs(intake_id: str):
 
 
 @app.get("/api/mailbox/run")
-def run_mailbox(actor: str = "E34120"):
+def run_mailbox(request: Request, actor: str | None = None):
+    actor = who(request, actor)
+    svc().authorize(actor, "run_agent", "mailbox")
     return _sse(svc().run_mailbox(actor=actor))
 
 
@@ -129,37 +149,36 @@ def work():
 
 
 @app.post("/api/vendors/{vendor_id}/callback")
-def callback(vendor_id: str, body: dict = Body(...)):
+def callback(vendor_id: str, request: Request, body: dict = Body(...)):
     try:
-        return svc().callback(vendor_id, body["outcome"], body["by"], body.get("note", ""))
+        return svc().callback(vendor_id, body["outcome"], who(request, body.get("by")), body.get("note", ""))
     except ValueError as e:
         _bad(e)
 
 
 @app.post("/api/invoices/{intake_id}/onboard")
-def onboard(intake_id: str, body: dict = Body(...)):
+def onboard(intake_id: str, request: Request, body: dict = Body(...)):
     try:
-        return svc().onboard(intake_id, body["by"], body["tax_id"], body.get("category", "facilities"))
+        return svc().onboard(intake_id, who(request, body.get("by")), body["tax_id"], body.get("category", "facilities"))
     except ValueError as e:
         _bad(e)
 
 
 @app.post("/api/procurement/requests")
-def po_request(body: dict = Body(...)):
+def po_request(request: Request, body: dict = Body(...)):
     try:
-        return svc().request_po(body["vendor_id"], body["kind"], body["by"])
+        return svc().request_po(body["vendor_id"], body["kind"], who(request, body.get("by")))
     except ValueError as e:
         _bad(e)
 
 
 @app.post("/api/clock/advance")
-def advance_clock(body: dict = Body(...)):
-    return svc().advance_clock(float(body.get("hours", 24)), body.get("by", "E34120"))
+def advance_clock(request: Request, body: dict = Body(...)):
+    return svc().advance_clock(float(body.get("hours", 24)), who(request, body.get("by")))
 
 
 @app.get("/api/model")
 def model_info():
-    from . import model as ds
     return {"metrics": ds.metrics(), "card": ds.card(), "manifest": ds.manifest(),
             "calibration": ds._calibration(),
             "history": {"invoices": len(svc().s.history), "lines": len(svc().s.lines), "vendors": len(svc().s.vendors),
@@ -195,13 +214,13 @@ def case_batch(batch: str):
 
 
 @app.post("/api/cases/bulk-prepare")
-def cases_bulk(body: dict = Body(...)):
-    return _case_call(svc().cases.bulk_prepare, body["by"], float(body.get("min_confidence", 0.95)))
+def cases_bulk(request: Request, body: dict = Body(...)):
+    return _case_call(svc().cases.bulk_prepare, who(request, body.get("by")), float(body.get("min_confidence", 0.95)))
 
 
 @app.post("/api/cases/export")
-def cases_export(body: dict = Body(...)):
-    return _case_call(svc().cases.export, body["kind"], body["by"])
+def cases_export(request: Request, body: dict = Body(...)):
+    return _case_call(svc().cases.export, body["kind"], who(request, body.get("by")))
 
 
 @app.get("/api/cases/{case_id}")
@@ -212,9 +231,9 @@ def case(case_id: str):
 
 
 @app.post("/api/cases/{case_id}/{action}")
-def case_action(case_id: str, action: str, body: dict = Body(...)):
+def case_action(case_id: str, action: str, request: Request, body: dict = Body(...)):
     c = svc().cases
-    by = body["by"]
+    by = who(request, body.get("by"))
     if action == "prepare":
         return _case_call(c.prepare, case_id, by, body.get("note", ""), body.get("account"))
     if action == "approve":
@@ -239,16 +258,16 @@ def audit(intake_id: str):
 
 
 @app.post("/api/invoices/{intake_id}/receipt/request")
-def receipt_request(intake_id: str, body: dict = Body(default={})):
+def receipt_request(intake_id: str, request: Request, body: dict = Body(default={})):
     try:
-        return svc().request_receipt(intake_id, actor=body.get("actor", "AGENT"))
+        return svc().request_receipt(intake_id, actor=who(request, body.get("actor")))
     except ValueError as e:
         _bad(e)
 
 
 @app.post("/api/invoices/{intake_id}/receipt/confirm")
-def receipt_confirm(intake_id: str, body: dict = Body(...)):
-    return svc().confirm_receipt(intake_id, body["by"], body.get("note", ""))
+def receipt_confirm(intake_id: str, request: Request, body: dict = Body(...)):
+    return svc().confirm_receipt(intake_id, who(request, body.get("by")), body.get("note", ""))
 
 
 @app.get("/api/tasks")
@@ -257,18 +276,18 @@ def tasks(person: str | None = None):
 
 
 @app.post("/api/invoices/{intake_id}/decision")
-def decision(intake_id: str, body: dict = Body(...)):
+def decision(intake_id: str, request: Request, body: dict = Body(...)):
     try:
-        return svc().submit(intake_id, body["action"], body.get("actor", "E34120"), body.get("reason"),
+        return svc().submit(intake_id, body["action"], who(request, body.get("actor")), body.get("reason"),
                             body.get("override") or {})
     except ValueError as e:
         _bad(e)
 
 
 @app.post("/api/invoices/{intake_id}/approve")
-def approve(intake_id: str, body: dict = Body(...)):
+def approve(intake_id: str, request: Request, body: dict = Body(default={})):
     try:
-        return svc().approve_step(intake_id, body["approver"])
+        return svc().approve_step(intake_id, who(request, body.get("approver")))
     except ValueError as e:
         _bad(e)
 
@@ -346,7 +365,8 @@ def export_procurement():
 
 
 @app.post("/api/wildcard")
-async def wildcard(file: UploadFile = File(...)):
+async def wildcard(request: Request, file: UploadFile = File(...)):
+    svc().authorize(who(request, "E34120"), "upload")
     if not WILDCARD:
         raise HTTPException(403, "Live upload is switched off")
     data = await file.read()
@@ -359,6 +379,95 @@ async def wildcard(file: UploadFile = File(...)):
 
 
 @app.post("/api/reset")
-def reset():
+def reset(request: Request):
+    svc().authorize(who(request, "E34120"), "reset")
     svc().reset()
     return {"ok": True}
+
+
+# ---------- sign-in, people, audit, policies, evidence ----------
+@app.get("/api/people")
+def people():
+    s = svc()
+    ids = list(auth.FIXED_ROLES) + ["E31188", "E33901", "E20417", "E10022", "E20388", "E33000"]
+    out = []
+    for pid in dict.fromkeys(ids):
+        p = s.s.person_brief(pid)
+        if p:
+            roles = auth.roles_for(s.s, pid)
+            out.append({**p, "roles": roles, "role_labels": [auth.ROLE_LABEL[r] for r in roles]})
+    return out
+
+
+@app.get("/api/session")
+def session(request: Request):
+    pid = auth.verify(request.cookies.get("mc_user"))
+    if not pid:
+        return {"person": None}
+    s = svc()
+    roles = auth.roles_for(s.s, pid)
+    return {"person": s.s.person_brief(pid), "roles": roles, "role_labels": [auth.ROLE_LABEL[r] for r in roles],
+            "can": sorted(a for a in auth.PERMISSIONS if auth.allowed(s.s, pid, a))}
+
+
+@app.post("/api/session")
+def sign_in(request: Request, body: dict = Body(...)):
+    s = svc()
+    pid = body.get("person_id")
+    if pid not in s.s.people:
+        raise HTTPException(404, "Unknown person")
+    previous = auth.verify(request.cookies.get("mc_user"))
+    s.state.add_event("security", pid, "SIGNED_IN", {"switched_from": previous})
+    resp = JSONResponse(session_payload(s, pid))
+    resp.set_cookie("mc_user", auth.sign(pid), httponly=True, samesite="lax", secure=bool(TOKEN),
+                    max_age=60 * 60 * 12)
+    return resp
+
+
+def session_payload(s, pid):
+    roles = auth.roles_for(s.s, pid)
+    return {"person": s.s.person_brief(pid), "roles": roles, "role_labels": [auth.ROLE_LABEL[r] for r in roles],
+            "can": sorted(a for a in auth.PERMISSIONS if auth.allowed(s.s, pid, a))}
+
+
+@app.get("/api/audit")
+def audit_log(actor: str | None = None, kind: str | None = None, key: str | None = None, limit: int = 300):
+    s = svc()
+    events = s.state.events()
+    out = []
+    for e in reversed(events):
+        if (actor and e["actor"] != actor) or (kind and e["kind"] != kind) or (key and e["invoice_key"] != key):
+            continue
+        e["actor_name"] = s.s.people[e["actor"]]["name"] if e["actor"] in s.s.people else \
+            ("Non-PO agent" if e["actor"] == "AGENT" else e["actor"])
+        out.append(e)
+        if len(out) >= limit:
+            break
+    return {"events": out, "total": len(events), "kinds": sorted({e["kind"] for e in events})}
+
+
+@app.get("/api/policies")
+def policies():
+    s = svc()
+    s.sync_clock()
+    return {**s.policies.editable(), "versions": s.policies.versions(),
+            "proposed_bands": {m: v.get("proposed_bands") for m, v in ((ds.metrics() or {}).get("models") or {}).items()}}
+
+
+@app.post("/api/policies")
+def update_policies(request: Request, body: dict = Body(...)):
+    try:
+        return svc().update_policy(who(request, body.get("by")), body.get("changes") or {}, body.get("reason", ""))
+    except ValueError as e:
+        _bad(e)
+
+
+@app.get("/api/invoices/{intake_id}/evidence", response_class=HTMLResponse)
+def evidence(intake_id: str):
+    from .evidence import render
+    s = svc()
+    try:
+        r = s.result(intake_id)
+    except KeyError:
+        raise HTTPException(404, "Unknown invoice")
+    return render(s, r, s.audit(intake_id))

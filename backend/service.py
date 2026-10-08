@@ -12,7 +12,9 @@ from . import clock
 from .agents.supervisor import STATUS_LABEL, Supervisor
 from .agents.base import RunContext
 from .agents.investigator import investigate
+from . import auth
 from .cases import Cases
+from .policies import Policies
 from .engine import exports
 from .engine.anomaly import AnomalyLayer
 from .state import BufferedState, get_state, now_iso
@@ -58,6 +60,9 @@ class DemoService:
         self._anomaly = None
         self._lock = threading.Lock()
         self.cases = Cases(self)
+        self.policies = Policies(self.s, self.state)
+        self.policies.apply()
+
         if not self.state.get("meta:seeded"):
             self.reset()
         self.sync_clock()
@@ -108,6 +113,11 @@ class DemoService:
         if not run or not r.get("vendor") or not r["vendor"].get("vendor_id"):
             return None
         done = run.get("finished_at") or run["started_at"]
+        current = getattr(self.s, "policy_version", 1)
+        if run.get("policy_version", 1) != current:
+            change = next((v for v in self.policies.versions() if v["version"] == current), {})
+            return f"Policy changed to version {current} after this run ({change.get('reason', '')}). " \
+                   f"Re-run the agent to apply it."
         for lesson in self.state.prefix(f"learned:{r['vendor']['vendor_id']}:").values():
             if lesson["at"] >= done and lesson.get("source_invoice") != r["document"].get("invoice_num"):
                 return f"A correction for this supplier was learned at {lesson['at'][11:16]}, after this run. " \
@@ -164,6 +174,8 @@ class DemoService:
         st.put(f"runs:{iid}", runs[-20:])
 
     def run(self, intake_id, trigger="manual", actor="E34120", on_event=None, live=True):
+        if trigger in ("manual", "mailbox"):
+            self.authorize(actor, "run_agent", intake_id)
         item = self.all_items()[intake_id]
         with self._lock:
             prev = self.latest(intake_id)
@@ -219,6 +231,7 @@ class DemoService:
         yield {"type": "done", "count": len(todo), "ms": round((time.perf_counter() - t) * 1000)}
 
     def investigate_case(self, case_id, actor):
+        self.authorize(actor, "case_investigate", case_id)
         case = self.cases.get(case_id)
         ctx = RunContext(self.agent.registry, case_id, "manual", actor)
         with ctx.step("investigator", "investigate", "Investigate the case", 8):
@@ -329,6 +342,7 @@ class DemoService:
 
     # ---------- receipt confirmation ----------
     def request_receipt(self, intake_id, actor="AGENT", ts=None):
+        self.authorize(actor, "request_receipt", intake_id)
         r = self.latest(intake_id)
         if not r:
             raise ValueError("Run the agent before requesting receipt")
@@ -352,6 +366,11 @@ class DemoService:
     def confirm_receipt(self, intake_id, by_id, note="", ts=None):
         task = self.state.get(f"receipt:{intake_id}") or self.request_receipt(intake_id, ts=ts)
         person = self.s.people[by_id]
+        allowed = {task["assignee_id"], (self.latest(intake_id).get("requester") or {}).get("person", {}).get("id")}
+        if by_id not in allowed:
+            auth.deny(self.state, by_id, "confirm_receipt",
+                      f"{person['name']} is not the requester for this invoice; only {task['assignee_name']} can "
+                      f"confirm receipt")
         task.update(status="confirmed", confirmed_by=by_id, confirmed_by_name=person["name"],
                     confirmed_at=ts or now_iso(), note=note)
         self.state.put(f"receipt:{intake_id}", task)
@@ -372,7 +391,9 @@ class DemoService:
             raise ValueError("Run the agent first: this invoice has not been worked")
         return self._overlay(r) if seeding else self.result(intake_id)
 
-    def submit(self, intake_id, action, actor, reason=None, override=None, ts=None):
+    def submit(self, intake_id, action, actor, reason=None, override=None, ts=None, authorized=False):
+        if not authorized:  # a call-back that proves fraud rejects on the vendor-master team's authority
+            self.authorize(actor, "decide", intake_id)
         seeding = ts is not None
         r = self._current(intake_id, seeding)
         if action in ("accept", "override") and r["status"] in NOT_APPROVABLE:
@@ -418,8 +439,11 @@ class DemoService:
         if not decision or decision["status"] != "IN_APPROVAL":
             raise ValueError("Not awaiting approval")
         nxt = decision["chain"][len(decision["approvals"])]
-        if approver_id != nxt:
-            raise ValueError(f"Next approver is {self.s.people[nxt]['name']}")
+        delegate = self.s.people[nxt].get("delegate_id") if self.s.people[nxt].get("out_of_office") else None
+        if approver_id not in (nxt, delegate):
+            auth.deny(self.state, approver_id, "approve",
+                      f"{self.s.people[approver_id]['name']} cannot approve: the next approver is "
+                      f"{self.s.people[nxt]['name']}")
         decision["approvals"].append({"person_id": approver_id, "name": self.s.people[approver_id]["name"],
                                       "at": ts or now_iso()})
         if len(decision["approvals"]) == len(decision["chain"]):
@@ -540,12 +564,22 @@ class DemoService:
         return iid
 
     # ---------- demo clock & receipt SLAs ----------
+    def authorize(self, actor, action, what=""):
+        if actor != "AGENT":
+            auth.check(self.s, self.state, actor, action, what)
+
+    def update_policy(self, by, changes, reason):
+        self.authorize(by, "policy_edit")
+        return self.policies.update(by, self.s.people[by]["name"], changes, reason)
+
     def sync_clock(self):
+        self.policies.apply() if hasattr(self, "policies") else None
         clock.set_offset_hours((self.state.get("meta:clock") or {}).get("offset_hours", 0))
         for v in self.state.prefix("onboarded:").values():
             self.s.vendors.setdefault(v["vendor_id"], v["record"])
 
     def advance_clock(self, hours, by):
+        self.authorize(by, "clock")
         offset = clock.offset_hours() + hours
         self.state.put("meta:clock", {"offset_hours": offset, "by": by})
         clock.set_offset_hours(offset)
@@ -629,6 +663,7 @@ class DemoService:
                 "receipts": self.tasks(), "routed_out": [r for r in rows if r["agent_status"] == "ROUTED_OUT"]}
 
     def callback(self, vendor_id, outcome, by, note=""):
+        self.authorize(by, "callback", vendor_id)
         if outcome not in ("verified", "fraud"):
             raise ValueError("Outcome must be verified or fraud")
         person = self.s.people[by]
@@ -641,7 +676,7 @@ class DemoService:
         for iid in affected:
             self.state.add_event(iid, by, "CALLBACK_COMPLETED", {"outcome": outcome, "note": note})
             if outcome == "fraud":
-                self.submit(iid, "reject", by, f"Bank-detail change not made by the supplier (call-back "
+                self.submit(iid, "reject", by, authorized=True, reason=f"Bank-detail change not made by the supplier (call-back "
                                                f"{rec['at'][:10]}). Fraud attempt: invoice rejected, vendor master "
                                                f"change reversed.")
             else:
@@ -649,6 +684,7 @@ class DemoService:
         return {"callback": rec, "invoices": affected}
 
     def onboard(self, intake_id, by, tax_id, category="facilities"):
+        self.authorize(by, "onboard", intake_id)
         r = self.latest(intake_id)
         if not r or r["agent_status"] != "VENDOR_ONBOARDING":
             raise ValueError("This invoice is not waiting for supplier onboarding")
@@ -673,6 +709,7 @@ class DemoService:
         return self.run(intake_id, "rerun", by)
 
     def request_po(self, vendor_id, kind, by):
+        self.authorize(by, "po_request", vendor_id)
         if kind not in ("Blanket PO", "Standing approval rule"):
             raise ValueError("Kind must be Blanket PO or Standing approval rule")
         v = self.s.vendors[vendor_id]
@@ -689,6 +726,7 @@ class DemoService:
         real.reset()
         self._anomaly = None
         clock.set_offset_hours(0)
+        self.policies.apply()
         buffered = BufferedState(real)
         self.state = buffered
         self.agent.bind_state(buffered)

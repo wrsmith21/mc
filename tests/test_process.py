@@ -83,7 +83,7 @@ def test_unconfirmed_receipt_reminds_then_escalates_then_contacts_supplier(svc):
     assert svc.result(legal)["receipt_task"]["status"] == "pending"
     stages = []
     for _ in range(12):
-        stages += [e["stage"] for e in svc.advance_clock(24, "E34120")["sla_events"] if e["intake_id"] == legal]
+        stages += [e["stage"] for e in svc.advance_clock(24, "E35051")["sla_events"] if e["intake_id"] == legal]
     assert stages == ["reminder", "escalated", "supplier"]
     kinds = [e["kind"] for e in svc.audit(legal)]
     assert {"RECEIPT_REMINDER", "RECEIPT_ESCALATED", "SUPPLIER_CONTACTED"} <= set(kinds)
@@ -114,5 +114,5 @@ def test_onboarding_creates_the_supplier_and_reruns(svc):
 
 
 def test_blanket_po_request_is_recorded(svc):
-    req = svc.request_po("V1102", "Standing approval rule", "E30876")
+    req = svc.request_po("V1102", "Standing approval rule", "E30911")
     assert svc.work()["po_requests"][0]["vendor_id"] == "V1102" and req["status"] == "Requested"

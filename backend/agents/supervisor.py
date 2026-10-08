@@ -101,6 +101,7 @@ class Supervisor:
         r["next_action"] = self._next_action(r)
         r["run"] = ctx.finish()
         r["run"]["llm_model"] = llm.MODEL
+        r["run"]["policy_version"] = getattr(self.s, "policy_version", 1)
         return r
 
     def _findings(self, r):
