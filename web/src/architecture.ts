@@ -1,328 +1,230 @@
-// Content for the Architecture & workflows page. Names, flag codes and thresholds mirror backend/ and data/seed/policies.json.
+// Architecture content. Component names, files and flows mirror backend/ and vercel.json; cloud proposals map each
+// as-built component to its AWS and Azure counterpart.
 
-export type Kind = 'rules' | 'history' | 'claude' | 'external'
-export const KIND_LABEL: Record<Kind, string> = {
-  rules: 'Policy rules', history: 'History scoring', claude: 'Claude', external: 'External check',
-}
+export type NodeKind = 'person' | 'ui' | 'edge' | 'app' | 'agent' | 'model' | 'data' | 'ext' | 'ops'
+export type DNode = { id: string; label: string; sub?: string; col: number; row: number; w?: number; kind: NodeKind; ai?: boolean }
+export type Zone = { label: string; col: number; row: number; w: number; h: number; kind: 'client' | 'tenant' | 'model' | 'public' | 'corp' }
+export type Flow = { from: string; to: string; n: number; label: string; data: 'Confidential' | 'Internal' | 'Public' }
+export type Diagram = { id: string; title: string; summary: string; cols: number; rows: number; zones: Zone[]; nodes: DNode[]; flows: Flow[]; notes: string[] }
 
-export type Tile = { name: string; role: string; path?: string; replaces?: string; ai?: boolean }
-export type Layer = { layer: string; tiles: Tile[] }
-export type Platform = { id: string; title: string; summary: string; layers: Layer[]; notes: string[] }
-
-export const REPO: Platform = {
-  id: 'repo',
-  title: 'How this demo is built',
-  summary:
-    'A single-page app and one Python function on Vercel. All reference data is synthetic JSON loaded into memory at start-up; every human action is written to an append-only event log.',
-  layers: [
-    { layer: 'People', tiles: [
-      { name: 'Reviewer workspace', role: 'Queue, invoice review, anomaly layer, value and this page. React 19 + Vite.', path: 'web/src/screens/' },
-      { name: 'Requester phone view', role: 'Receipt confirmation opened from a QR code, no app install.', path: 'web/src/screens/Requester.tsx' },
-      { name: 'Guided walkthrough', role: 'Spotlight tour of every scene, with talk-track notes.', path: 'web/src/walkthrough.ts' },
-    ] },
-    { layer: 'Edge', tiles: [
-      { name: 'Vercel CDN', role: 'Serves the built app, rewrites /api/* to the Python function, marks every response noindex.', path: 'vercel.json' },
-      { name: 'Passcode gate', role: 'Middleware checks an HttpOnly cookie or x-demo-token on every API call except health and login.', path: 'backend/app.py' },
-    ] },
-    { layer: 'Application', tiles: [
-      { name: 'FastAPI', role: 'REST endpoints plus a server-sent event stream that plays the agent run step by step.', path: 'backend/app.py' },
-      { name: 'Demo service', role: 'Queue, decisions, approvals, receipt tasks, audit trail, KPIs, exports, live uploads.', path: 'backend/service.py' },
-    ] },
-    { layer: 'Agent', tiles: [
-      { name: 'Invoice agent', role: 'Ten traced steps per invoice, then a status and a reason.', path: 'backend/engine/pipeline.py', ai: true },
-      { name: 'Checks', role: 'Supplier match, sanctions, invoice validity, duplicates, payment risk.', path: 'backend/engine/checks.py' },
-      { name: 'Policy', role: 'PO policy, open-PO match, requester, receipt rule, approval routing.', path: 'backend/engine/policy.py' },
-      { name: 'Recommender', role: 'Scores GL account and cost centre from similar past lines; capitalise or prepay.', path: 'backend/engine/recommend.py' },
-      { name: 'Anomaly layer', role: 'The same scoring pointed at journals, the AP subledger and cash application.', path: 'backend/engine/anomaly.py' },
-    ] },
-    { layer: 'Model', tiles: [
-      { name: 'Claude reads', role: 'Reads the invoice PDF into a fixed JSON schema; fields are cross-checked against intake.', path: 'backend/llm.py', ai: true },
-      { name: 'Claude explains', role: 'Writes the reviewer-facing reason from the engine’s findings, with a deterministic template as fallback.', path: 'backend/llm.py', ai: true },
-      { name: 'Response cache', role: 'Keyed by content hash, so replay mode runs the whole demo with no network.', path: 'data/cache/' },
-    ] },
-    { layer: 'Data', tiles: [
-      { name: 'Reference data', role: '142 queued invoices, 12,340 past invoices (27,157 lines), 405 vendors, 167 people, 45 cost centres.', path: 'data/seed/' },
-      { name: 'Close and cash data', role: '4,100 September journal lines, 11,400 cash receipts, 29,608 open AR items.', path: 'data/seed/' },
-      { name: 'Event log and state', role: 'SQLite locally, /tmp on Vercel, Postgres when DATABASE_URL is set.', path: 'backend/state.py' },
-    ] },
-    { layer: 'Outside world', tiles: [
-      { name: 'EU VIES', role: 'VAT-number registration check, queried live when the printed number differs from the vendor master.', path: 'backend/integrations/external.py' },
-      { name: 'OFAC screen and ECB rates', role: 'Sanctions name screen; daily FX reference rates via Frankfurter, cached.', path: 'backend/integrations/external.py' },
-      { name: 'Oracle R12 interface files', role: 'AP invoice, GL amortisation and reclass CSVs in open-interface format.', path: 'backend/engine/exports.py' },
-    ] },
+export const AS_BUILT: Diagram = {
+  id: 'repo', title: 'How this demo is built',
+  summary: 'One React app and one Python service. The agent runtime, every check and the model calls run inside the service; state is an append-only event log plus run records. Everything outside the dashed line is a public service called over HTTPS.',
+  cols: 5, rows: 4,
+  zones: [
+    { label: 'Browser', col: 0, row: 0, w: 1, h: 4, kind: 'client' },
+    { label: 'Vercel project (demo tenant)', col: 1, row: 0, w: 3, h: 4, kind: 'tenant' },
+    { label: 'Public services', col: 4, row: 0, w: 1, h: 4, kind: 'public' },
+  ],
+  nodes: [
+    { id: 'people', label: 'Reviewers, approvers, controllers', sub: 'Named sign-in, role-aware', col: 0, row: 0, kind: 'person' },
+    { id: 'spa', label: 'React workspace', sub: 'web/src · Vite build', col: 0, row: 1, kind: 'ui' },
+    { id: 'phone', label: 'Requester phone view', sub: 'QR code, no install', col: 0, row: 2, kind: 'ui' },
+    { id: 'cdn', label: 'Vercel CDN + rewrites', sub: 'vercel.json · noindex', col: 1, row: 0, kind: 'edge' },
+    { id: 'api', label: 'FastAPI service', sub: 'backend/app.py · passcode + session + roles', col: 1, row: 1, kind: 'app' },
+    { id: 'svc', label: 'Demo service', sub: 'service.py · runs, decisions, cases, SLAs', col: 1, row: 2, kind: 'app' },
+    { id: 'sup', label: 'Supervisor + 6 specialist agents', sub: 'backend/agents · fixed order', col: 2, row: 1, kind: 'agent', ai: true },
+    { id: 'tools', label: 'Tool registry (40+ tools)', sub: 'agents/tools.py · typed, recorded', col: 2, row: 2, kind: 'agent' },
+    { id: 'inv', label: 'Investigator', sub: 'Claude tool loop, read-only', col: 2, row: 0, kind: 'agent', ai: true },
+    { id: 'model', label: 'Coding model', sub: 'champion + challenger, calibrated', col: 3, row: 1, kind: 'model' },
+    { id: 'seed', label: 'Reference data', sub: '12k invoices · 5k POs · 4k journals · 11k receipts', col: 3, row: 2, kind: 'data' },
+    { id: 'state', label: 'Event log + run records', sub: 'state.py · SQLite / Neon Postgres', col: 2, row: 3, kind: 'data' },
+    { id: 'files', label: 'R12 interface files', sub: 'AP_INVOICES, GL_INTERFACE, reapplication', col: 1, row: 3, kind: 'data' },
+    { id: 'cache', label: 'Model response cache', sub: 'data/cache · replay mode', col: 3, row: 3, kind: 'data' },
+    { id: 'claude', label: 'Claude API', sub: 'Opus 5.5 · read, explain, investigate', col: 4, row: 0, kind: 'ext', ai: true },
+    { id: 'vies', label: 'EU VIES · OFAC · ECB FX', sub: 'tax, sanctions, rates', col: 4, row: 1, kind: 'ext' },
+  ],
+  flows: [
+    { from: 'spa', to: 'cdn', n: 1, label: 'Page and API requests over HTTPS; session cookie', data: 'Internal' },
+    { from: 'cdn', to: 'api', n: 2, label: '/api/* rewritten to the Python function', data: 'Internal' },
+    { from: 'api', to: 'svc', n: 3, label: 'Role check on every action; refusals audited', data: 'Internal' },
+    { from: 'svc', to: 'sup', n: 4, label: 'Run the invoice: events streamed back over SSE', data: 'Confidential' },
+    { from: 'sup', to: 'tools', n: 5, label: 'Every check is a recorded tool call', data: 'Confidential' },
+    { from: 'tools', to: 'model', n: 6, label: 'Score accounts; calibrated confidence + second opinion', data: 'Confidential' },
+    { from: 'tools', to: 'seed', n: 7, label: 'History, vendors, POs, contracts, policies', data: 'Confidential' },
+    { from: 'sup', to: 'claude', n: 8, label: 'PDF read and reviewer reason (schema-bound)', data: 'Confidential' },
+    { from: 'inv', to: 'claude', n: 9, label: 'Exception investigation with read-only tools', data: 'Confidential' },
+    { from: 'tools', to: 'vies', n: 10, label: 'VAT, sanctions, FX lookups (no client data beyond the tax ID)', data: 'Public' },
+    { from: 'svc', to: 'state', n: 11, label: 'Runs, decisions, cases, policy versions, audit events', data: 'Confidential' },
+    { from: 'svc', to: 'files', n: 12, label: 'Approved invoices and corrections as interface files', data: 'Confidential' },
+    { from: 'phone', to: 'api', n: 13, label: 'Requester confirms receipt', data: 'Internal' },
   ],
   notes: [
-    'Claude never picks the account. The recommender scores it from history, so every recommendation traces back to past invoices.',
-    'If the model is unreachable the run still completes: extraction falls back to the intake record, the reason to a template.',
-    'The agent can recommend, hold and route. It cannot approve or release a payment.',
+    'Claude never picks the GL account: the scoring engine does, and every recommendation cites the past invoices behind it.',
+    'If the model is unreachable the run completes: extraction falls back to the intake record, the reason and the investigation to deterministic summaries.',
+    'The agents can recommend, hold and route. Approvals, corrections and policy changes are people, checked by role on the server.',
   ],
 }
 
-export const AWS: Platform = {
-  id: 'aws',
-  title: 'Proposed on Amazon Bedrock',
-  summary:
-    'The engine code moves unchanged into a container. Each group of steps becomes a Bedrock collaborator agent whose tools are the existing Python checks, so the rules stay deterministic and auditable.',
-  layers: [
-    { layer: 'People', tiles: [
-      { name: 'CloudFront + S3', role: 'Hosts the reviewer workspace.', replaces: 'Vercel CDN' },
-      { name: 'Amazon Cognito', role: 'Federated to the corporate identity provider over SAML; roles decide what each persona sees.', replaces: 'Passcode gate' },
-      { name: 'Amazon SES', role: 'Receives the AP mailbox and sends receipt-confirmation links to requesters.', replaces: 'QR phone view' },
-    ] },
-    { layer: 'Edge', tiles: [
-      { name: 'AWS WAF + API Gateway', role: 'Rate limits, request validation, private VPC link to the service.' },
-    ] },
-    { layer: 'Application', tiles: [
-      { name: 'ECS on Fargate', role: 'Runs the FastAPI service unchanged, including the live run stream.', replaces: 'Vercel Python function' },
-      { name: 'AWS Step Functions', role: 'Waits on people: receipt confirmation and each approval resume the run through task tokens.' },
-    ] },
-    { layer: 'Agent', tiles: [
-      { name: 'Bedrock Agents supervisor', role: 'Plans each invoice’s run, calls collaborators, applies the status precedence.', replaces: 'Agent.process', ai: true },
-      { name: 'Bedrock collaborator agents', role: 'Intake, supplier and validity, coding and treatment, payment risk, approval and receipt, anomaly sweep.', ai: true },
-      { name: 'Action groups on Lambda', role: 'Checks, Policy and Recommender exposed as typed tools.', replaces: 'Direct Python calls' },
-      { name: 'Bedrock AgentCore Runtime', role: 'Alternative first step: host the current Python orchestrator as it is, with managed identity and session isolation.' },
-    ] },
-    { layer: 'Model', tiles: [
-      { name: 'Claude on Amazon Bedrock', role: 'Same extraction schema and reason prompt, served in-region.', replaces: 'Anthropic API', ai: true },
-      { name: 'Bedrock Guardrails', role: 'PII redaction, denied topics and a contextual grounding check on every reason.' },
-      { name: 'Bedrock Knowledge Bases', role: 'Delegation of authority, PO policy and the AP manual as sources the reason can cite.' },
-      { name: 'Amazon Textract', role: 'Fallback OCR for poor-quality scans before the model reads them.' },
-    ] },
-    { layer: 'Data', tiles: [
-      { name: 'S3 with Object Lock', role: 'Invoice PDFs and model invocation logs, retained for audit.', replaces: 'data/pdfs' },
-      { name: 'Aurora PostgreSQL', role: 'Event log, decisions, receipt tasks, learned corrections.', replaces: 'SQLite or Neon' },
-      { name: 'OpenSearch Serverless', role: 'History similarity index at full ledger volume.', replaces: 'In-memory history' },
-    ] },
-    { layer: 'Outside world', tiles: [
-      { name: 'EventBridge Scheduler', role: 'Month-end journal sweep and the daily cash-application run.' },
-      { name: 'PrivateLink or Direct Connect', role: 'Oracle EBS open-interface upload and vendor master reads.', replaces: 'CSV download' },
-      { name: 'Secrets Manager, KMS, CloudWatch, CloudTrail', role: 'Keys, encryption, tracing and an immutable record of who did what.' },
-    ] },
+export const BEDROCK: Diagram = {
+  id: 'aws', title: 'Proposed on Amazon Bedrock',
+  summary: 'The same service in a container inside the client VPC. Specialists become Bedrock collaborator agents whose action groups are the existing tools, Claude is served in-region from Bedrock, and Step Functions holds the waits on people. Nothing leaves the account except to Bedrock and the public registries.',
+  cols: 5, rows: 4,
+  zones: [
+    { label: 'Mastercard network', col: 0, row: 0, w: 1, h: 4, kind: 'corp' },
+    { label: 'AWS account · client VPC', col: 1, row: 0, w: 3, h: 4, kind: 'tenant' },
+    { label: 'Amazon Bedrock (same region)', col: 4, row: 0, w: 1, h: 2, kind: 'model' },
+    { label: 'Public', col: 4, row: 2, w: 1, h: 2, kind: 'public' },
+  ],
+  nodes: [
+    { id: 'people', label: 'Finance users', sub: 'Corporate IdP → Cognito (SAML)', col: 0, row: 0, kind: 'person' },
+    { id: 'mail', label: 'AP mailbox', sub: 'SES inbound → S3', col: 0, row: 1, kind: 'ui' },
+    { id: 'erp', label: 'Oracle EBS R12', sub: 'Open interfaces via PrivateLink', col: 0, row: 3, kind: 'ext' },
+    { id: 'edge', label: 'CloudFront + WAF + API Gateway', sub: 'S3 static site, private VPC link', col: 1, row: 0, kind: 'edge' },
+    { id: 'svc', label: 'FastAPI on ECS Fargate', sub: 'same container as the demo', col: 1, row: 1, kind: 'app' },
+    { id: 'sfn', label: 'Step Functions', sub: 'receipt and approval waits (task tokens)', col: 1, row: 2, kind: 'app' },
+    { id: 'evb', label: 'EventBridge Scheduler', sub: 'month-end sweep, daily cash run', col: 1, row: 3, kind: 'ops' },
+    { id: 'agents', label: 'Bedrock Agents', sub: 'supervisor + collaborators', col: 2, row: 0, kind: 'agent', ai: true },
+    { id: 'lambda', label: 'Action groups on Lambda', sub: 'Checks, Policy, Recommender as tools', col: 2, row: 1, kind: 'agent' },
+    { id: 'aurora', label: 'Aurora PostgreSQL', sub: 'runs, decisions, cases, audit', col: 2, row: 2, kind: 'data' },
+    { id: 's3', label: 'S3 (Object Lock)', sub: 'PDFs, invocation logs, evidence packs', col: 2, row: 3, kind: 'data' },
+    { id: 'kb', label: 'Knowledge Bases + OpenSearch', sub: 'policy grounding, history index', col: 3, row: 1, kind: 'data' },
+    { id: 'obs', label: 'CloudWatch · CloudTrail · KMS', sub: 'metrics, audit, keys', col: 3, row: 3, kind: 'ops' },
+    { id: 'claude', label: 'Claude on Bedrock', sub: 'in-region, no training on client data', col: 4, row: 0, kind: 'model', ai: true },
+    { id: 'guard', label: 'Bedrock Guardrails', sub: 'PII, grounding, denied topics', col: 4, row: 1, kind: 'model' },
+    { id: 'pub', label: 'EU VIES · OFAC · ECB', sub: 'via NAT, allow-listed', col: 4, row: 2, kind: 'ext' },
+  ],
+  flows: [
+    { from: 'people', to: 'edge', n: 1, label: 'SSO session; roles from IdP groups', data: 'Internal' },
+    { from: 'mail', to: 'svc', n: 2, label: 'New invoice event (S3 put → EventBridge)', data: 'Confidential' },
+    { from: 'edge', to: 'svc', n: 3, label: 'API calls through the VPC link', data: 'Internal' },
+    { from: 'svc', to: 'agents', n: 4, label: 'InvokeAgent per invoice', data: 'Confidential' },
+    { from: 'agents', to: 'lambda', n: 5, label: 'Action group calls (typed tools)', data: 'Confidential' },
+    { from: 'agents', to: 'claude', n: 6, label: 'Reasoning, extraction, reasons', data: 'Confidential' },
+    { from: 'claude', to: 'guard', n: 7, label: 'Every response passes guardrails', data: 'Confidential' },
+    { from: 'lambda', to: 'kb', n: 8, label: 'Similar lines, policy passages', data: 'Confidential' },
+    { from: 'svc', to: 'aurora', n: 9, label: 'State and audit events', data: 'Confidential' },
+    { from: 'svc', to: 'sfn', n: 10, label: 'Start wait; resume on confirm or approve', data: 'Internal' },
+    { from: 'evb', to: 'svc', n: 11, label: 'Scheduled sweeps', data: 'Internal' },
+    { from: 'svc', to: 'erp', n: 12, label: 'AP and GL interface batches', data: 'Confidential' },
+    { from: 'lambda', to: 'pub', n: 13, label: 'Registry lookups', data: 'Public' },
+    { from: 'svc', to: 's3', n: 14, label: 'Documents and evidence, retained', data: 'Confidential' },
   ],
   notes: [
-    'Lowest-risk path: start on AgentCore Runtime with the current orchestrator, then split into collaborator agents once the tools are stable.',
-    'Step Functions holds the human waits, so an invoice can sit with a requester for days without a running process.',
+    'Lowest-risk first step: run the current orchestrator on Bedrock AgentCore Runtime, then split into collaborator agents once the tools are stable.',
+    'The tool contracts in backend/agents/tools.py already have the shape of action-group schemas; no logic is rewritten.',
   ],
 }
 
-export const AZURE: Platform = {
-  id: 'azure',
-  title: 'Proposed on Azure AI Foundry',
-  summary:
-    'The same agent split on Microsoft’s stack. It fits best where identity, mail and approvals already run on Microsoft 365.',
-  layers: [
-    { layer: 'People', tiles: [
-      { name: 'Azure Static Web Apps', role: 'Hosts the reviewer workspace.', replaces: 'Vercel CDN' },
-      { name: 'Microsoft Entra ID', role: 'Single sign-on; app roles map to AP specialist, approver and controller.', replaces: 'Passcode gate' },
-      { name: 'Teams and Outlook actionable messages', role: 'Requesters confirm receipt and approvers approve where they already work.', replaces: 'QR phone view' },
-    ] },
-    { layer: 'Edge', tiles: [
-      { name: 'Front Door + WAF, API Management', role: 'Global entry, request policies, private link to the service.' },
-    ] },
-    { layer: 'Application', tiles: [
-      { name: 'Azure Container Apps', role: 'Runs the FastAPI service unchanged, including the live run stream.', replaces: 'Vercel Python function' },
-      { name: 'Durable Functions', role: 'Long-running waits for receipt and each approval.' },
-    ] },
-    { layer: 'Agent', tiles: [
-      { name: 'Foundry Agent Service orchestrator', role: 'Plans each invoice’s run and calls the connected agents.', replaces: 'Agent.process', ai: true },
-      { name: 'Connected agents', role: 'Intake, supplier and validity, coding and treatment, payment risk, approval and receipt, anomaly sweep.', ai: true },
-      { name: 'OpenAPI tools on Azure Functions', role: 'Checks, Policy and Recommender exposed as typed tools.', replaces: 'Direct Python calls' },
-    ] },
-    { layer: 'Model', tiles: [
-      { name: 'Claude in Azure AI Foundry', role: 'Same extraction schema and reason prompt; Azure OpenAI available as a second model.', replaces: 'Anthropic API', ai: true },
-      { name: 'Azure AI Content Safety', role: 'Prompt shields against instructions hidden in supplier documents; groundedness detection.' },
-      { name: 'Azure AI Search', role: 'Policy grounding for reasons, and the history similarity index.' },
-      { name: 'Document Intelligence', role: 'Prebuilt invoice model as a fallback for poor-quality scans.' },
-    ] },
-    { layer: 'Data', tiles: [
-      { name: 'Immutable Blob Storage', role: 'Invoice PDFs and run traces under a retention policy.', replaces: 'data/pdfs' },
-      { name: 'Azure Database for PostgreSQL', role: 'Event log, decisions, receipt tasks, learned corrections.', replaces: 'SQLite or Neon' },
-    ] },
-    { layer: 'Outside world', tiles: [
-      { name: 'Logic Apps', role: 'Watches the AP mailbox and schedules the month-end sweep and daily cash run.' },
-      { name: 'ExpressRoute or on-premises data gateway', role: 'Oracle EBS open-interface upload and vendor master reads.', replaces: 'CSV download' },
-      { name: 'Key Vault, Managed Identity, Azure Monitor, Purview', role: 'Secrets, keyless access, tracing, data lineage.' },
-    ] },
+export const FOUNDRY: Diagram = {
+  id: 'azure', title: 'Proposed on Azure AI Foundry',
+  summary: 'The same split on Microsoft’s stack, where identity, mail and approvals already live in Microsoft 365. Foundry Agent Service runs the supervisor and connected agents, Claude is served from Foundry, and Teams carries receipt confirmation and approval.',
+  cols: 5, rows: 4,
+  zones: [
+    { label: 'Microsoft 365 tenant', col: 0, row: 0, w: 1, h: 4, kind: 'corp' },
+    { label: 'Azure subscription · VNet', col: 1, row: 0, w: 3, h: 4, kind: 'tenant' },
+    { label: 'Azure AI Foundry', col: 4, row: 0, w: 1, h: 2, kind: 'model' },
+    { label: 'Public', col: 4, row: 2, w: 1, h: 2, kind: 'public' },
+  ],
+  nodes: [
+    { id: 'people', label: 'Finance users', sub: 'Entra ID SSO, app roles', col: 0, row: 0, kind: 'person' },
+    { id: 'teams', label: 'Teams + Outlook', sub: 'actionable approvals and receipt', col: 0, row: 1, kind: 'ui' },
+    { id: 'mail', label: 'AP shared mailbox', sub: 'Logic Apps trigger', col: 0, row: 2, kind: 'ui' },
+    { id: 'erp', label: 'Oracle EBS R12', sub: 'ExpressRoute / data gateway', col: 0, row: 3, kind: 'ext' },
+    { id: 'edge', label: 'Front Door + WAF + APIM', sub: 'Static Web Apps', col: 1, row: 0, kind: 'edge' },
+    { id: 'svc', label: 'FastAPI on Container Apps', sub: 'same container as the demo', col: 1, row: 1, kind: 'app' },
+    { id: 'durable', label: 'Durable Functions', sub: 'receipt and approval waits', col: 1, row: 2, kind: 'app' },
+    { id: 'logic', label: 'Logic Apps', sub: 'mailbox, schedules', col: 1, row: 3, kind: 'ops' },
+    { id: 'agents', label: 'Foundry Agent Service', sub: 'orchestrator + connected agents', col: 2, row: 0, kind: 'agent', ai: true },
+    { id: 'fn', label: 'OpenAPI tools on Functions', sub: 'Checks, Policy, Recommender', col: 2, row: 1, kind: 'agent' },
+    { id: 'pg', label: 'Azure Database for PostgreSQL', sub: 'runs, decisions, cases, audit', col: 2, row: 2, kind: 'data' },
+    { id: 'blob', label: 'Immutable Blob Storage', sub: 'PDFs, traces, evidence packs', col: 2, row: 3, kind: 'data' },
+    { id: 'search', label: 'Azure AI Search', sub: 'policy grounding, history index', col: 3, row: 1, kind: 'data' },
+    { id: 'obs', label: 'Monitor · Key Vault · Purview', sub: 'tracing, secrets, lineage', col: 3, row: 3, kind: 'ops' },
+    { id: 'claude', label: 'Claude in Foundry', sub: 'Azure OpenAI as second model', col: 4, row: 0, kind: 'model', ai: true },
+    { id: 'safety', label: 'AI Content Safety', sub: 'prompt shields, groundedness', col: 4, row: 1, kind: 'model' },
+    { id: 'pub', label: 'EU VIES · OFAC · ECB', sub: 'egress allow-list', col: 4, row: 2, kind: 'ext' },
+  ],
+  flows: [
+    { from: 'people', to: 'edge', n: 1, label: 'Entra ID token; app roles', data: 'Internal' },
+    { from: 'mail', to: 'logic', n: 2, label: 'New invoice trigger', data: 'Confidential' },
+    { from: 'logic', to: 'svc', n: 3, label: 'Intake and scheduled sweeps', data: 'Internal' },
+    { from: 'edge', to: 'svc', n: 4, label: 'API calls via private endpoint', data: 'Internal' },
+    { from: 'svc', to: 'agents', n: 5, label: 'Create run per invoice', data: 'Confidential' },
+    { from: 'agents', to: 'fn', n: 6, label: 'OpenAPI tool calls', data: 'Confidential' },
+    { from: 'agents', to: 'claude', n: 7, label: 'Reasoning, extraction, reasons', data: 'Confidential' },
+    { from: 'claude', to: 'safety', n: 8, label: 'Shields and groundedness checks', data: 'Confidential' },
+    { from: 'fn', to: 'search', n: 9, label: 'Similar lines, policy passages', data: 'Confidential' },
+    { from: 'svc', to: 'pg', n: 10, label: 'State and audit events', data: 'Confidential' },
+    { from: 'svc', to: 'durable', n: 11, label: 'Wait for receipt or approval', data: 'Internal' },
+    { from: 'durable', to: 'teams', n: 12, label: 'Adaptive card to requester / approver', data: 'Internal' },
+    { from: 'svc', to: 'erp', n: 13, label: 'AP and GL interface batches', data: 'Confidential' },
+    { from: 'fn', to: 'pub', n: 14, label: 'Registry lookups', data: 'Public' },
+    { from: 'svc', to: 'blob', n: 15, label: 'Documents and evidence, retained', data: 'Confidential' },
   ],
   notes: [
-    'Teams approvals replace the QR phone view once a Mastercard tenant is available.',
-    'Foundry tracing records every tool call per run, giving audit the same evidence the demo’s trail shows.',
+    'Teams approvals replace the QR phone view once a Mastercard tenant is available; the server-side role checks do not change.',
+    'Foundry tracing records every tool call per run, giving audit the same evidence the demo’s run records show.',
   ],
 }
+
+export type AgentMeta = {
+  id: string; name: string; question: string; step: string; trigger: string; decides: string[];
+  inputs: string; outputs: string; guardrails: string[]; failure: string; human?: string; kind: 'deterministic' | 'model' | 'mixed'
+}
+
+export const AGENTS: AgentMeta[] = [
+  { id: 'supervisor', name: 'Supervisor', question: 'In what order, and what is the status?', step: 'All', kind: 'mixed',
+    trigger: 'An invoice arrives, is run by a reviewer, or something it depends on changes',
+    decides: ['Runs every specialist in a fixed order', 'Applies status precedence: match to PO, held, awaiting receipt, needs coding, fast-track, recommended', 'Calls the investigator on exceptions', 'Asks Claude for the reviewer reason'],
+    inputs: 'Intake record', outputs: 'Run record: steps, tool calls, findings, status, reason, policy and model versions',
+    guardrails: ['Cannot approve, pay or edit master data', 'Every control always runs; none is skipped on confidence'],
+    failure: 'A failed control holds the invoice with "check could not complete"; a model failure falls back to the template reason' },
+  { id: 'intake', name: 'Intake and extraction', question: 'What does the invoice say?', step: 'Intake', kind: 'model',
+    trigger: 'Every run', decides: ['Reads the PDF into a fixed schema with Claude', 'Cross-checks six key fields against the intake record', 'Translates to USD at the month-end rate'],
+    inputs: 'PDF or portal/e-invoice record', outputs: 'Structured invoice; field agreement',
+    guardrails: ['Schema-constrained output', 'Any field disagreement raises a warning for a person'],
+    failure: 'Model unavailable: uses the intake-captured fields and says so' },
+  { id: 'supplier', name: 'Supplier and validity', question: 'Should this be here, and is it valid?', step: 'Steps 1–2', kind: 'deterministic',
+    trigger: 'Every run', decides: ['Routes intercompany and employee reimbursements out of AP', 'Matches the vendor master; OFAC screen', 'Mandatory fields, billed-to entity, currency, VAT via EU VIES', 'Duplicates across 18 months and the open queue', 'Open-PO match; PO policy'],
+    inputs: 'Structured invoice, sender', outputs: 'Vendor match, validity, duplicates, PO findings',
+    guardrails: ['Unknown supplier stops the run before any coding', 'Holds are released only by a person'],
+    failure: 'Registry unreachable: uses the cached answer and labels its age', human: 'Vendor master onboards unknown suppliers' },
+  { id: 'coding', name: 'Coding and treatment', question: 'What is it, where does it go?', step: 'Step 4', kind: 'mixed',
+    trigger: 'Supplier is known and in scope', decides: ['Scores account and cost centre from similar past lines', 'Applies learned corrections', 'Splits by named cost centre or entity', 'Capitalise (per-unit threshold) or prepay', 'Cut-off against the closed period and its accruals', 'Use-tax accrual'],
+    inputs: 'Invoice lines, supplier history, policies', outputs: 'Coding per line with calibrated confidence, evidence, treatment',
+    guardrails: ['The language model never picks the account', 'Capitalisation is routed, not decided'],
+    failure: 'No similar history: confidence drops into the needs-a-person band', human: 'AP specialist accepts or overrides; Fixed Asset Accounting decides capitalisation' },
+  { id: 'price', name: 'Price', question: 'Is the price right?', step: 'Step 5', kind: 'deterministic',
+    trigger: 'Every coded invoice', decides: ['Billed rates against the engagement letter by role', 'Fixed fee against the signed SOW', 'Legal matter budget consumed', 'Amount against the supplier median'],
+    inputs: 'Invoice lines, contracts, budgets', outputs: 'Rate variances, budget share, SOW match',
+    guardrails: ['Flags variances; never edits the invoice'], failure: 'No contract on file: says so and relies on supplier history' },
+  { id: 'approval', name: 'Approval and receipt', question: 'Who asked, did we get it, who can approve?', step: 'Steps 3 and 6', kind: 'deterministic',
+    trigger: 'Every coded invoice', decides: ['Identifies the requester (matter register, named contact, history)', 'Accepts existing receipt evidence or sends a confirmation task with SLA timers', 'Routes by category rules, amount tier, approval limits, SoD and delegates'],
+    inputs: 'Coding, people directory, approval matrix', outputs: 'Requester, receipt status, approval chain',
+    guardrails: ['The approval matrix is data, not prompt', 'Nobody approves their own spend'],
+    failure: 'No requester found: escalates to the cost-centre owner, then the supplier', human: 'Requester confirms; approvers sign in order' },
+  { id: 'risk', name: 'Payment risk', question: 'Is it safe to pay?', step: 'Step 7', kind: 'deterministic',
+    trigger: 'Every coded invoice', decides: ['Amount against the supplier norm', 'Recent bank change without call-back', 'Remit-to mismatch, look-alike sender domain', 'Terms and open early-payment discounts'],
+    inputs: 'Invoice, vendor master, bank change log', outputs: 'Risk signals, payment hold, discount',
+    guardrails: ['High-severity signals always hold; never cleared automatically'], failure: 'Missing bank history: treated as unverified', human: 'Vendor master verifies by call-back' },
+  { id: 'investigator', name: 'Investigator', question: 'Why was it stopped, and what next?', step: 'Exceptions', kind: 'model',
+    trigger: 'Held, needs coding, unknown supplier, or an anomaly case', decides: ['Calls up to 8 read-only tools (vendor profile, bank log, history, invoice lookup, open POs, directory, journals, receivables)', 'Writes a summary with evidence citing the tool calls it made', 'Picks the next action from a fixed list'],
+    inputs: 'Case file: invoice or case, findings', outputs: 'Summary, cited evidence, next action, confidence',
+    guardrails: ['Read-only tools; cannot change status or write', 'Schema-checked; uncited evidence is dropped', 'Tool budget and 45-second deadline'],
+    failure: 'Invalid output, budget or model failure: deterministic summary of the findings' },
+  { id: 'anomaly', name: 'Anomaly sweep', question: 'What was miscoded after the fact?', step: 'Close', kind: 'deterministic',
+    trigger: 'Month-end close; daily cash run', decides: ['Journals posted against how similar lines are coded', 'Duplicate accruals, self-approved entries', 'AP lines coded away from the supplier’s norm', 'Misapplied and unapplied cash with proposed matches'],
+    inputs: 'Journals, AP subledger, receipts, AR', outputs: 'Cases with drafted fixes',
+    guardrails: ['Proposes fixes; posts nothing', 'Suppliers legitimately coded two ways are not flagged'],
+    failure: 'Cases stay open past SLA and show as overdue', human: 'Preparer submits, a different approver signs, then export to the ledger' },
+]
 
 export const MAPPING: { concern: string; repo: string; aws: string; azure: string }[] = [
   { concern: 'Front end', repo: 'Vercel CDN', aws: 'CloudFront + S3', azure: 'Static Web Apps' },
-  { concern: 'Sign-in', repo: 'Shared passcode', aws: 'Cognito + corporate IdP', azure: 'Entra ID' },
+  { concern: 'Sign-in and roles', repo: 'Named sign-in, server-side roles', aws: 'Cognito + corporate IdP groups', azure: 'Entra ID app roles' },
   { concern: 'API service', repo: 'Vercel Python function', aws: 'ECS on Fargate', azure: 'Container Apps' },
-  { concern: 'Agent orchestration', repo: 'Agent.process in Python', aws: 'Bedrock Agents supervisor', azure: 'Foundry Agent Service' },
-  { concern: 'Agent tools', repo: 'Checks, Policy, Recommender', aws: 'Action groups on Lambda', azure: 'OpenAPI tools on Functions' },
+  { concern: 'Agent orchestration', repo: 'Supervisor in Python', aws: 'Bedrock Agents supervisor', azure: 'Foundry Agent Service' },
+  { concern: 'Agent tools', repo: 'Tool registry (typed, recorded)', aws: 'Action groups on Lambda', azure: 'OpenAPI tools on Functions' },
   { concern: 'Model', repo: 'Claude via Anthropic API', aws: 'Claude on Bedrock', azure: 'Claude in Foundry' },
-  { concern: 'Safety', repo: 'Schema output, template fallback', aws: 'Bedrock Guardrails', azure: 'AI Content Safety' },
-  { concern: 'Policy grounding', repo: 'policies.json', aws: 'Bedrock Knowledge Bases', azure: 'AI Search' },
-  { concern: 'Scan fallback', repo: 'Intake record', aws: 'Textract', azure: 'Document Intelligence' },
+  { concern: 'Safety', repo: 'Schema output, read-only investigator, fallbacks', aws: 'Bedrock Guardrails', azure: 'AI Content Safety' },
+  { concern: 'Coding model', repo: 'Calibrated champion + challenger', aws: 'SageMaker endpoint or Lambda numpy', azure: 'Azure ML endpoint or Functions' },
+  { concern: 'Policy grounding', repo: 'Versioned policies in state', aws: 'Bedrock Knowledge Bases', azure: 'AI Search' },
   { concern: 'Documents', repo: 'data/pdfs', aws: 'S3 with Object Lock', azure: 'Immutable Blob Storage' },
   { concern: 'State and audit log', repo: 'SQLite or Neon Postgres', aws: 'Aurora PostgreSQL', azure: 'Azure Database for PostgreSQL' },
-  { concern: 'Waiting on people', repo: 'Receipt task in state', aws: 'Step Functions task tokens', azure: 'Durable Functions' },
-  { concern: 'Schedules', repo: 'Computed on request', aws: 'EventBridge Scheduler', azure: 'Logic Apps' },
-  { concern: 'Invoice intake', repo: 'Seeded queue and live upload', aws: 'SES inbound to S3', azure: 'Logic Apps mailbox trigger' },
-  { concern: 'ERP', repo: 'Oracle R12 CSV download', aws: 'PrivateLink to Oracle EBS', azure: 'ExpressRoute to Oracle EBS' },
-  { concern: 'Secrets and tracing', repo: 'Vercel env, function logs', aws: 'Secrets Manager, CloudWatch, CloudTrail', azure: 'Key Vault, Azure Monitor' },
+  { concern: 'Waiting on people', repo: 'Receipt tasks + SLA sweep', aws: 'Step Functions task tokens', azure: 'Durable Functions' },
+  { concern: 'Schedules', repo: 'Demo clock + on-request sweep', aws: 'EventBridge Scheduler', azure: 'Logic Apps' },
+  { concern: 'Invoice intake', repo: 'Seeded mailbox and live upload', aws: 'SES inbound to S3', azure: 'Logic Apps mailbox trigger' },
+  { concern: 'ERP', repo: 'Oracle R12 interface CSVs', aws: 'PrivateLink to Oracle EBS', azure: 'ExpressRoute to Oracle EBS' },
+  { concern: 'Observability', repo: 'Operations page from run records', aws: 'CloudWatch, CloudTrail, X-Ray', azure: 'Azure Monitor, App Insights' },
 ]
-
-// ---------- agent flow ----------
-
-export type Flag = { code: string; severity: 'hold' | 'warn' | 'info' }
-export type AgentStep = { key: string; question: string; does: string; kinds: Kind[]; flags: Flag[]; path: string }
-
-export const AS_BUILT: AgentStep[] = [
-  { key: 'intake', question: 'Received', kinds: ['rules'], flags: [], path: 'pipeline.py',
-    does: 'Logs the channel, sender and received time, and converts the amount to USD at the month’s rate.' },
-  { key: 'read', question: 'Read the invoice', kinds: ['claude'], flags: [], path: 'llm.extract_pdf',
-    does: 'Claude reads the PDF into a fixed schema. Supplier, number, date, currency, total and line count are compared with the intake record.' },
-  { key: 'supplier', question: 'Should this be here?', kinds: ['rules', 'external'], flags: [{ code: 'UNKNOWN_SUPPLIER', severity: 'hold' }, { code: 'SANCTIONS', severity: 'hold' }], path: 'checks.resolve_vendor, checks.sanctions',
-    does: 'Matches the supplier to the vendor master by name, corroborated by tax ID, and screens the name against OFAC.' },
-  { key: 'validity', question: 'Is the invoice valid?', kinds: ['rules', 'external', 'history'], flags: [{ code: 'VAT_INVALID', severity: 'hold' }, { code: 'DUPLICATE', severity: 'hold' }], path: 'checks.validity, checks.duplicates',
-    does: 'Checks mandatory fields, billed-to entity, currency and the VAT number (EU VIES when it differs from the master), then looks for the same invoice within 45 days under any number format.' },
-  { key: 'po', question: 'Should it have been a PO?', kinds: ['rules'], flags: [{ code: 'OPEN_PO_MATCH', severity: 'hold' }, { code: 'PO_POLICY', severity: 'warn' }], path: 'policy.open_po_match, policy.po_policy',
-    does: 'Sends it to three-way match if an open PO fits. Otherwise applies PO policy, such as IT hardware at any amount or consulting over $25k, and logs any breach for procurement.' },
-  { key: 'coding', question: 'What is it, where does it go?', kinds: ['history'], flags: [{ code: 'DEFAULT_OVERRIDE', severity: 'info' }], path: 'recommend.recommend_line',
-    does: 'Scores GL account and cost centre from similar past lines, weighting the same supplier highest, and flags when the vendor default would have been wrong.' },
-  { key: 'treatment', question: 'Capitalise or prepay?', kinds: ['rules', 'history'], flags: [{ code: 'CAPITALISE', severity: 'info' }, { code: 'PREPAID', severity: 'info' }], path: 'recommend.recommend_line',
-    does: 'Routes per-unit costs over the asset-class threshold to Fixed Assets, and books multi-month service periods to prepaid with an amortisation schedule.' },
-  { key: 'receipt', question: 'Who asked, did we get it?', kinds: ['rules', 'history'], flags: [], path: 'policy.identify_requester, policy.receipt_requirement',
-    does: 'Finds the requester from the legal matter register, a name on the invoice or supplier history. It asks them to confirm receipt unless a standing rule covers it: recurring service within 10% of the 6-month average.' },
-  { key: 'risk', question: 'Is it safe to pay?', kinds: ['rules', 'history'], flags: [{ code: 'PAYMENT_RISK', severity: 'hold' }], path: 'checks.payment_risk',
-    does: 'Looks for an amount 2.5× the supplier’s normal, bank details changed within 30 days without a call-back, a remit-to mismatch, a look-alike sender domain and shortened terms.' },
-  { key: 'approval', question: 'Who can approve it?', kinds: ['rules'], flags: [{ code: 'SOD_REROUTE', severity: 'warn' }], path: 'policy.route',
-    does: 'Applies category rules first, then the amount tier: cost-centre owner under $10k, director to $100k, VP above. Skips anyone below their limit, the requester and anyone out of office.' },
-]
-
-export const WRAP_UP = {
-  question: 'Decide and explain',
-  does: 'Sets the status by precedence, then Claude writes the reason from the findings, with a template as fallback.',
-  path: 'pipeline.decide, llm.explain',
-}
-
-export const OUTCOMES: { status: string; label: string; when: string }[] = [
-  { status: 'MATCH_TO_PO', label: 'Match to PO', when: 'An open PO matches' },
-  { status: 'HELD', label: 'Held', when: 'Any hold: unknown supplier, sanctions, VAT, duplicate, payment risk' },
-  { status: 'AWAITING_CONFIRMATION', label: 'Awaiting confirmation', when: 'Receipt needed and not yet confirmed' },
-  { status: 'NEEDS_CODING', label: 'Needs coding', when: 'Confidence below 60%' },
-  { status: 'FAST_TRACK', label: 'Fast-track', when: 'Confidence 90% or more, no warnings, nothing to capitalise or prepay' },
-  { status: 'RECOMMENDED', label: 'Recommended', when: 'Everything else: a person reviews the recommendation' },
-]
-
-export type Specialist = { name: string; job: string; tools: string[]; raises: string[]; guardrail: string; human?: string; scheduled?: boolean }
-
-export const SUPERVISOR = {
-  name: 'Supervisor',
-  job: 'Plans each invoice’s run, calls the specialists, merges their flags, applies the status precedence and asks the model for the reason.',
-  guardrail: 'Can recommend, hold and route. Cannot approve, change vendor master data or release payment.',
-}
-
-export const SPECIALISTS: Specialist[] = [
-  { name: 'Intake and extraction', job: 'Turns an email or upload into a structured invoice.',
-    tools: ['extract_pdf', 'field agreement', 'fx_rate'], raises: [],
-    guardrail: 'Schema-constrained output; any field disagreement goes to a person.' },
-  { name: 'Supplier and validity', job: 'Decides whether the invoice belongs in AP at all.',
-    tools: ['resolve_vendor', 'sanctions', 'vies_check', 'duplicates', 'open_po_match', 'po_policy'],
-    raises: ['UNKNOWN_SUPPLIER', 'SANCTIONS', 'VAT_INVALID', 'DUPLICATE', 'OPEN_PO_MATCH', 'PO_POLICY'],
-    guardrail: 'Holds stand for the run; only a person releases them.' },
-  { name: 'Coding and treatment', job: 'Recommends account, cost centre and accounting treatment.',
-    tools: ['recommend_line', 'recommend_cc', 'vendor_default_contrast', 'learned corrections'],
-    raises: ['DEFAULT_OVERRIDE', 'CAPITALISE', 'PREPAID'],
-    guardrail: 'Every recommendation carries its evidence lines and confidence.', human: 'AP specialist accepts or overrides; overrides become history.' },
-  { name: 'Payment risk', job: 'Looks for fraud and error patterns before money moves.',
-    tools: ['payment_risk', 'comparable_median', 'aba_valid', 'iban_valid'], raises: ['PAYMENT_RISK'],
-    guardrail: 'High-severity signals always hold and are never cleared automatically.', human: 'Vendor master team verifies by call-back.' },
-  { name: 'Approval and receipt', job: 'Finds who asked for it, who confirms it and who can approve it.',
-    tools: ['identify_requester', 'receipt_requirement', 'route'], raises: ['SOD_REROUTE'],
-    guardrail: 'The approval matrix is data, not prompt; the agent cannot invent an approver.', human: 'Requester confirms receipt; approvers sign in order.' },
-  { name: 'Anomaly sweep', job: 'Runs the same coding engine over journals, the AP subledger and cash application.',
-    tools: ['scan_journals', 'scan_ap_ledger', 'scan_cash', 'gl_reclass'], raises: [],
-    guardrail: 'Proposes reclasses and matches; posts nothing.', human: 'Controller reviews and uploads the reclass file.', scheduled: true },
-]
-
-// ---------- operational workflows ----------
-
-export type Actor = 'AP specialist' | 'Agent' | 'Requester' | 'Approver' | 'Controller' | 'Procurement' | 'Oracle EBS'
-export type WStep = { actor: Actor; text: string; api?: string }
-export type Workflow = { id: string; name: string; purpose: string; trigger: string; outcome: string; steps: WStep[] }
-
-export const WORKFLOWS: Workflow[] = [
-  { id: 'intake', name: 'Intake and agent run', purpose: 'Every non-PO invoice is read and worked before anyone opens it.',
-    trigger: 'An invoice arrives in the AP mailbox or the overnight batch', outcome: 'A status, a recommendation and a reason for each invoice',
-    steps: [
-      { actor: 'Agent', text: 'Reads the PDF and cross-checks the fields against the intake record', api: 'llm.extract_pdf' },
-      { actor: 'Agent', text: 'Runs supplier, validity, PO, coding, treatment, receipt, risk and approval steps', api: 'GET /api/invoices/{id}/run' },
-      { actor: 'Agent', text: 'Sets the status by precedence and writes the reason', api: 'llm.explain' },
-      { actor: 'AP specialist', text: 'Works the queue: fast-tracked items ready, holds explained', api: 'GET /api/queue' },
-    ] },
-  { id: 'review', name: 'Review and decision', purpose: 'A person stays in charge of every coding decision.',
-    trigger: 'An invoice is Recommended, Needs coding or Fast-track', outcome: 'Submitted for approval, or rejected with a reason',
-    steps: [
-      { actor: 'AP specialist', text: 'Checks the recommendation, evidence lines and flags', api: 'GET /api/invoices/{id}' },
-      { actor: 'AP specialist', text: 'Accepts, overrides with a reason, or rejects with a reason', api: 'POST /api/invoices/{id}/decision' },
-      { actor: 'Agent', text: 'On an override, stores the correction so the next similar line picks it up' },
-      { actor: 'Agent', text: 'Builds the approval chain and records the submission in the audit trail', api: 'GET /api/invoices/{id}/audit' },
-    ] },
-  { id: 'receipt', name: 'Receipt confirmation', purpose: 'No PO means no goods receipt, so the requester’s confirmation is the evidence.',
-    trigger: 'Receipt is required and no standing rule applies', outcome: 'Receipt confirmed and the invoice becomes approvable',
-    steps: [
-      { actor: 'Agent', text: 'Identifies the requester from the legal matter, a name on the invoice or history' },
-      { actor: 'Agent', text: 'Creates a receipt task with the invoice and the evidence for the match', api: 'POST /api/invoices/{id}/receipt/request' },
-      { actor: 'Requester', text: 'Opens the task on a phone and confirms, with an optional note', api: 'POST /api/invoices/{id}/receipt/confirm' },
-      { actor: 'Agent', text: 'Re-evaluates: Awaiting confirmation moves to the post-receipt status' },
-    ] },
-  { id: 'approval', name: 'Approval routing', purpose: 'The approval matrix applied the same way every time.',
-    trigger: 'An invoice is submitted for approval', outcome: 'Approved and written to the AP interface batch',
-    steps: [
-      { actor: 'Agent', text: 'Applies category rules, such as Legal Operations first for legal fees, then the amount tier' },
-      { actor: 'Agent', text: 'Skips anyone below their limit, the requester and anyone out of office' },
-      { actor: 'Approver', text: 'Each approver signs in order; out-of-turn approvals are refused', api: 'POST /api/invoices/{id}/approve' },
-      { actor: 'Agent', text: 'On the final approval, adds the invoice to the AP open-interface batch' },
-      { actor: 'Oracle EBS', text: 'Imports AP_INVOICES_INTERFACE and AP_INVOICE_LINES_INTERFACE', api: 'GET /api/exports/ap-interface/{part}' },
-    ] },
-  { id: 'controls', name: 'Holds and controls', purpose: 'Stop the bad invoice before the payment run, and say why.',
-    trigger: 'Any hold raised during the run', outcome: 'Held with a named next action; nothing reaches approval',
-    steps: [
-      { actor: 'Agent', text: 'Raises the hold: duplicate, VAT invalid, sanctions, unknown supplier or payment risk' },
-      { actor: 'Agent', text: 'Blocks submission: a held invoice cannot be accepted or overridden', api: 'POST /api/invoices/{id}/decision' },
-      { actor: 'AP specialist', text: 'Follows the next action: vendor onboarding, call-back or three-way match' },
-      { actor: 'AP specialist', text: 'Rejects with a reason once the outcome is known' },
-    ] },
-  { id: 'anomaly', name: 'Month-end anomaly sweep', purpose: 'Catch miscoding wherever it was keyed, not only in AP.',
-    trigger: 'Month-end close, or the daily cash-application run', outcome: 'A reclass file and proposed cash matches',
-    steps: [
-      { actor: 'Agent', text: 'Scans manual and spreadsheet journals against how similar lines are usually coded', api: 'GET /api/anomalies' },
-      { actor: 'Agent', text: 'Scans the AP subledger for lines coded away from their usual account' },
-      { actor: 'Agent', text: 'Matches unapplied cash to open AR, including transposed customer references' },
-      { actor: 'Controller', text: 'Reviews the findings and downloads the GL reclass file', api: 'GET /api/exports/reclass' },
-      { actor: 'Oracle EBS', text: 'Imports the reclass through GL_INTERFACE' },
-    ] },
-  { id: 'value', name: 'PO compliance and value', purpose: 'Shrink non-PO volume at source, not just process it faster.',
-    trigger: 'A PO-policy breach is logged as each invoice is processed', outcome: 'Procurement report and blanket-PO candidates',
-    steps: [
-      { actor: 'Agent', text: 'Logs each invoice that should have had a PO, with the rule it broke' },
-      { actor: 'Agent', text: 'Aggregates 18 months of spend with and without a PO, by category and supplier', api: 'GET /api/insights/procurement' },
-      { actor: 'Procurement', text: 'Downloads the PO-policy report and chooses blanket-PO candidates', api: 'GET /api/exports/procurement' },
-    ] },
-  { id: 'treatment', name: 'Prepaid and capitalisation', purpose: 'Join P2P to R2R so the period’s numbers are right.',
-    trigger: 'A multi-month service period, or a per-unit cost over the asset threshold', outcome: 'An amortisation journal, or a Fixed Assets referral',
-    steps: [
-      { actor: 'Agent', text: 'Books multi-month services to prepaid and drafts the monthly amortisation', api: 'GET /api/exports/amortisation/{id}' },
-      { actor: 'Agent', text: 'Routes hardware over the per-unit threshold to Fixed Asset Accounting' },
-      { actor: 'Controller', text: 'Confirms the treatment and posts the amortisation journal' },
-      { actor: 'Oracle EBS', text: 'Imports the journal through GL_INTERFACE' },
-    ] },
-  { id: 'wildcard', name: 'Live upload', purpose: 'Prove it on an invoice nobody prepared.',
-    trigger: 'Someone in the room uploads any invoice PDF', outcome: 'The new invoice worked end to end, live',
-    steps: [
-      { actor: 'AP specialist', text: 'Uploads a PDF under 8 MB', api: 'POST /api/wildcard' },
-      { actor: 'Agent', text: 'Claude reads it live, bypassing the cache', api: 'llm.extract_pdf' },
-      { actor: 'Agent', text: 'Runs the same ten steps and streams them to the screen', api: 'GET /api/invoices/{id}/run' },
-      { actor: 'AP specialist', text: 'Reviews and decides as for any other invoice' },
-    ] },
-]
-
-export const ACTORS: Actor[] = ['AP specialist', 'Agent', 'Requester', 'Approver', 'Controller', 'Procurement', 'Oracle EBS']
