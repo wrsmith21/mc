@@ -8,7 +8,7 @@ importers:
 
   .:
     dependencies:
-      plotly.js-dist-min:
+      plotly.js-basic-dist-min:
         specifier: ^4.1.2
         version: 4.1.2
       qrcode.react:
@@ -979,8 +979,8 @@ packages:
     resolution: {integrity: sha512-qcJu88Q2IWqJsDD529JKMdwGm/dvInW4HvQnRwiH9JtihJvzGOscDtHE3x1pBKeUOTysQ8kVmLnJ2kJu7yhcGA==}
     engines: {node: '>=12'}
 
-  plotly.js-dist-min@4.1.2:
-    resolution: {integrity: sha512-VSmS9KVNun16S8qFYYp9LlL/XBby4ueeGqB+K9AqRCVsup8dSpGULap4UyR1f2mz4pV3qjWp1sR5chwLgIKPoQ==}
+  plotly.js-basic-dist-min@4.1.2:
+    resolution: {integrity: sha512-LvfKTeVYIKzEyMj9TuH+8ot0I7IMG1fET2YxgUtbpZVHd2fBrOlBFsk26wKgnAckHyNhKG7vDk4tEyqGCYs2Aw==}
 
   plotly.js@4.1.2:
     resolution: {integrity: sha512-+0CpavZ4QofYgr1OBigX1Ut+CyMkx74gQWiWRBNoAHwBnyrOjKaLq7UWWa0YFArYF3TMx50HvnUh2RjVatedzg==}
@@ -2138,7 +2138,7 @@ snapshots:
 
   picomatch@4.0.7: {}
 
-  plotly.js-dist-min@4.1.2: {}
+  plotly.js-basic-dist-min@4.1.2: {}
 
   plotly.js@4.1.2:
     dependencies:
