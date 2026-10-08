@@ -5,7 +5,7 @@ import { useApp, useCan } from '../context'
 import { compact, money, num, pct } from '../format'
 
 // Validated with the dataviz palette checker (CVD ΔE 23.5, contrast ≥ 3:1 on white). Orange always means "needs attention".
-const ALLOWED = '#1F64B0'
+const ALLOWED = '#4F7FB8'
 const ATTENTION = '#E85400'
 
 export default function Insights() {
@@ -71,7 +71,7 @@ export default function Insights() {
               { type: 'bar', name: 'Without a PO', x: months, y: p.by_month.map((m: Json) => m.non_po), marker: { color: ATTENTION, line: { color: '#fff', width: 2 } },
                 hovertemplate: '%{x}<br>Without a PO: $%{y:,.0f}<extra></extra>' },
             ]}
-            layout={{ barmode: 'stack', bargap: 0.25, yaxis: { gridcolor: '#ebe6e2', tickprefix: '$', tickformat: '~s' } }}
+            layout={{ barmode: 'stack', bargap: 0.45, yaxis: { gridcolor: '#eff0f2', tickprefix: '$', tickformat: '~s' } }}
           />
         </div>
         <div className="card" data-tour="category-breach">
@@ -84,7 +84,7 @@ export default function Insights() {
               { type: 'bar', orientation: 'h', name: 'Should have been a PO', y: cats.map((c: Json) => c.category), x: cats.map((c: Json) => c.breach),
                 marker: { color: ATTENTION, line: { color: '#fff', width: 2 } }, hovertemplate: '%{y}<br>Should have been a PO: $%{x:,.0f}<extra></extra>' },
             ]}
-            layout={{ barmode: 'stack', margin: { l: 170, r: 16, t: 10, b: 44 }, xaxis: { gridcolor: '#ebe6e2', tickprefix: '$', tickformat: '~s' } }}
+            layout={{ barmode: 'stack', bargap: 0.35, margin: { l: 170, r: 16, t: 10, b: 44 }, xaxis: { gridcolor: '#eff0f2', tickprefix: '$', tickformat: '~s' } }}
           />
         </div>
         <div className="card wide" data-tour="blanket-po">

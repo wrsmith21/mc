@@ -9,18 +9,18 @@ export const brand = {
   wordmark: neutral ? null : '/brand/mastercard-logo.svg',
   disclaimer: 'Demonstration on synthetic data · built by Ciklum',
   colors: {
-    ink: '#141413',
-    paper: '#F3F0EE',
+    ink: '#1B1D21',
+    paper: '#F6F7F9',
     panel: '#FFFFFF',
-    line: '#DCD6D1',
-    muted: '#5F5A55',
+    line: '#E4E6EA',
+    muted: '#6B7079',
     red: '#EB001B',
     yellow: '#F79E1B',
     orange: '#FF5F00',
-    green: '#1A7F4B',
-    blue: '#2C5D8A',
+    green: '#16794C',
+    blue: '#2F5F8F',
   },
-  font: "'Figtree', 'Helvetica Neue', Arial, sans-serif",
+  font: "'Geist', 'Helvetica Neue', Arial, sans-serif",
 }
 
-export const chartColors = ['#141413', '#FF5F00', '#2C5D8A', '#9C8F84', '#F79E1B', '#1A7F4B']
+export const chartColors = ['#1B1D21', '#FF5F00', '#2F5F8F', '#A3A7AE', '#F79E1B', '#16794C']

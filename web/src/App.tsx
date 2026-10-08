@@ -2,6 +2,7 @@ import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react'
 import { NavLink, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { api, ApiError, type Json } from './api'
 import { brand } from './brand'
+import Icon from './components/Icon'
 import Walkthrough from './components/Walkthrough'
 import { AppCtx, type Session } from './context'
 import Audit from './screens/Audit'
@@ -159,42 +160,48 @@ export default function App() {
           <span className="clock" title="Demo clock">{meta?.now ? `${meta.now.slice(0, 10)} ${meta.now.slice(11, 16)}` : ''}</span>
           {meta?.mode && (
             <span className={`mode ${meta.mode === 'live' ? '' : 'replay'}`} title={meta.model}>
-              {meta.mode === 'live' ? 'Live · Claude connected' : 'Replay mode'}
+              {meta.mode === 'live' ? 'Claude connected' : 'Replay mode'}
             </span>
           )}
           <label className="pace" title="Spaces out agent events on screen for presenting. The agent itself never waits.">
             <input type="checkbox" checked={slow} onChange={toggleSlow} /> Presentation pace
           </label>
-          <span className="disclaimer" data-tour="disclaimer">{brand.disclaimer}</span>
+          <span className="divider" />
           <button type="button" className="user" onClick={() => setChoosing(true)} data-tour="persona" title="Switch user (logged)">
-            <b>{session.person.name}</b>
-            <span>{session.role_labels.filter((l) => l !== 'Requester').join(' · ') || 'Requester'}</span>
+            <span className="avatar">{session.person.name.split(' ').map((w: string) => w[0]).join('').slice(0, 2)}</span>
+            <span className="who">
+              <b>{session.person.name}</b>
+              <span>{session.role_labels.filter((l) => l !== 'Requester').join(', ') || 'Requester'}</span>
+            </span>
           </button>
         </header>
         <nav className="nav" aria-label="Main">
-          <NavLink to="/" end>My work {(counts.mine > 0 || (has('ap_specialist') && counts.fresh > 0)) && <span className="count">{has('ap_specialist') ? counts.fresh : counts.mine}</span>}</NavLink>
-          <NavLink to="/queue">Invoice queue</NavLink>
-          <NavLink to="/close">Close and anomalies</NavLink>
-          <NavLink to="/insights">Value and procurement</NavLink>
-          <NavLink to="/model">Model and data</NavLink>
-          <NavLink to="/architecture">Architecture and workflows</NavLink>
+          <div className="nav-group">Work</div>
+          <NavLink to="/" end><Icon name="inbox" /><span className="label">My work</span>{(counts.mine > 0 || (has('ap_specialist') && counts.fresh > 0)) && <span className="count">{has('ap_specialist') ? counts.fresh : counts.mine}</span>}</NavLink>
+          <NavLink to="/queue"><Icon name="queue" /><span className="label">Invoice queue</span></NavLink>
+          <NavLink to="/close"><Icon name="close" /><span className="label">Close and anomalies</span></NavLink>
+          <div className="nav-group">Insight</div>
+          <NavLink to="/insights"><Icon name="value" /><span className="label">Value and procurement</span></NavLink>
+          <NavLink to="/model"><Icon name="model" /><span className="label">Model and data</span></NavLink>
+          <NavLink to="/architecture"><Icon name="arch" /><span className="label">Architecture</span></NavLink>
           <div className="nav-group">Governance</div>
-          <NavLink to="/policies">Policies</NavLink>
-          <NavLink to="/audit">Audit log</NavLink>
-          <NavLink to="/operations">Operations</NavLink>
-          <a href="/requester" target="_blank" rel="noreferrer">Requester phone view</a>
+          <NavLink to="/policies"><Icon name="policy" /><span className="label">Policies</span></NavLink>
+          <NavLink to="/audit"><Icon name="audit" /><span className="label">Audit log</span></NavLink>
+          <NavLink to="/operations"><Icon name="ops" /><span className="label">Operations</span></NavLink>
+          <a href="/requester" target="_blank" rel="noreferrer"><Icon name="phone" /><span className="label">Requester phone view</span></a>
           <div className="sep" />
           <div className="tools">
-            <button type="button" className="tour" onClick={() => setTour(true)}>Start walkthrough</button>
+            <button type="button" className="tour" onClick={() => setTour(true)}><Icon name="play" />Start walkthrough</button>
             {meta?.wildcard && has('ap_specialist', 'admin') && (
               <label data-tour="wildcard">
-                Process a new invoice…
+                <Icon name="upload" />Process a new invoice…
                 <input type="file" accept="application/pdf" onChange={(e) => upload(e.target.files?.[0])} />
               </label>
             )}
-            {has('admin') && <button type="button" onClick={advance}>Advance clock 24h</button>}
-            {has('admin', 'ap_specialist') && <button type="button" onClick={reset}>Reset demo</button>}
+            {has('admin') && <button type="button" onClick={advance}><Icon name="clock" />Advance clock 24h</button>}
+            {has('admin', 'ap_specialist') && <button type="button" onClick={reset}><Icon name="reset" />Reset demo</button>}
           </div>
+          <p className="disclaimer" data-tour="disclaimer">{brand.disclaimer}</p>
         </nav>
         <main className="main">
           <Routes>

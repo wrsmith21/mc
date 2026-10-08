@@ -11,12 +11,12 @@ export default function Plot({ data, layout, height = 340 }: { data: any[]; layo
       data={data}
       layout={{
         height,
-        margin: { l: 56, r: 16, t: 10, b: 44 },
+        margin: { l: 48, r: 12, t: 8, b: 40 },
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)',
-        font: { family: brand.font, size: 14, color: brand.colors.ink },
-        xaxis: { gridcolor: '#ebe6e2', zeroline: false },
-        yaxis: { gridcolor: '#ebe6e2', zeroline: false },
+        font: { family: brand.font, size: 12, color: brand.colors.muted },
+        xaxis: { gridcolor: '#eff0f2', linecolor: brand.colors.line, zeroline: false },
+        yaxis: { gridcolor: '#eff0f2', zeroline: false },
         legend: { orientation: 'h', y: -0.18 },
         hoverlabel: { font: { family: brand.font } },
         ...layout,

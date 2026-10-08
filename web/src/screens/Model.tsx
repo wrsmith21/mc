@@ -3,7 +3,7 @@ import { api, type Json } from '../api'
 import Plot from '../components/Plot'
 import { num, pct } from '../format'
 
-const BLUE = '#1F64B0'
+const BLUE = '#4F7FB8'
 const NAME: Record<string, string> = { champion: 'Champion · explainable similarity engine', challenger: 'Challenger · logistic regression', blend: 'Blend of both' }
 
 export default function Model() {
@@ -59,13 +59,13 @@ export default function Model() {
         <div className="card" data-tour="calibration">
           <h3>When it says 95%, is it right 95% of the time?</h3>
           <Plot height={300} data={[
-            { x: [0, 1], y: [0, 1], mode: 'lines', line: { color: '#9c8f84', width: 1, dash: 'dot' }, hoverinfo: 'skip', showlegend: false },
+            { x: [0, 1], y: [0, 1], mode: 'lines', line: { color: '#a3a7ae', width: 1, dash: 'dot' }, hoverinfo: 'skip', showlegend: false },
             { x: prod.reliability.map((b: Json) => b.confidence), y: prod.reliability.map((b: Json) => b.accuracy), mode: 'lines+markers',
               line: { color: BLUE, width: 2 }, marker: { size: 9, color: BLUE, line: { color: '#fff', width: 2 } }, showlegend: false,
               customdata: prod.reliability.map((b: Json) => b.n), hovertemplate: 'Says %{x:.0%}<br>Right %{y:.1%}<br>%{customdata} lines<extra></extra>' },
           ]} layout={{ xaxis: { title: { text: 'Calibrated confidence' }, tickformat: '.0%', range: [0, 1.02] },
             yaxis: { title: { text: 'Measured accuracy' }, tickformat: '.0%', range: [0, 1.02] },
-            annotations: [{ x: 0.3, y: 0.36, text: 'perfect calibration', showarrow: false, font: { size: 12, color: '#5f5a55' } }] }} />
+            annotations: [{ x: 0.3, y: 0.36, text: 'perfect calibration', showarrow: false, font: { size: 12, color: '#6b7079' } }] }} />
           <p className="muted small">Isotonic calibration fitted on May – Jun 2026, checked on Jul – Sep. Each dot is a confidence band of hold-out lines.</p>
         </div>
 
