@@ -8,6 +8,7 @@ import io
 import json
 import os
 import re
+import threading
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -56,47 +57,80 @@ def _norm(name):
 
 
 class OfacList:
-    def __init__(self):
-        self.names, self.rows, self.source, self.as_of = [], [], None, None
+    """Screens against the bundled SDN list at once; a copy older than a day is refreshed from Treasury in the
+    background, so no request ever waits on the 5.7 MB download."""
+    REFRESH_AFTER = 86400
 
-    def load(self):
-        if self.names:
-            return self
-        path = CACHE / "sdn.csv"
-        text, source = None, None
-        fresh = path.exists() and time.time() - path.stat().st_mtime < 7 * 86400
-        if fresh:
-            text, source = path.read_text(errors="ignore"), "cached"
-        elif not OFFLINE:
-            try:
-                r = httpx.get(SDN_URL, timeout=TIMEOUT * 3, follow_redirects=True)
-                r.raise_for_status()
-                text, source = r.text, "live"
-            except httpx.HTTPError:
-                text = None
-        if text is None and path.exists():
-            text, source = path.read_text(errors="ignore"), "cached"
-        if text is None:
-            self.source = "unavailable"
-            return self
+    def __init__(self):
+        self._list, self.source, self.as_of = None, None, None
+        self._refreshing = False
+
+    @property
+    def names(self):
+        return self._list[0] if self._list else []
+
+    @staticmethod
+    def _parse(text):
+        names, rows = [], []
         for row in csv.reader(io.StringIO(text)):
             if len(row) > 3 and row[1] and row[1] != "-0-":
-                self.rows.append({"uid": row[0], "name": row[1], "type": row[2], "program": row[3]})
-                self.names.append(_norm(row[1]))
-        self.source = source
-        self.as_of = _now() if source == "live" else datetime.fromtimestamp(path.stat().st_mtime, timezone.utc) \
-            .isoformat(timespec="seconds")
+                rows.append({"uid": row[0], "name": row[1], "type": row[2], "program": row[3]})
+                names.append(_norm(row[1]))
+        return names, rows
+
+    @staticmethod
+    def _fetched_at(base):
+        # bundle file dates are not preserved on deploy, so the fetch time is recorded next to the list
+        meta = base / "sdn.json"
+        if meta.exists():
+            return json.loads(meta.read_text())["fetched_at"]
+        return datetime.fromtimestamp((base / "sdn.csv").stat().st_mtime, timezone.utc).isoformat(timespec="seconds")
+
+    def _download(self):
+        r = httpx.get(SDN_URL, timeout=TIMEOUT * 3, follow_redirects=True)
+        r.raise_for_status()
+        return r.text
+
+    def _refresh(self):
+        try:
+            text = self._download()
+            self._list, self.source, self.as_of = self._parse(text), "live", _now()
+            WRITABLE.mkdir(parents=True, exist_ok=True)
+            (WRITABLE / "sdn.csv").write_text(text)
+            (WRITABLE / "sdn.json").write_text(json.dumps({"fetched_at": self.as_of}))
+        except (httpx.HTTPError, OSError):
+            pass
+        finally:
+            self._refreshing = False
+
+    def load(self):
+        if self._list:
+            return self
+        base = next((b for b in (WRITABLE, CACHE) if (b / "sdn.csv").exists()), None)
+        if base:
+            self.as_of, self.source = self._fetched_at(base), "cached"
+            self._list = self._parse((base / "sdn.csv").read_text(errors="ignore"))
+            age = time.time() - datetime.fromisoformat(self.as_of).timestamp()
+            if not OFFLINE and age > self.REFRESH_AFTER and not self._refreshing:
+                self._refreshing = True
+                threading.Thread(target=self._refresh, daemon=True).start()
+        elif not OFFLINE:
+            self._refreshing = True
+            self._refresh()
+        if not self._list:
+            self.source = "unavailable"
         return self
 
     def screen(self, name, threshold=92):
         self.load()
-        if not self.names:
+        if not self._list:
             return {"status": "unavailable", "source": self.source, "matches": []}
-        hits = process.extract(_norm(name), self.names, scorer=fuzz.token_sort_ratio, limit=3,
+        names, rows = self._list
+        hits = process.extract(_norm(name), names, scorer=fuzz.token_sort_ratio, limit=3,
                                score_cutoff=threshold)
         return {"status": "potential_match" if hits else "clear", "source": self.source, "as_of": self.as_of,
-                "list_size": len(self.names), "screened_name": name,
-                "matches": [{**self.rows[i], "score": round(s, 1)} for _n, s, i in hits]}
+                "list_size": len(names), "screened_name": name,
+                "matches": [{**rows[i], "score": round(s, 1)} for _n, s, i in hits]}
 
 
 ofac = OfacList()
