@@ -49,7 +49,12 @@ def api(pg, path):
 
 
 def toast(pg, text, timeout=60_000):
-    pg.wait_for_selector(f".toast:has-text('{text}')", timeout=timeout)
+    try:
+        pg.wait_for_selector(f".toast:has-text('{text}')", timeout=timeout)
+    except Exception:
+        pg.screenshot(path=f"{SHOTS}/missing-toast.png")
+        raise AssertionError(f"No '{text}' toast; on screen: {pg.locator('.toast').all_inner_texts()} "
+                             f"(screenshot {SHOTS}/missing-toast.png)") from None
 
 
 def test_01_reset_and_morning_mailbox(page):

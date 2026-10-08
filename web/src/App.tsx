@@ -1,6 +1,6 @@
 import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react'
 import { NavLink, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
-import { api, type Json } from './api'
+import { api, ApiError, type Json } from './api'
 import { brand } from './brand'
 import Walkthrough from './components/Walkthrough'
 import { AppCtx, type Session } from './context'
@@ -52,15 +52,22 @@ export default function App() {
   useEffect(() => {
     const onAuth = () => setNeedLogin(true)
     const onSignIn = () => setChoosing(true)
+    const onUnhandled = (e: PromiseRejectionEvent) => {
+      if (!(e.reason instanceof ApiError) || e.reason.status === 401) return
+      e.preventDefault()
+      toast(e.reason.message, 'error')
+    }
     window.addEventListener('mc-auth-required', onAuth)
     window.addEventListener('mc-signin-required', onSignIn)
+    window.addEventListener('unhandledrejection', onUnhandled)
     api.meta().then(setMeta).catch(() => {})
     api.session().then((s) => setSession(s.person ? s : null)).catch(() => setSession(null))
     return () => {
       window.removeEventListener('mc-auth-required', onAuth)
       window.removeEventListener('mc-signin-required', onSignIn)
+      window.removeEventListener('unhandledrejection', onUnhandled)
     }
-  }, [needLogin])
+  }, [needLogin, toast])
 
   useEffect(() => {
     if (!session) return

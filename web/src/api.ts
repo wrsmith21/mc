@@ -9,8 +9,15 @@ export class ApiError extends Error {
   }
 }
 
+export const OFFLINE = "Can't reach the server. Check the connection and try again."
+
 async function call(path: string, init?: RequestInit): Promise<Json> {
-  const res = await fetch(path, { credentials: 'include', ...init })
+  let res: Response
+  try {
+    res = await fetch(path, { credentials: 'include', ...init })
+  } catch {
+    throw new ApiError(0, OFFLINE)
+  }
   if (!res.ok) {
     let detail = res.statusText
     try {
