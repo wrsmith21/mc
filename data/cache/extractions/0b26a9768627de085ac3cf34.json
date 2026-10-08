@@ -1,0 +1,44 @@
+{
+ "fields": {
+  "vendor_name": "Baker Street Kitchens",
+  "vendor_tax_id": "88-2949775",
+  "invoice_num": "INV003321",
+  "invoice_date": "2026-10-13",
+  "due_date": "2026-11-27",
+  "currency": "USD",
+  "bill_to": "Accounts Payable \u2013 US Operating Entity (US01), GBSC Finance, O'Fallon, MO",
+  "po_reference": null,
+  "service_period_start": null,
+  "service_period_end": null,
+  "matter": null,
+  "named_contact": null,
+  "remit_account_last4": "5938",
+  "remit_routing_number": "021037926",
+  "lines": [
+   {
+    "description": "Working lunch \u2013 Customer Advisory Board",
+    "qty": 1,
+    "unit_price": 2677.71,
+    "amount": 2677.71
+   },
+   {
+    "description": "Meeting catering \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 362.55,
+    "amount": 362.55
+   }
+  ],
+  "subtotal": 3040.26,
+  "tax": 0.0,
+  "total": 3040.26,
+  "notes": "Terms: NET45. Payment via ACH."
+ },
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 3896,
+  "input_tokens": 3067,
+  "output_tokens": 333,
+  "request_id": "req_011Cfp4t9sckQ9AdzA7Mx3jS"
+ }
+}

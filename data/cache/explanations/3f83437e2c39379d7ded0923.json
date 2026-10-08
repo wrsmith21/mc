@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Heartland Gas Co. invoice to account 6440 (Utilities) under cost centre CC5230, but at low confidence (0.345), so it still needs a coder's review. The suggestion rests on three similar \"As per agreement\" invoices from other vendors (Heartland Utilities, Ameri Gas Co. and Riverside Energy), all coded to 6440 between May and September 2026. None of these are from Heartland Gas Co. itself, and once coded, the invoice would route to Chris Calloway (cost-centre owner) for approval.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2614
+ }
+}

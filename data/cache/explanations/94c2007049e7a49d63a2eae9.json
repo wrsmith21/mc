@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Printcraft Print invoice to account 6480 (Printing & Reprographics) under cost centre CC6100, with a confidence of 0.95. The recommendation is supported by three prior large-format printing invoices for the New York office from Inkwell Print and Pressline Print, all coded to 6480. No policy flags were raised, and the invoice is awaiting confirmation from Nikhil Khan as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1737
+ }
+}

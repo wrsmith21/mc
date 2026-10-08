@@ -1,0 +1,62 @@
+{
+ "fields": {
+  "vendor_name": "Hartwell & Pryce LLP",
+  "vendor_tax_id": "11-8751465",
+  "invoice_num": "0098",
+  "invoice_date": "2026-10-02",
+  "due_date": "2026-11-01",
+  "currency": "USD",
+  "bill_to": "Accounts Payable \u2013 US Operating Entity (US01), GBSC Finance, O'Fallon, MO",
+  "po_reference": null,
+  "service_period_start": "2026-08-01",
+  "service_period_end": "2026-09-30",
+  "matter": "M-2207 \u2014 Supplier contract review",
+  "named_contact": "J. Ortiz",
+  "remit_account_last4": "0571",
+  "remit_routing_number": "042976480",
+  "lines": [
+   {
+    "description": "Partner \u2013 contract review, matter M-2207 (23.0 hrs)",
+    "qty": 23,
+    "unit_price": 1100.0,
+    "amount": 25300.0
+   },
+   {
+    "description": "Senior Associate \u2013 contract review, matter M-2207 (50.0 hrs)",
+    "qty": 50,
+    "unit_price": 720.0,
+    "amount": 36000.0
+   },
+   {
+    "description": "Associate \u2013 contract review, matter M-2207 (38.0 hrs)",
+    "qty": 38,
+    "unit_price": 575.0,
+    "amount": 21850.0
+   },
+   {
+    "description": "Paralegal \u2013 document management, matter M-2207 (7.5 hrs)",
+    "qty": 7.5,
+    "unit_price": 240.0,
+    "amount": 1800.0
+   },
+   {
+    "description": "Disbursements \u2013 courier and filing",
+    "qty": 1,
+    "unit_price": 1550.0,
+    "amount": 1550.0
+   }
+  ],
+  "subtotal": 86500.0,
+  "tax": 0.0,
+  "total": 86500.0,
+  "notes": "Terms: NET30. Detailed time entries available on request. Please quote the invoice number with payment. Disbursements billed as a single lump-sum line without itemization."
+ },
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 5555,
+  "input_tokens": 3278,
+  "output_tokens": 576,
+  "request_id": "req_011Cfp4JB4rbBY8azvfbJ58K"
+ }
+}

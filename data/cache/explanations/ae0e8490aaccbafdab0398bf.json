@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Allied IT Services invoice to account 6420 (Repairs & Maintenance), cost centre CC4480, with 98.9% confidence. All three prior invoices from this supplier (22 Aug, 3 Sep and 26 Sep 2026), each for desk-side support on a time-and-materials basis, were coded to 6420, and no policy flags were raised. The recommendation is awaiting confirmation, with approval routed to Shreya Singh (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2957
+ }
+}

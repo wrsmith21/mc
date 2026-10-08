@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Bluehaven Cloud invoice to account 6340 (Cloud & Hosting Services), cost centre CC4430, with 93.5% confidence. The three most recent Bluehaven Cloud invoices, all for the monthly managed database service (June, July and August 2026), were coded to 6340, and no policy flags were raised. Approval routes to Ethan Eriksen (VP).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1783
+ }
+}

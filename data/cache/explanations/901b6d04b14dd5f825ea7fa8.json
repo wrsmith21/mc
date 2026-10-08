@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Brightway Facility Services invoice to account 6430 (Facilities Services) under cost centre CC5230, with a confidence of 0.879. The recommendation follows three prior plant care service invoices from this supplier (Oct 2025, May 2026 and Aug 2026), all coded to 6430. No policy flags were raised, and the invoice routes to Chris Calloway (Cost-centre owner) for approval.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1825
+ }
+}

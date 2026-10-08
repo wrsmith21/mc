@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Allied Technical Services invoice to account 6420 (Repairs & Maintenance), cost centre CC4480, with 0.99 confidence, based on three prior hardware maintenance contract invoices from this supplier, all posted to 6420. Bank details were changed 15 days ago via the Supplier portal, and call-back verification has been completed. Approval is routed to Mateo Quinn (Cost-centre owner).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2282
+ }
+}

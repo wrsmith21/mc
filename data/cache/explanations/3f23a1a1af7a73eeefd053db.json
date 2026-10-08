@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Cornerstone Property Services invoice to 6420 (Repairs & Maintenance), cost centre CC5210, with 0.871 confidence. This overrides the vendor default of 6430 (Facilities Services): 3 past invoices with these items were coded to 6420, while 6430 has been used for the elevator maintenance contract (52 invoices). Approval is routed to Gabriel Kulkarni as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 3558
+ }
+}

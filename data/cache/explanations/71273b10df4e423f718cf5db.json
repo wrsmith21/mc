@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Pryor Whitley & Partners LLP invoice to account 6610 (Legal Fees), cost centre CC5100, with 95% confidence. All three prior invoices shown from this supplier, each for regulatory advice (most recently M-2254 on 2026-04-08), were coded to 6610, and no policy flags were raised. Approval routes to Marcus Feld (Legal Operations) and then Mateo Novak (VP).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2110
+ }
+}

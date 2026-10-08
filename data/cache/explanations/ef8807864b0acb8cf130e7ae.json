@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends holding this $9,870 invoice from Summit Facility Services and coding it to 6430 Facilities Services (CC5200) at 0.879 confidence, consistent with prior janitorial invoices for the O'Fallon campus. It recommends a vendor master review before payment: the amount is 2.63x the supplier's median of $3,753 across 18 invoices, and bank details were changed 2 days ago by email from summitfaci1ity.example, one character off the registered domain summitfacility.example, with call-back verification not completed. The invoice also requests payment in 7 days against agreed NET30 terms. It routes to Hana Vogel (cost-centre owner) for approval.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 3438
+ }
+}

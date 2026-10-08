@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Learnwell Learning invoice to account 6910 (Training), cost centre CC8120, with 97.7% confidence. Two prior Learnwell invoices for certification exam vouchers (December 2025 and March 2026) and a similar voucher purchase from Mentorly Academy were all coded to 6910, and no policy flags were raised. Approval routes to Ruth Lewis (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2795
+ }
+}

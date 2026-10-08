@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Northwind Logic HQ invoice to account 6350 (Software Subscriptions), cost centre CC8100, with a confidence of 0.937. Three comparable \"Premium support tier\" charges were all coded to 6350, including Northwind Logic HQ's own March 2026 invoice. Approval sits with Ruth Lewis (Director), and paying by 2026-10-21 captures a 2% early-payment discount worth USD 481.03.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2229
+ }
+}

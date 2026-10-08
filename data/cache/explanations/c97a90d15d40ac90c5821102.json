@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Skyloft Software invoice to account 6350 (Software Subscriptions) under cost centre CC4440, with a confidence of 0.939 and no flags raised. The recommendation rests on three recent comparable invoices for monthly user licences, from Nimbusly Technologies (60 seats), Signalpath Labs (5 seats) and Haldane Analytics (20 seats), all coded to 6350 in early September 2026. It is awaiting confirmation and routes to Laura Gallagher (Director) for approval.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1978
+ }
+}

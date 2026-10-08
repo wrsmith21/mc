@@ -1,0 +1,38 @@
+{
+ "fields": {
+  "vendor_name": "Dell Technologies",
+  "vendor_tax_id": "32-7185184",
+  "invoice_num": "7781452",
+  "invoice_date": "2026-10-06",
+  "due_date": "2026-11-20",
+  "currency": "USD",
+  "bill_to": "Accounts Payable \u2013 US Operating Entity (US01), GBSC Finance, O'Fallon, MO",
+  "po_reference": null,
+  "service_period_start": null,
+  "service_period_end": null,
+  "matter": null,
+  "named_contact": "Kevin Brandt, IT End-User Services",
+  "remit_account_last4": "3081",
+  "remit_routing_number": "146334562",
+  "lines": [
+   {
+    "description": "Latitude 7450 laptop, 16GB RAM, 512GB SSD, Intel Core Ultra 7",
+    "qty": 10,
+    "unit_price": 1845.0,
+    "amount": 18450.0
+   }
+  ],
+  "subtotal": 18450.0,
+  "tax": 1559.03,
+  "total": 20009.03,
+  "notes": "Customer PO printed as blank (\u2014). Order number OR-9918274. Ship to: IT End-User Services, Building 2 Dock B, O'Fallon, MO. Sales tax MO 8.45%. Terms NET45. Hardware ships with standard 3-year limited warranty; service contracts invoiced separately."
+ },
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 5258,
+  "input_tokens": 3176,
+  "output_tokens": 417,
+  "request_id": "req_011Cfp3MpoT5azEiByLwWLsh"
+ }
+}

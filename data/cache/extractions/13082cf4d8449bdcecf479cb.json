@@ -1,0 +1,44 @@
+{
+ "fields": {
+  "vendor_name": "Signalpath Software",
+  "vendor_tax_id": "91-2408267",
+  "invoice_num": "INV005305",
+  "invoice_date": "2026-10-08",
+  "due_date": "2026-12-07",
+  "currency": "USD",
+  "bill_to": "Accounts Payable \u2013 US Operating Entity (US01), GBSC Finance, O'Fallon, MO",
+  "po_reference": null,
+  "service_period_start": null,
+  "service_period_end": null,
+  "matter": null,
+  "named_contact": null,
+  "remit_account_last4": "4153",
+  "remit_routing_number": "259380953",
+  "lines": [
+   {
+    "description": "Additional storage add-on \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 11524.94,
+    "amount": 11524.94
+   },
+   {
+    "description": "Premium support tier \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 2905.84,
+    "amount": 2905.84
+   }
+  ],
+  "subtotal": 14430.78,
+  "tax": 0.0,
+  "total": 14430.78,
+  "notes": "Terms: NET60"
+ },
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 4102,
+  "input_tokens": 3071,
+  "output_tokens": 324,
+  "request_id": "req_011Cfp4mfrEYiU8bvjr4gBgh"
+ }
+}

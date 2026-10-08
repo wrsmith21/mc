@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Precision Technical Services invoice to account 6420 (Repairs & Maintenance), cost centre CC4420, with 98.3% confidence and no policy flags raised. This matches Precision's own prior UPS preventive maintenance charge (Chicago office, 2025-09-05) and two similar UPS maintenance invoices from other vendors, all coded to 6420. Approval routes to Sean Santos as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1997
+ }
+}

@@ -1,0 +1,8 @@
+{
+ "text": "The agent **recommends coding this Quantia Cloud invoice to account 6350 (Software Subscriptions) under cost centre CC9110**, with 87% confidence and no flags. This follows three comparable \"Professional services rendered\" invoices from Vantix Analytics, Ironpeak Infrastructure and Coldspring Hosting (July\u2013September 2026), all coded to 6350. The recommendation is awaiting confirmation and routes to Amara Torres (Director) for approval.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 3796
+ }
+}

@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Ironwatch Security invoice to account 6450 (Security Services) under cost centre CC5240, with a confidence of 0.969 and no flags raised. The recommendation follows three prior Ironwatch invoices for executive protection detail (March, April and June 2026), all coded to 6450. Approval would route to Paolo Doyle (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 5355
+ }
+}

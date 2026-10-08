@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Harbourview Property Services invoice to account 6430 (Facilities Services), cost centre CC5220, with 98.4% confidence and no flags raised. The three prior invoices shown in the evidence, all monthly elevator maintenance contracts dated May through August 2026, were coded to 6430. Approval routes only to Chris Vogel as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1845
+ }
+}

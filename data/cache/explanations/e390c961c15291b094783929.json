@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends routing this invoice from India GBSC Entity to Intercompany settlement (R12 AGIS) rather than processing it through AP. The findings identify it as an intercompany recharge from IN01, which should be settled through intercompany. No GL account, cost centre or approval chain is recommended because the invoice falls outside AP coding.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2348
+ }
+}

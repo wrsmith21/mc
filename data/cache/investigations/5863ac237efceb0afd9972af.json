@@ -1,0 +1,39 @@
+{
+ "answer": {
+  "summary": "Treat this as fraud. Invoice SFS-55120 for $9,870 came from accounts@summitfaci1ity.example, a lookalike that puts a '1' in place of an 'l' in Summit Facility Services' registered domain (summitfacility.example). Two days before the invoice arrived, on 2026-10-13, the same lookalike address got the supplier's ACH account changed from ending 5927 to ending 6122, with no call-back. The invoice asks for payment to that new account. It is also 2.63x the supplier's $3,753 median and asks for payment in 7 days against agreed NET30 terms. Reject it and do not release any payment to account 6122. Flag the bank change for vendor-master to reverse and to confirm by phone with the real supplier, using contact details already on file.",
+  "evidence": [
+   {
+    "text": "Bank account changed on 2026-10-13 from ending 5927 to ending 6122 by E30655. The request came by email from accounts@summitfaci1ity.example and the call-back was not verified.",
+    "tool_call_id": "T32"
+   },
+   {
+    "text": "The registered remit email is accounts@summitfacility.example and terms are NET30. The supplier's median invoice is $3,752.81 and its 90th-percentile invoice is $4,083.10, both far below $9,870.",
+    "tool_call_id": "T31"
+   }
+  ],
+  "next_action": "Reject as suspected fraud",
+  "confidence": 0.9
+ },
+ "calls": [
+  {
+   "tool": "vendor.profile",
+   "args": {
+    "vendor_id": "V4120"
+   }
+  },
+  {
+   "tool": "vendor.bank_change_log",
+   "args": {
+    "vendor_id": "V4120"
+   }
+  }
+ ],
+ "call_ids": [
+  "T31",
+  "T32"
+ ],
+ "meta": {
+  "model": "claude-opus-5-5",
+  "latency_ms": 11461
+ }
+}

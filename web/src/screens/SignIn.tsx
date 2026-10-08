@@ -22,6 +22,7 @@ export default function SignIn({ onDone, current }: { onDone: (s: Json) => void;
 
   useEffect(() => {
     api.people().then(setPeople).catch((e) => setError(e.message))
+    fetch('/api/warm').catch(() => {})
   }, [])
 
   const groups: Record<string, Json[]> = {}

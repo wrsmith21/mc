@@ -34,7 +34,7 @@ def svc() -> DemoService:
 @app.middleware("http")
 async def passcode(request: Request, call_next):
     path = request.url.path
-    if TOKEN and path.startswith("/api/") and path not in ("/api/health", "/api/login"):
+    if TOKEN and path.startswith("/api/") and path not in ("/api/health", "/api/login", "/api/warm"):
         supplied = request.cookies.get("mc_demo") or request.headers.get("x-demo-token") or ""
         if not hmac.compare_digest(supplied, TOKEN):
             return JSONResponse({"detail": "passcode required"}, status_code=401)
@@ -51,7 +51,7 @@ def who(request: Request, fallback=None):
     user = auth.verify(request.cookies.get("mc_user"))
     if user:
         return user
-    if fallback:
+    if fallback and not TOKEN:  # local scripts and tests only; the hosted app always needs a session
         return fallback
     raise HTTPException(401, "Sign in as a named person first")
 
@@ -63,6 +63,14 @@ def _bad(e: Exception):
 @app.get("/api/health")
 def health():
     return {"ok": True}
+
+
+@app.get("/api/warm")
+def warm():
+    """Load the service and the close sweep so the first real request is fast (called by the sign-in screens)."""
+    s = svc()
+    s.anomalies()
+    return {"ok": True, "invoices": len(s.items)}
 
 
 @app.post("/api/login")
@@ -107,7 +115,10 @@ def summary():
 @app.get("/api/invoices/{intake_id}")
 def invoice(intake_id: str):
     try:
-        return svc().result(intake_id)
+        r = svc().result(intake_id)
+        person = ((r.get("requester") or {}).get("person") or {}).get("id")
+        r["requester_link_token"] = auth.sign(person) if person else None
+        return r
     except KeyError:
         raise HTTPException(404, "Unknown invoice")
 
@@ -272,7 +283,12 @@ def receipt_request(intake_id: str, request: Request, body: dict = Body(default=
 
 @app.post("/api/invoices/{intake_id}/receipt/confirm")
 def receipt_confirm(intake_id: str, request: Request, body: dict = Body(...)):
-    return svc().confirm_receipt(intake_id, who(request, body.get("by")), body.get("note", ""))
+    # A signed link (QR code / email) identifies the requester on a device with no session.
+    linked = auth.verify(body.get("token")) if body.get("token") else None
+    if body.get("token") and linked != body.get("by"):
+        raise HTTPException(403, "This confirmation link is not valid for that person")
+    actor = linked or who(request, body.get("by"))
+    return svc().confirm_receipt(intake_id, actor, body.get("note", ""))
 
 
 @app.get("/api/tasks")

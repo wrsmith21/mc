@@ -1,0 +1,44 @@
+{
+ "fields": {
+  "vendor_name": "Pressline Graphics",
+  "vendor_tax_id": "52-3532259",
+  "invoice_num": "INV000898",
+  "invoice_date": "2026-10-05",
+  "due_date": "2026-11-19",
+  "currency": "USD",
+  "bill_to": "Accounts Payable \u2013 US Operating Entity (US01), GBSC Finance, O'Fallon, MO",
+  "po_reference": null,
+  "service_period_start": null,
+  "service_period_end": null,
+  "matter": null,
+  "named_contact": null,
+  "remit_account_last4": "8225",
+  "remit_routing_number": "080561116",
+  "lines": [
+   {
+    "description": "Large-format printing \u2013 Arlington office",
+    "qty": 1,
+    "unit_price": 1060.19,
+    "amount": 1060.19
+   },
+   {
+    "description": "Business cards (12 sets)",
+    "qty": 1,
+    "unit_price": 283.55,
+    "amount": 283.55
+   }
+  ],
+  "subtotal": 1343.74,
+  "tax": 113.55,
+  "total": 1457.29,
+  "notes": "Terms: NET45. Sales tax MO 8.45%. Remit via ACH."
+ },
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 5387,
+  "input_tokens": 3075,
+  "output_tokens": 338,
+  "request_id": "req_011Cfp4SnFBAfjVMybTazvrJ"
+ }
+}

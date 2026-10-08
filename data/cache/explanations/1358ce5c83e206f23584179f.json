@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Mosaic Agency invoice to account 6810 (Marketing Services), cost centre CC6110, with 96.2% confidence, consistent with three prior Mosaic creative production invoices (February, March and June 2026) all coded to 6810. Note that policy required a PO for marketing services over $50k. The invoice was processed and logged to the procurement non-compliance report, and approval routes to Ana Sorensen (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 3314
+ }
+}

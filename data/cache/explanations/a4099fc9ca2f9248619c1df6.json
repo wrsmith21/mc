@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Uptime Technical Services invoice to account 6420 (Repairs & Maintenance), cost centre CC4470, with 98.8% confidence. All three prior invoices shown from this supplier, each for UPS preventive maintenance at the New York, Arlington and Waterloo offices, were coded to 6420, and no policy flags were raised. The recommendation is awaiting confirmation from Olu Anand as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1823
+ }
+}

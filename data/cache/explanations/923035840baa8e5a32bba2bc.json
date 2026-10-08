@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Papermill Supplies invoice to account 6460 (Office Supplies) under cost centre CC5200, with a confidence of 0.912. The three most recent comparable invoices from this supplier, all for copier paper in September 2026, were coded to the same account, and no policy flags were raised. Approval is routed to Hana Vogel as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1955
+ }
+}

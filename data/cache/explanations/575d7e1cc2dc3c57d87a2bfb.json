@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Lakeland Gas Co. invoice to account 6440 (Utilities), cost centre CC5220, with 0.99 confidence and no policy flags raised. Two prior Lakeland Gas Co. invoices for chilled water service at the Kansas City data centre (April and June 2025) were coded to 6440, and a matching invoice from Lakeland Water Authority was coded the same way. Approval routes to Ana Gallagher (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 3304
+ }
+}

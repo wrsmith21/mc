@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Ironbridge Support Services invoice to account 6420 (Repairs & Maintenance), cost centre CC4410, with a confidence score of 0.968. The three most recent comparable invoices for the printer fleet managed service, dated 3 Aug, 9 Aug and 9 Sep 2026, were all coded to 6420. No flags were raised, and the recommended approver is Derek Adeyemi (Cost-centre owner).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1800
+ }
+}

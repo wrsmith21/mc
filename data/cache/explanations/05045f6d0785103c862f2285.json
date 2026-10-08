@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Guardline Security Group invoice to account 6450 (Security Services) under cost centre CC5240, with a confidence of 0.988 and no flags raised. The three most recent Guardline invoices, all for access control system support (May, July and August 2026), were coded to account 6450. Approval routes to Paolo Doyle (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1955
+ }
+}

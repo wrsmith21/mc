@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Meridian Grid Infrastructure invoice to account 6340 (Cloud & Hosting Services), cost centre CC4460, with a confidence of 0.883. All three prior invoices from this supplier for backup and DR services (Dec 2025, Feb 2026 and Aug 2026) were coded to 6340, and no policy flags were raised. The recommendation is awaiting confirmation and routes to Laura Gallagher (Director) for approval.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2429
+ }
+}

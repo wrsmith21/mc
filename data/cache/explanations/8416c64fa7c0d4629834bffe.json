@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Papermill Supplies invoice to account 6460 (Office Supplies) under cost centre CC5200, with a confidence of 91.2%. The recommendation is based on three prior Papermill Supplies invoices for copier paper, dated 9 and 26 September 2026, all coded to 6460. No flags were raised, and the invoice is awaiting confirmation from Hana Vogel (Cost-centre owner).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 8559
+ }
+}

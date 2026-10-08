@@ -1,0 +1,56 @@
+{
+ "fields": {
+  "vendor_name": "Bluehaven Cloud",
+  "vendor_tax_id": "76-7749875",
+  "invoice_num": "000293",
+  "invoice_date": "2026-10-09",
+  "due_date": "2026-11-08",
+  "currency": "USD",
+  "bill_to": "Accounts Payable \u2013 US Operating Entity (US01), GBSC Finance, O'Fallon, MO",
+  "po_reference": null,
+  "service_period_start": "2026-09-01",
+  "service_period_end": "2026-09-30",
+  "matter": null,
+  "named_contact": null,
+  "remit_account_last4": "3072",
+  "remit_routing_number": "299288934",
+  "lines": [
+   {
+    "description": "Managed database service \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 68369.5,
+    "amount": 68369.5
+   },
+   {
+    "description": "Colocation rack space \u2013 Pune GBSC \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 40167.86,
+    "amount": 40167.86
+   },
+   {
+    "description": "Object storage \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 16090.37,
+    "amount": 16090.37
+   },
+   {
+    "description": "Content delivery network \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 7874.17,
+    "amount": 7874.17
+   }
+  ],
+  "subtotal": 132501.9,
+  "tax": 0,
+  "total": 132501.9,
+  "notes": "Terms: NET30. Service period inferred from 'Sep 2026' line descriptions. Colocation line references Pune GBSC while billed to US01 entity."
+ },
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 6465,
+  "input_tokens": 3143,
+  "output_tokens": 470,
+  "request_id": "req_011Cfp4gWVmeowcpNyCknhUF"
+ }
+}

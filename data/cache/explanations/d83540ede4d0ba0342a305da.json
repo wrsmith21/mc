@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends routing this item out of accounts payable rather than coding it to a GL account, because Deepa Walsh is an employee requesting reimbursement. This should be handled as an expense claim in Concur. No account, cost centre, confidence score or approval chain is provided, since the item falls outside the AP coding process.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2170
+ }
+}

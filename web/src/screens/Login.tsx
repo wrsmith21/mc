@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { api } from '../api'
 import { brand } from '../brand'
 
 export default function Login({ onDone }: { onDone: () => void }) {
   const [code, setCode] = useState('')
   const [error, setError] = useState('')
+  useEffect(() => { fetch('/api/warm').catch(() => {}) }, [])  // start a cold instance while the passcode is typed
   return (
     <div className="center-page">
       <form className="login" onSubmit={async (e) => {

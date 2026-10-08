@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Midstate Utilities invoice to account 6440 (Utilities) under cost centre CC5200, with a confidence of 0.977 and no flags raised. This matches prior history: two earlier Midstate Utilities water and sewer invoices for the Chicago office (Apr 2025 and May 2026) and a similar Lakeland Water Authority invoice (Jul 2026) were all coded to 6440. Approval routes to Ana Gallagher (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2300
+ }
+}

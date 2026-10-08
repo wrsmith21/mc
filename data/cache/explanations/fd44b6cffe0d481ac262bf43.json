@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Pinecrest Facility Services invoice to account 6430 (Facilities Services), cost centre CC5200, with 98.6% confidence. All three prior Pinecrest invoices shown, for HVAC preventive maintenance in Oct 2025, Dec 2025 and Apr 2026, were coded to 6430, and no policy flags were raised. The recommended approver is Ana Gallagher (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2941
+ }
+}

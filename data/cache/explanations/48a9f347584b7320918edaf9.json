@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Northwind Logic HQ invoice to account 6350 (Software Subscriptions), cost centre CC8100, with 95% confidence. The match is supported by prior \"Premium support tier\" charges coded to 6350, including Northwind Logic HQ's own March 2026 invoice and similar August 2026 charges from Nimbusly Cloud and Skyloft HQ. A 2% early-payment discount (USD 452.28) is available if paid by 2026-10-17, and the recommended approver is Ruth Lewis (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2115
+ }
+}

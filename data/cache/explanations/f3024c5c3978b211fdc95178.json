@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Cloudline Analytics invoice to Prepaid Expenses (1310) under cost centre CC9130, with 97.7% confidence, consistent with Cloudline's prior annual platform subscription coded to 1310 on 2025-09-24. It flags the invoice for amortisation of 12 \u00d7 $10,000.00 to account 6350. Approval is routed to Mahesh Lewis (VP).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 3991
+ }
+}

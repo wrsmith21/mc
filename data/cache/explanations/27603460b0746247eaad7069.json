@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Greenleaf Kitchens invoice to account 6720 (Meals & Catering) under cost centre CC5230, with a confidence of 94.6%. The three most recent Greenleaf Kitchens invoices, for executive dining between August and September 2026, were all coded to 6720, and no policy flags were raised. Approval routes to Chris Calloway as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2142
+ }
+}

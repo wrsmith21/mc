@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Pathwise Institute invoice to account 6910 (Training), cost centre CC8120, with 95.2% confidence. Three similar past invoices were coded to 6910: a prior Pathwise Institute course (Advanced Excel for Finance, 8 delegates) and two Advanced Excel for Finance workshops from Cadence Learning and Cadence Institute. No policy flags were raised, and the recommendation is awaiting confirmation from Ruth Lewis (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 7050
+ }
+}

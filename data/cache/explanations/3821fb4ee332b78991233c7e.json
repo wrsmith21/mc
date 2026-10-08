@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Northgate Connect invoice to account 6310 (Telecommunications) under cost centre CC4420, with a confidence of 0.909. All three prior \"As per agreement\" invoices from this supplier (Apr, May and Jul 2026) were coded to 6310, and no policy flags were raised. Approval routes to Shreya Singh (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2355
+ }
+}

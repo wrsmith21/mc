@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Synapsis Software invoice to account 6350 (Software Subscriptions) under cost centre CC9130, with 92.5% confidence. Comparable user-licence invoices from Nimbusly Technologies, Signalpath Labs and Haldane Analytics in early September 2026 were all coded to 6350. Note that $53,453.30 of SEP-26 service was not accrued at close and will land in October. Because this is above the $25,000 materiality threshold, it is reported to Record-to-Report as out-of-period expense, and approval routes to Amara Torres (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2117
+ }
+}

@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Allied IT Services invoice to account 6420 (Repairs & Maintenance), cost centre CC4480, with 98.9% confidence and no flags raised. This matches the supplier's recent history: the three prior desk-side support T&M invoices (22 Aug, 3 Sep and 26 Sep 2026) were all coded to 6420. Approval routes to Shreya Singh (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 5037
+ }
+}

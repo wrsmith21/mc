@@ -1,0 +1,38 @@
+{
+ "fields": {
+  "vendor_name": "Quickfix Plumbing LLC",
+  "vendor_tax_id": null,
+  "invoice_num": "2214",
+  "invoice_date": "2026-10-09",
+  "due_date": "2026-10-23",
+  "currency": "USD",
+  "bill_to": "Accounts Payable \u2013 US Operating Entity (US01), GBSC Finance, O'Fallon, MO",
+  "po_reference": null,
+  "service_period_start": null,
+  "service_period_end": null,
+  "matter": null,
+  "named_contact": null,
+  "remit_account_last4": null,
+  "remit_routing_number": null,
+  "lines": [
+   {
+    "description": "Replace water heater \u2013 Building 2 kitchen",
+    "qty": 1,
+    "unit_price": 3480.0,
+    "amount": 3480.0
+   }
+  ],
+  "subtotal": 3480.0,
+  "tax": 0.0,
+  "total": 3480.0,
+  "notes": "Federal Tax ID printed as blank ('\u2014'). 'RECEIVED OCT 12' stamp on invoice. Footer states 'Terms: Due on receipt', which conflicts with the printed due date of October 23, 2026. Remit to PO Box 118, Wentzville, MO; no bank details printed. No PO reference."
+ },
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 12602,
+  "input_tokens": 2751,
+  "output_tokens": 380,
+  "request_id": "req_011Cfp5Mt2ALNTpHo58Z1L3F"
+ }
+}

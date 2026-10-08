@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Continuum IT Services invoice to account 6420 (Repairs & Maintenance), cost centre CC4480, with 98.7% confidence. All three prior desk-side support time-and-materials invoices from this supplier (July 15, August 3 and August 11, 2026) were coded to 6420, and no policy flags were raised. Approval routes to Shreya Singh (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2023
+ }
+}

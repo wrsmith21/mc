@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Crestline Property Services invoice to account 6430 (Facilities Services), cost centre CC5200, with 87.9% confidence. This matches two prior Crestline invoices (January 2026 and June 2025) and a similar Harbourview Facility Services invoice, all coded to 6430. A 2% early-payment discount (USD 649.48) is available if paid by 2026-10-14, and the invoice routes to Ana Gallagher (Director) for approval.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 3186
+ }
+}

@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this invoice to account 6430 (Facilities Services), cost centre CC5220, with 0.879 confidence. Three recent comparable invoices for Waterloo office janitorial services were all posted to 6430. The invoice is held because its VAT number (BE0942360146) differs from the vendor master (BE0939924852) and is not registered on EU VIES, so \u20ac3,355.80 of input VAT is not recoverable on this document. It routes to Ana Gallagher (Director) for approval.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2632
+ }
+}

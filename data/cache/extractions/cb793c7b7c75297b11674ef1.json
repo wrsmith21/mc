@@ -1,0 +1,38 @@
+{
+ "fields": {
+  "vendor_name": "Halden Consulting",
+  "vendor_tax_id": "19-8167220",
+  "invoice_num": "INV-2026-06894",
+  "invoice_date": "2026-10-09",
+  "due_date": "2026-11-08",
+  "currency": "USD",
+  "bill_to": "Accounts Payable \u2013 US Operating Entity (US01), GBSC Finance, O'Fallon, MO",
+  "po_reference": null,
+  "service_period_start": null,
+  "service_period_end": null,
+  "matter": null,
+  "named_contact": null,
+  "remit_account_last4": "7926",
+  "remit_routing_number": "009296213",
+  "lines": [
+   {
+    "description": "Controls design review \u2013 phase 2 (fixed fee)",
+    "qty": 1,
+    "unit_price": 48000.0,
+    "amount": 48000.0
+   }
+  ],
+  "subtotal": 48000.0,
+  "tax": 0.0,
+  "total": 48000.0,
+  "notes": "Terms: 2/10 NET30. No PO reference printed."
+ },
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 5974,
+  "input_tokens": 3048,
+  "output_tokens": 300,
+  "request_id": "req_011Cfp5GD6TjCL1zt7nQwsxZ"
+ }
+}

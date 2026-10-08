@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Whitcombe & Co. LLP invoice to account 6520 (Professional Fees \u2013 Audit & Tax), cost centre CC7130, with 94.4% confidence. That matches how prior transfer pricing documentation invoices from Whitcombe & Co. LLP and Castell Tax Advisors were coded. The $38,400.00 of SEP-26 service was not accrued at close, so it lands in October, and because it exceeds the $25,000 materiality threshold it is being reported to Record-to-Report as out-of-period expense. It is awaiting confirmation from Joel Tan (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2265
+ }
+}

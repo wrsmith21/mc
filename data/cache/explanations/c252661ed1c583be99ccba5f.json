@@ -1,0 +1,8 @@
+{
+ "text": "The agent **recommends** coding this Ashby Lowe LLP invoice to **account 6610 (Legal Fees), cost centre CC5100**, with **94.7% confidence**. All three recent Ashby Lowe invoices in the evidence (29 Jul, 3 Sep and 15 Sep 2026, each for professional fees on a separate matter) were posted to 6610, and no policy flags were raised. The recommendation is awaiting confirmation and will route to **Marcus Feld (Legal Operations)** and then **Hannah Leclerc (Director)** for approval.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2480
+ }
+}

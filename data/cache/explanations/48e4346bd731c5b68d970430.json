@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Vantix Cloud invoice to account 6350 (Software Subscriptions), cost centre CC9110, with 97.7% confidence. Both prior Vantix Cloud annual platform subscriptions (June 2025 and June 2026) were coded to 6350, and a comparable Pivotra Analytics platform subscription used the same account. No policy flags were raised, and the invoice is awaiting confirmation from Amara Torres (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1836
+ }
+}

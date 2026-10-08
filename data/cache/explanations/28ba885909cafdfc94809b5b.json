@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Frontline IT Services invoice to account 6420 (Repairs & Maintenance), cost centre CC4480, with 95% confidence. All three prior desk-side support invoices from this supplier (April, July, and September 2026) were coded to 6420. Paying by 2026-10-16 captures a 2% early-payment discount of USD 181.27, and approval routes to Mateo Quinn as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2144
+ }
+}

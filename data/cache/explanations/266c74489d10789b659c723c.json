@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Pinecrest Maintenance Co. invoice to account 6430 (Facilities Services), cost centre CC5230, with a confidence of 0.897. All three prior Pinecrest invoices on record (October 2025, April 2026, and August 2026), each for HVAC preventive maintenance, were coded to 6430, and no policy flags were raised. The invoice routes to Ana Gallagher (Director) for approval.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 3381
+ }
+}

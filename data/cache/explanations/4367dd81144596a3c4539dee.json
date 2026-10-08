@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Crestline Property Services invoice to account 6430 (Facilities Services), cost centre CC5250, with 0.95 confidence and no policy flags raised. Both prior Crestline invoices in the evidence (January 2026 and June 2025) were coded to 6430, as was a similar invoice from Harbourview Facility Services. The recommended approver is Ana Gallagher (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2952
+ }
+}

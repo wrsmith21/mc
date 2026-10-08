@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Pathwise Training Group invoice to account 6910 (Training), cost centre CC7100, with 95% confidence, based on prior SOX Controls Fundamentals training invoices from Pathwise entities that were coded to 6910. Two flags need review: at $16,560 the invoice is 2.53x this supplier's median comparable invoice ($6,533 across 16 invoices), and its lines are split across CC7100, CC7110 and CC7160. The recommendation is awaiting confirmation and routes to Diana Moreno (Director) for approval.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2614
+ }
+}

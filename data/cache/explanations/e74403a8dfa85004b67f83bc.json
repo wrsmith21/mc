@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Learnwell Learning invoice to account 6910 (Training), cost centre CC8120, with 97.7% confidence, and it is awaiting confirmation. All three comparable past invoices for certification exam vouchers were coded to 6910: two from Learnwell Learning (March 2026 and December 2025) and one from Mentorly Academy. No policy flags were raised, and the invoice routes to Ruth Lewis (Director) for approval.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2613
+ }
+}

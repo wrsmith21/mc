@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Prestige Building Services invoice to account 6430 (Facilities Services), cost centre CC5250, with a confidence of 96.7%. The three most recent invoices from this supplier, for monthly waste and recycling collection (June, July and August 2026), were all coded to 6430, and no policy flags were raised. The invoice routes to Ana Gallagher (Director) for approval.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2015
+ }
+}

@@ -1,0 +1,8 @@
+{
+ "text": "The agent **recommends** coding this Oakmont Facility Services invoice to account 6430 (Facilities Services), cost centre CC5230, with 87.9% confidence. It routes the invoice to Chris Calloway (Cost-centre owner) for approval. Note that Oakmont's two prior window-cleaning invoices for the Waterloo office (2025-09-09 and 2026-06-08) were coded to 6420, while the most recent matching invoice from Crestline Maintenance Co. (2026-09-24) used 6430, so the reviewer may want to confirm the account. A 2% early-payment discount (USD 146.92) is available if paid by 2026-10-22.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 3189
+ }
+}

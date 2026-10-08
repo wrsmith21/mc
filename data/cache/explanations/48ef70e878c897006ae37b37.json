@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Ironbridge Managed Services invoice to account 6420 (Repairs & Maintenance), cost centre CC4470, with a confidence of 91.1%. The recommendation is based on three recent comparable invoices, from Allied IT Services, Prestige Building Services and Frontline Technical Services, all for \"Services \u2013 Aug 2026\" and all coded to 6420. No policy flags were raised, and the item is awaiting confirmation from Olu Anand (Cost-centre owner).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2378
+ }
+}

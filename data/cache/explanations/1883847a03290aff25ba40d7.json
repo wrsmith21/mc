@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Hartwell & Pryce LLP invoice to account 6610 (Legal Fees), cost centre CC5100, with 97.4% confidence and no flags raised. The coding matches three prior invoices from this supplier for the same matter, \"Supplier contract review \u2013 M-2207,\" dated 2 June 2025, 3 April 2026 and 21 May 2026, all posted to 6610. Approval would route to Marcus Feld (Legal Operations), then Hannah Leclerc (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2761
+ }
+}

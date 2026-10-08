@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Brightlane Technologies invoice to account 6350 (Software Subscriptions) under cost centre CC4440, with a confidence score of 0.879 and no policy flags raised. The evidence supports this: a prior Brightlane Technologies invoice (ref 5839, 5 August 2026) was coded to 6350, as were recent invoices from Fieldmark Software and Northwind Logic Labs. The recommendation routes to Nathan Barros, the cost-centre owner, for approval.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1906
+ }
+}

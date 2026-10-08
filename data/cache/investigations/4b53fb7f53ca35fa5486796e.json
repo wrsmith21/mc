@@ -1,0 +1,51 @@
+{
+ "answer": {
+  "summary": "JE-US01-2609-00956 duplicates JE-US01-2609-00955. Both entries accrue the same September 2026 work: $64,000.00 for Hartwell & Pryce LLP on matter M-2207 contract review, with the same Dr 6610/CC5100 and Cr 2150/CC7150 lines. The manual entry was posted on 2026-10-02 and the spreadsheet upload on 2026-10-03, by different preparers and approvers. Neither entry has a reference number, and nothing in the descriptions points to a second, separate piece of work. Approve the proposed OCT-26 reversal of 00956 (Dr 2150/CC7150, Cr 6610/CC5100 $64,000), which keeps 00955.",
+  "evidence": [
+   {
+    "text": "JE-00956 (Spreadsheet upload batch, created 2026-10-03 11:06 by E35126, approved by E30233): Dr 6610/CC5100 $64,000, Cr 2150/CC7150 $64,000, Sep-26 accrual Hartwell & Pryce M-2207 contract review, no reference.",
+    "tool_call_id": "T01"
+   },
+   {
+    "text": "JE-00955 (Manual batch, created 2026-10-02 10:12 by E35123, approved by E35051): same accounts, cost centres, $64,000 and description, no reference.",
+    "tool_call_id": "T02"
+   },
+   {
+    "text": "Matter M-2207 (supplier contract review) has a life-of-matter budget of $893,000 and $645,353.75 billed to date. Adding $64,000 brings it to 79.4%. The budget check does not show whether one or two accruals were expected.",
+    "tool_call_id": "T03"
+   }
+  ],
+  "next_action": "Approve the proposed reclass",
+  "confidence": 0.85
+ },
+ "calls": [
+  {
+   "tool": "journal.entry",
+   "args": {
+    "je_id": "JE-US01-2609-00956"
+   }
+  },
+  {
+   "tool": "journal.entry",
+   "args": {
+    "je_id": "JE-US01-2609-00955"
+   }
+  },
+  {
+   "tool": "price.matter_budget",
+   "args": {
+    "matter": "M-2207",
+    "amount_usd": 64000
+   }
+  }
+ ],
+ "call_ids": [
+  "T01",
+  "T02",
+  "T03"
+ ],
+ "meta": {
+  "model": "claude-opus-5-5",
+  "latency_ms": 10423
+ }
+}

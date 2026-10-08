@@ -1,0 +1,56 @@
+{
+ "answer": {
+  "summary": "I recommend approving the reclass. Staffwise Talent invoice 004311 (APINV-2026-011188, $66,560.20, \"QA test analyst \u2013 Jul 2026\") was posted to 6510 Professional Fees \u2013 Consulting. Every comparable \"QA test analyst\" line I found is in 6530 Contract Labour, from Staffwise Talent and from other staffing suppliers alike. The proposed October entry (Dr 6530 / Cr 6510, CC9120, $66,560.20, with a prior-period reference because September is closed) balances, keeps the original cost centre and fixes the error. Two gaps: I couldn't open the Staffwise Talent vendor record by name, and searching for invoice 004311 by number returned nothing. Before posting, the reviewer should confirm the original line is still sitting in 6510.",
+  "evidence": [
+   {
+    "text": "Staffwise Talent's earlier QA test analyst invoices 004177 ($14,852.79) and 004179 ($47,253.20) are both coded 6530 Contract Labour on cost centre CC9120, the same cost centre as this invoice.",
+    "tool_call_id": "T01"
+   },
+   {
+    "text": "All 20 similar 'QA test analyst' lines returned, from Staffwise, Crewmark, Peoplelink, Skillhaus and others, are coded 6530. None is in 6510.",
+    "tool_call_id": "T01"
+   },
+   {
+    "text": "Looking up the vendor master record for 'Staffwise Talent' by name returned 'No vendor Staffwise Talent', so I couldn't check the supplier's default account.",
+    "tool_call_id": "T02"
+   },
+   {
+    "text": "Searching for invoice 004311 by number returned no matches, so the 6510 posting comes only from the case file and should be checked in the ledger before the reclass posts.",
+    "tool_call_id": "T03"
+   }
+  ],
+  "next_action": "Approve the proposed reclass",
+  "confidence": 0.82
+ },
+ "calls": [
+  {
+   "tool": "history.similar_lines",
+   "args": {
+    "vendor_id": "Staffwise Talent",
+    "description": "QA test analyst \u2013 Jul 2026",
+    "limit": 20
+   }
+  },
+  {
+   "tool": "vendor.profile",
+   "args": {
+    "vendor_id": "Staffwise Talent"
+   }
+  },
+  {
+   "tool": "invoice.find",
+   "args": {
+    "invoice_num": "004311"
+   }
+  }
+ ],
+ "call_ids": [
+  "T01",
+  "T02",
+  "T03"
+ ],
+ "meta": {
+  "model": "claude-opus-5-5",
+  "latency_ms": 12514
+ }
+}

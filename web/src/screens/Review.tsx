@@ -190,7 +190,7 @@ export default function Review() {
   const learned = c?.lines?.find((l: Json) => l.rec?.learned)?.rec?.learned
   const canSubmit = !['HELD', 'MATCH_TO_PO', 'VENDOR_ONBOARDING', 'AWAITING_CONFIRMATION', 'APPROVED', 'IN_APPROVAL', 'REJECTED', 'ROUTED_OUT', 'NEW'].includes(r.status)
   const isRunning = live !== null
-  const phoneUrl = requester ? `${window.location.origin}/requester?person=${requester.id}` : ''
+  const phoneUrl = requester ? `${window.location.origin}/requester?person=${requester.id}&t=${r.requester_link_token}` : ''
   const explainSrc = r.explanation_meta?.source
   const alternatives: Json[] = rec0?.alternatives ?? []
   const worked = !!r.run

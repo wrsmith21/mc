@@ -1,0 +1,55 @@
+{
+ "answer": {
+  "summary": "INV-0098 (IN-2026-00126, received 2026-10-15) appears to be a resubmission of invoice 0098 (IN-2026-00002), which is already in the queue from 2026-10-06. Both have the same invoice date (2026-10-02), the same total ($86,500.00) and the same service period (Aug 1 \u2013 Sep 30, 2026) for matter M-2207. The only difference is format: the earlier copy lists partner, associate, paralegal and disbursement lines, and this one is a single summary line. The sender email and the ACH account ending 0571 match the vendor master, and there have been no bank-detail changes, so this looks like an innocent resend, not fraud. Reject this copy as a duplicate and process the itemized original.",
+  "evidence": [
+   {
+    "text": "IN-2026-00002, invoice 0098, received 2026-10-06: dated 2026-10-02, $86,500.00 USD, service period 2026-08-01 to 2026-09-30, itemized lines for matter M-2207",
+    "tool_call_id": "T32"
+   },
+   {
+    "text": "IN-2026-00126, invoice INV-0098: same date, amount and service period, with one summary line 'Legal services rendered \u2013 matter M-2207 \u2013 Aug\u2013Sep 2026'",
+    "tool_call_id": "T32"
+   },
+   {
+    "text": "No bank-detail changes on record for V2007",
+    "tool_call_id": "T33"
+   },
+   {
+    "text": "Vendor master remit email accounts@hartwellpryce.example and ACH account ending 0571 match this invoice's sender and remit-to",
+    "tool_call_id": "T34"
+   }
+  ],
+  "next_action": "Reject as a duplicate",
+  "confidence": 0.93
+ },
+ "calls": [
+  {
+   "tool": "invoice.find",
+   "args": {
+    "invoice_num": "0098",
+    "vendor_id": "V2007"
+   }
+  },
+  {
+   "tool": "vendor.bank_change_log",
+   "args": {
+    "vendor_id": "V2007"
+   }
+  },
+  {
+   "tool": "vendor.profile",
+   "args": {
+    "vendor_id": "V2007"
+   }
+  }
+ ],
+ "call_ids": [
+  "T32",
+  "T33",
+  "T34"
+ ],
+ "meta": {
+  "model": "claude-opus-5-5",
+  "latency_ms": 8904
+ }
+}

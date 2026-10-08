@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Bluehaven Infrastructure invoice to account 6340 (Cloud & Hosting Services) under cost centre CC4430, with 94.6% confidence. All three prior Bluehaven invoices on record, for compute instances billed in January, March and June 2026, were coded to 6340, and no policy flags were raised. The recommendation is awaiting confirmation and routes to Shreya Singh (Director) for approval.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1916
+ }
+}

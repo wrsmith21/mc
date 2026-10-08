@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Courierco Logistics invoice to account 6470 (Postage & Courier), cost centre CC7110, with 95% confidence. The three most recent Courierco Logistics invoices, monthly mailroom franking for June, July and August 2026, were all coded to 6470, and no policy flags were raised. The only approval needed is from Amara Walsh as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1915
+ }
+}

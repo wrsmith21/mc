@@ -7,7 +7,7 @@
   "functions": {
     "api/index.py": {
       "maxDuration": 120,
-      "includeFiles": "{backend/**,data/seed/**,data/cache/**,data/pdfs/**}"
+      "includeFiles": "{backend/**,data/seed/**,data/cache/**,data/pdfs/**,data/model/**}"
     }
   },
   "rewrites": [

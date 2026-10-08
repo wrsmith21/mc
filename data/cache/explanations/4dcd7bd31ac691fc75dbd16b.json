@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding the Ampliqo Analytics invoice to account 6350 (Software Subscriptions), cost centre CC9130, with 95% confidence. This matches recent API usage overage invoices from Ledgerly Technologies, Vantix Analytics and Nimbusly Cloud, all coded to 6350. $30,252.32 of SEP-26 service was not accrued at close and lands in October, which is above the $25,000 materiality threshold, so it has been reported to Record-to-Report as out-of-period expense, and the invoice is awaiting confirmation from Amara Torres (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2430
+ }
+}

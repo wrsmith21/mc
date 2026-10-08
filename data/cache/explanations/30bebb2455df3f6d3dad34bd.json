@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Swiftline Logistics invoice to account 6470 (Postage & Courier) under cost centre CC5250, with a confidence of 0.879. The three most recent Swiftline Logistics invoices, all courier shipments from Nov 2025 to Feb 2026, were coded to 6470, and no policy flags were raised. The invoice routes to Alejandro Larsen (Cost-centre owner) for approval.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2107
+ }
+}

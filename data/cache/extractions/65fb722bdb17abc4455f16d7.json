@@ -1,0 +1,38 @@
+{
+ "fields": {
+  "vendor_name": "Deepa Walsh",
+  "vendor_tax_id": null,
+  "invoice_num": "Receipt 55-2093",
+  "invoice_date": "2026-10-01",
+  "due_date": null,
+  "currency": "USD",
+  "bill_to": "Accounts Payable \u2013 US Operating Entity (US01), GBSC Finance, O'Fallon, MO",
+  "po_reference": null,
+  "service_period_start": null,
+  "service_period_end": null,
+  "matter": null,
+  "named_contact": null,
+  "remit_account_last4": null,
+  "remit_routing_number": null,
+  "lines": [
+   {
+    "description": "Finance Transformation Summit 2026 \u2013 registration (paid personally)",
+    "qty": 1,
+    "unit_price": 1295.0,
+    "amount": 1295.0
+   }
+  ],
+  "subtotal": 1295.0,
+  "tax": 0.0,
+  "total": 1295.0,
+  "notes": "Document is titled RECEIPT, not an invoice. The vendor is an individual (Deepa Walsh) and the line states 'paid personally'. Printed note: 'Paid by personal card ending 4471. Please reimburse the employee.' This looks like an employee expense reimbursement and should likely go through the expense process rather than supplier AP. Federal Tax ID is shown as blank ('\u2014'). No due date is printed. Remit to: 'Check payable to supplier'. Terms: None."
+ },
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 7156,
+  "input_tokens": 2751,
+  "output_tokens": 435,
+  "request_id": "req_011Cfp5KGZuFMwSyPbwvHL4N"
+ }
+}

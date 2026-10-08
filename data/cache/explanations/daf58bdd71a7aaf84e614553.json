@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Deskright Business Products invoice to account 6460 (Office Supplies), cost centre CC5250, with 0.99 confidence. The three prior invoices from this supplier (July 12, August 5 and September 18, 2026), all for ergonomic accessories, were coded to 6460, and no policy flags were raised. Approval routes to Alejandro Larsen as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1711
+ }
+}

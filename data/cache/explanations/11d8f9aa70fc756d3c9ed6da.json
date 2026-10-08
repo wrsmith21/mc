@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Harvest Table Catering invoice to account 6720 (Meals & Catering), cost centre CC6120, with 98.8% confidence. All three recent invoices from this supplier for executive dining (dated 30 Aug, 1 Sep and 25 Sep 2026) were coded to 6720, and no policy flags were raised. Approval routes to Hana Becker (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1830
+ }
+}

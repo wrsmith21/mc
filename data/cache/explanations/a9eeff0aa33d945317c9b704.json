@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Oakmont Property Services invoice to account 6430 (Facilities Services), cost centre CC5250, with 97.7% confidence. The three most recent Oakmont invoices in the evidence, all for HVAC preventive maintenance, were coded to 6430, and no policy flags were raised. Approval routes to Alejandro Larsen as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 6710
+ }
+}

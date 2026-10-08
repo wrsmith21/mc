@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Northstar IT Services invoice to account 6420 (Repairs & Maintenance), cost centre CC4450, with 0.99 confidence. The three prior Northstar invoices on record, all for the printer fleet managed service (May, Jun and Aug 2026), were coded to 6420, and no flags were raised. Approval routes to Carlos Walsh as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1985
+ }
+}

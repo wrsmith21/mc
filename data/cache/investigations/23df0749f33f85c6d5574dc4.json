@@ -1,0 +1,39 @@
+{
+ "answer": {
+  "summary": "Invoice SFS-55120 for $9,870 shows the classic signs of a vendor-impersonation (business email compromise) attempt. It came from accounts@summitfaci1ity.example, a lookalike domain that swaps one letter for the digit '1'. The supplier's registered remit email is accounts@summitfacility.example. On 2026-10-13, two days before the invoice arrived, a request from that same lookalike address changed the supplier's bank account from ending 5927 to ending 6122, and no call-back was done. The invoice now asks for payment to the 6122 account in 7 days, although the agreed terms are NET30, and the amount is about 2.6 times the supplier's median invoice of $3,752.81 (the 90th percentile is $4,083.10).",
+  "evidence": [
+   {
+    "text": "Registered remit email is accounts@summitfacility.example; terms NET30; median invoice $3,752.81, p90 $4,083.10 over 18 invoices; bank on file now ends 6122.",
+    "tool_call_id": "T31"
+   },
+   {
+    "text": "Bank account changed 2026-10-13 from last4 5927 to 6122 by E30655, requested by email from accounts@summitfaci1ity.example, callback_verified false.",
+    "tool_call_id": "T32"
+   }
+  ],
+  "next_action": "Reject as suspected fraud",
+  "confidence": 0.9
+ },
+ "calls": [
+  {
+   "tool": "vendor.profile",
+   "args": {
+    "vendor_id": "V4120"
+   }
+  },
+  {
+   "tool": "vendor.bank_change_log",
+   "args": {
+    "vendor_id": "V4120"
+   }
+  }
+ ],
+ "call_ids": [
+  "T31",
+  "T32"
+ ],
+ "meta": {
+  "model": "claude-opus-5-5",
+  "latency_ms": 7698
+ }
+}

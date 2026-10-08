@@ -1,0 +1,44 @@
+{
+ "fields": {
+  "vendor_name": "Midstate Utilities",
+  "vendor_tax_id": "30-1877388",
+  "invoice_num": "INV006324",
+  "invoice_date": "2026-10-04",
+  "due_date": "2026-11-18",
+  "currency": "USD",
+  "bill_to": "Accounts Payable \u2013 US Operating Entity (US01), GBSC Finance, O'Fallon, MO",
+  "po_reference": null,
+  "service_period_start": null,
+  "service_period_end": null,
+  "matter": null,
+  "named_contact": null,
+  "remit_account_last4": "1976",
+  "remit_routing_number": "369137067",
+  "lines": [
+   {
+    "description": "Water and sewer \u2013 Chicago office \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 27167.58,
+    "amount": 27167.58
+   },
+   {
+    "description": "Chilled water service \u2013 Miami hub \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 6694.2,
+    "amount": 6694.2
+   }
+  ],
+  "subtotal": 33861.78,
+  "tax": 0,
+  "total": 33861.78,
+  "notes": "Terms: NET45. Vendor address shows Stamford, CT with ZIP 07216, which is not a Connecticut ZIP code (07xxx is New Jersey)."
+ },
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 3842,
+  "input_tokens": 3082,
+  "output_tokens": 383,
+  "request_id": "req_011Cfp4S5f939kxM575sKnZ8"
+ }
+}

@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Inkwell Print invoice to account 6480 (Printing & Reprographics) under cost centre CC5250, with 99% confidence. All three prior Inkwell Print invoices were brochure print runs coded to 6480: 40 units on 2026-08-27, 25 units on 2026-09-01 and 12 units on 2026-09-19. No policy flags were raised, and the recommendation is awaiting confirmation from Alejandro Larsen as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1915
+ }
+}

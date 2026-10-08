@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Midstate Utilities invoice to account 6440 (Utilities), cost centre CC5200, with 97.7% confidence. Three similar past invoices for Chicago office water and sewer were all coded to 6440: two from Midstate Utilities and one from Lakeland Water Authority. No flags were raised, and the invoice awaits confirmation from Ana Gallagher (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2984
+ }
+}

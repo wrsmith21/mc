@@ -1,0 +1,50 @@
+{
+ "fields": {
+  "vendor_name": "Ironwatch Security Group",
+  "vendor_tax_id": "71-7155509",
+  "invoice_num": "0005903",
+  "invoice_date": "2026-10-07",
+  "due_date": "2026-11-06",
+  "currency": "USD",
+  "bill_to": "Accounts Payable \u2013 US Operating Entity (US01), GBSC Finance, O'Fallon, MO",
+  "po_reference": null,
+  "service_period_start": null,
+  "service_period_end": null,
+  "matter": null,
+  "named_contact": null,
+  "remit_account_last4": "9870",
+  "remit_routing_number": "057215084",
+  "lines": [
+   {
+    "description": "Access control system support \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 39475.77,
+    "amount": 39475.77
+   },
+   {
+    "description": "Alarm monitoring \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 5338.82,
+    "amount": 5338.82
+   },
+   {
+    "description": "Manned guarding \u2013 Arlington office \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 6300.74,
+    "amount": 6300.74
+   }
+  ],
+  "subtotal": 51115.33,
+  "tax": 0.0,
+  "total": 51115.33,
+  "notes": "Terms: 2/10 NET30. Line items reference Sep 2026 service month (no explicit service period dates printed)."
+ },
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 4112,
+  "input_tokens": 3116,
+  "output_tokens": 407,
+  "request_id": "req_011Cfp4fGWcefLR6ckmrtnwJ"
+ }
+}

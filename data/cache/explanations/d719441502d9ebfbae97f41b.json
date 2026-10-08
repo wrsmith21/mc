@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Pinecrest Property Services invoice to account 6430 (Facilities Services), cost centre CC5220, with a confidence of 0.93. The three most recent Pinecrest invoices for HVAC preventive maintenance (April, May and August 2026) were all coded to 6430, and no policy flags were raised. The invoice routes to Ana Gallagher (Director) for approval.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2248
+ }
+}

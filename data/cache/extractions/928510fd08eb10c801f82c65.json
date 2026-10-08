@@ -1,0 +1,44 @@
+{
+ "fields": {
+  "vendor_name": "Pinecrest Property Services",
+  "vendor_tax_id": "BE0926561222",
+  "invoice_num": "0006258",
+  "invoice_date": "2026-10-13",
+  "due_date": "2026-11-27",
+  "currency": "EUR",
+  "bill_to": "Accounts Payable \u2013 European Entity (EU01), GBSC Finance, Waterloo, Belgium",
+  "po_reference": null,
+  "service_period_start": "2026-09-01",
+  "service_period_end": "2026-09-30",
+  "matter": null,
+  "named_contact": null,
+  "remit_account_last4": "4681",
+  "remit_routing_number": null,
+  "lines": [
+   {
+    "description": "HVAC preventive maintenance \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 8561.17,
+    "amount": 8561.17
+   },
+   {
+    "description": "Janitorial services \u2013 New York office \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 5936.55,
+    "amount": 5936.55
+   }
+  ],
+  "subtotal": 14497.72,
+  "tax": 3044.52,
+  "total": 17542.24,
+  "notes": "Terms printed as NET45, but due date 27/11/2026 is 45 days after 13/10/2026 = 27/11/2026 (consistent). Belgian VAT 21% charged on janitorial services for a New York office, billed to a Belgian entity \u2014 worth reviewing location/VAT treatment. IBAN partially masked (BE36 \u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022 4681). Service period inferred from 'Sep 2026' in line descriptions."
+ },
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 5016,
+  "input_tokens": 3155,
+  "output_tokens": 480,
+  "request_id": "req_011Cfp4rHK3EW9wifhzu7mAr"
+ }
+}

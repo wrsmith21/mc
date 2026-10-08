@@ -1,0 +1,50 @@
+{
+ "fields": {
+  "vendor_name": "Northwind Logic HQ",
+  "vendor_tax_id": "65-5889556",
+  "invoice_num": "NLH-06991",
+  "invoice_date": "2026-10-11",
+  "due_date": "2026-11-10",
+  "currency": "USD",
+  "bill_to": "Accounts Payable \u2013 US Operating Entity (US01), GBSC Finance, O'Fallon, MO",
+  "po_reference": null,
+  "service_period_start": null,
+  "service_period_end": null,
+  "matter": null,
+  "named_contact": null,
+  "remit_account_last4": "1090",
+  "remit_routing_number": "347879499",
+  "lines": [
+   {
+    "description": "Premium support tier \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 15504.91,
+    "amount": 15504.91
+   },
+   {
+    "description": "Monthly charges \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 5506.96,
+    "amount": 5506.96
+   },
+   {
+    "description": "Platform subscription \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 3039.5,
+    "amount": 3039.5
+   }
+  ],
+  "subtotal": 24051.37,
+  "tax": 0,
+  "total": 24051.37,
+  "notes": "Terms: 2/10 NET30"
+ },
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 3982,
+  "input_tokens": 3111,
+  "output_tokens": 374,
+  "request_id": "req_011Cfp558d1rJLWe77cnPvTS"
+ }
+}

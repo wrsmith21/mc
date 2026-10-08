@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Ratewise Information Services invoice to account 6370 (Market Data Services), cost centre CC7120, with 98.9% confidence. The three most recent Ratewise invoices on record, each a credit ratings data licence dated between 1 and 17 September 2026, were all coded to 6370, and no policy flags were raised. Approval routes to Rahul Hughes as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 3401
+ }
+}

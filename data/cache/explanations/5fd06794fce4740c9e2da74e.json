@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Clearbook Cloud invoice to account 6350 (Software Subscriptions), cost centre CC8100, with a confidence of 0.921. The three most recent Clearbook Cloud platform subscription invoices (June, July and August 2026) were all coded to 6350, and no flags were raised. Approval routes to Ruth Lewis (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1989
+ }
+}

@@ -39,7 +39,7 @@ export const api = {
   invoice: (id: string) => call(`/api/invoices/${id}`),
   audit: (id: string) => call(`/api/invoices/${id}/audit`),
   requestReceipt: (id: string) => post(`/api/invoices/${id}/receipt/request`),
-  confirmReceipt: (id: string, note: string, by?: string) => post(`/api/invoices/${id}/receipt/confirm`, { note, by }),
+  confirmReceipt: (id: string, note: string, by?: string, token?: string) => post(`/api/invoices/${id}/receipt/confirm`, { note, by, token }),
   tasks: (person?: string) => call(`/api/tasks${person ? `?person=${person}` : ''}`),
   decide: (id: string, body: Json) => post(`/api/invoices/${id}/decision`, body),
   approve: (id: string) => post(`/api/invoices/${id}/approve`),

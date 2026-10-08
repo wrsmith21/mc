@@ -6,6 +6,7 @@ import json
 import os
 import sqlite3
 import threading
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -83,6 +84,7 @@ class PostgresState:
         import psycopg
         self.psycopg = psycopg
         self.url = url
+        self._local = threading.local()
         with self._conn() as c:
             c.execute("""
                 CREATE TABLE IF NOT EXISTS events (id BIGSERIAL PRIMARY KEY, invoice_key TEXT, ts TEXT, actor TEXT,
@@ -91,8 +93,17 @@ class PostgresState:
                 CREATE TABLE IF NOT EXISTS kv (key TEXT PRIMARY KEY, value JSONB);
             """)
 
+    @contextmanager
     def _conn(self):
-        return self.psycopg.connect(self.url, autocommit=True)
+        """One connection per worker thread, reused: a new TLS handshake per call is too slow against Neon."""
+        c = getattr(self._local, "c", None)
+        if c is None or c.closed:
+            c = self._local.c = self.psycopg.connect(self.url, autocommit=True)
+        try:
+            yield c
+        except self.psycopg.OperationalError:
+            self._local.c = None  # dropped by the server; the next call reconnects
+            raise
 
     def add_event(self, key, actor, kind, payload, ts=None):
         with self._conn() as c:

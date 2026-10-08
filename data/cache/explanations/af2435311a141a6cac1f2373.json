@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Skillforge Learning invoice to account 6910 (Training) under cost centre CC4440, with 0.99 confidence. All three prior e-learning library licence invoices from this supplier (April, May and September 2026) were coded to 6910, and no flags were raised. Approval routes to Nathan Barros as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2129
+ }
+}

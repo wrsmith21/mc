@@ -1,0 +1,51 @@
+{
+ "answer": {
+  "summary": "Invoice WWS/2026/0412 is on hold for one reason: it shows VAT number BE0942360146. That number differs from the vendor master (BE0939924852) and is not registered on EU VIES, so the \u20ac3,355.80 of input VAT on this document can't be recovered. Nothing else looks wrong. The sender is the supplier's usual remit email, the SEPA account ending 0781 matches the master record and has never been changed, and the $22,601.62 total is in line with recent monthly invoices ($23.2k\u2013$24.2k from June to September). Ask Wavre Workplace Solutions for a corrected invoice with the right VAT number, then post it to 6430/CC5220 as usual.",
+  "evidence": [
+   {
+    "text": "Vendor master V6208 is active, with remit email facturation@wavreworkplace.example and SEPA account ending 0781. Defaults are GL 6430 and CC5220. Typical invoices run from $19,850.66 (p10) to $27,506.12 (p90).",
+    "tool_call_id": "T31"
+   },
+   {
+    "text": "The vendor's bank details have no change history, so the remit-to account ending 0781 is the long-standing account on file.",
+    "tool_call_id": "T32"
+   },
+   {
+    "text": "The last six invoices were all coded to 6430, at $19.9k\u2013$28.7k. The September invoice WWS/2026/7400 was $24,216.52, so the October amount is consistent.",
+    "tool_call_id": "T33"
+   }
+  ],
+  "next_action": "Ask the supplier for a corrected invoice",
+  "confidence": 0.85
+ },
+ "calls": [
+  {
+   "tool": "vendor.profile",
+   "args": {
+    "vendor_id": "V6208"
+   }
+  },
+  {
+   "tool": "vendor.bank_change_log",
+   "args": {
+    "vendor_id": "V6208"
+   }
+  },
+  {
+   "tool": "history.vendor_invoices",
+   "args": {
+    "vendor_id": "V6208",
+    "limit": 6
+   }
+  }
+ ],
+ "call_ids": [
+  "T31",
+  "T32",
+  "T33"
+ ],
+ "meta": {
+  "model": "claude-opus-5-5",
+  "latency_ms": 10183
+ }
+}

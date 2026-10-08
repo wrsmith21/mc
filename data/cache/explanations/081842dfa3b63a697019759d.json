@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Cornerstone Facility Services invoice to account 6430 (Facilities Services), cost centre CC5250, with 95% confidence. The three closest past matches are window cleaning at Pune GBSC: Prestige Facility Services on 9 Sep 2026, and Brightway Facility Services on 8 Sep and 10 Aug 2026. All three were coded to 6430. No policy flags were raised, and the recommendation routes for approval to Alejandro Larsen as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2141
+ }
+}

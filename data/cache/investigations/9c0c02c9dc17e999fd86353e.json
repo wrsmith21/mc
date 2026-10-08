@@ -1,0 +1,55 @@
+{
+ "answer": {
+  "summary": "This is a routine monthly Heartland Gas Co. utility bill, and it should be coded to the vendor default of account 6440 / CC5230. The coding model's confidence was low (0.345) only because the line just says \"As per agreement \u2013 Sep 2026\". Every recent invoice from this supplier went to 6440, the amount of USD 282.30 is normal for them, and the remit details match the vendor master with no bank changes on record. The one line is INR 22,081.98 and the total is INR 26,056.74; the INR 3,974.76 gap is exactly 18%, which looks like GST, but please confirm the tax breakdown when posting.",
+  "evidence": [
+   {
+    "text": "The vendor master lists Heartland Gas Co. as an active Utilities supplier with default GL 6440 and cost centre CC5230. Its typical invoice is USD 224.75 to 324.34 (median 265.59), so this invoice's USD 282.30 is in range.",
+    "tool_call_id": "T30"
+   },
+   {
+    "text": "The vendor master's NEFT account ending 0488 and remit email ar@heartlandgasco.example match the invoice's remit details and sender.",
+    "tool_call_id": "T30"
+   },
+   {
+    "text": "The last six invoices (Jul\u2013Sep 2026, USD 228.37 to 327.34) were all coded to 6440, with no PO and no matter. Shreya Nakamura was the requester on five of the six.",
+    "tool_call_id": "T31"
+   },
+   {
+    "text": "There are no changes to the supplier's bank details on record.",
+    "tool_call_id": "T32"
+   }
+  ],
+  "next_action": "Code manually starting from the closest past invoices",
+  "confidence": 0.85
+ },
+ "calls": [
+  {
+   "tool": "vendor.profile",
+   "args": {
+    "vendor_id": "V9786"
+   }
+  },
+  {
+   "tool": "history.vendor_invoices",
+   "args": {
+    "vendor_id": "V9786",
+    "limit": 6
+   }
+  },
+  {
+   "tool": "vendor.bank_change_log",
+   "args": {
+    "vendor_id": "V9786"
+   }
+  }
+ ],
+ "call_ids": [
+  "T30",
+  "T31",
+  "T32"
+ ],
+ "meta": {
+  "model": "claude-opus-5-5",
+  "latency_ms": 13476
+ }
+}

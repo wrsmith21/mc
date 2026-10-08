@@ -107,3 +107,14 @@ def test_evidence_pack_renders_the_record(client):
     sv.run(iid)
     html = client.get(f"/api/invoices/{iid}/evidence").text
     assert "SOX evidence pack" in html and "coding.recommend_line" in html and "1540" in html
+
+
+def test_signed_requester_link_confirms_without_a_session(client):
+    sv = app_module.svc()
+    legal = sv.by_key["legal"]
+    token = client.get(f"/api/invoices/{legal}").json()["requester_link_token"]
+    phone = TestClient(app_module.app)  # a separate device, no session
+    as_(client, AP)  # the presenter's laptop is signed in as someone else
+    assert phone.post(f"/api/invoices/{legal}/receipt/confirm", json={"by": JULIA, "token": "forged.token"}).status_code == 403
+    r = phone.post(f"/api/invoices/{legal}/receipt/confirm", json={"by": JULIA, "token": token, "note": "Delivered"})
+    assert r.status_code == 200 and r.json()["status"] == "confirmed"

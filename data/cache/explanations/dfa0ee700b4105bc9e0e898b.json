@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Bluehaven Data Centers invoice to account 6340 (Cloud & Hosting Services), cost centre CC4430, with 91.4% confidence and no policy flags raised. The supporting evidence is three similar invoices from other vendors, all coded to 6340: two from Coldspring Hosting (July 2026 and February 2026) and one from Meridian Grid Infrastructure (November 2025). The recommendation is awaiting confirmation and routes to Shreya Singh (Director) for approval.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2629
+ }
+}

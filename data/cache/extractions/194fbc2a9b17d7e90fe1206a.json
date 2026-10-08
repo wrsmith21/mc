@@ -1,0 +1,44 @@
+{
+ "fields": {
+  "vendor_name": "Learnwell Institute",
+  "vendor_tax_id": "78-5750290",
+  "invoice_num": "INV001606",
+  "invoice_date": "2026-10-06",
+  "due_date": "2026-11-20",
+  "currency": "USD",
+  "bill_to": "Accounts Payable \u2013 US Operating Entity (US01), GBSC Finance, O'Fallon, MO",
+  "po_reference": null,
+  "service_period_start": null,
+  "service_period_end": null,
+  "matter": null,
+  "named_contact": null,
+  "remit_account_last4": "5413",
+  "remit_routing_number": "092409826",
+  "lines": [
+   {
+    "description": "Certification exam vouchers (40)",
+    "qty": 1,
+    "unit_price": 27511.47,
+    "amount": 27511.47
+   },
+   {
+    "description": "Facilitated workshop \u2013 Data Literacy",
+    "qty": 1,
+    "unit_price": 12401.83,
+    "amount": 12401.83
+   }
+  ],
+  "subtotal": 39913.3,
+  "tax": 0,
+  "total": 39913.3,
+  "notes": "Terms: NET45. Exam vouchers line shows quantity 40 in description but billed as qty 1 at lump sum."
+ },
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 4170,
+  "input_tokens": 3063,
+  "output_tokens": 355,
+  "request_id": "req_011Cfp4Pj2cRAmkT7AFuBopC"
+ }
+}

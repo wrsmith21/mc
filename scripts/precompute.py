@@ -52,6 +52,13 @@ def main():
     svc.submit(l1, "override", "E34120", "Chargers are for IT end-user laptops",
                {"account": "6360", "cost_centre": "CC4410"})
     svc.run(l2)
+    # Investigations for the close cases a demo opens: every journal and cash finding, and the largest AP ones.
+    cases = svc.cases.all()
+    picks = [c for c in cases if c["source"] == "journals" or c["type"] in ("MISAPPLIED", "DOUBLE_APPLICATION")]
+    picks += sorted([c for c in cases if c["source"] == "ap_ledger"], key=lambda c: -c["amount"])[:3]
+    for c in picks:
+        svc.investigate_case(c["case_id"], "E30233")
+    print(f"investigated {len(picks)} close cases")
     print(f"warmed {len(svc.items)} invoices from the starting state in {time.time() - t:.1f}s · reason sources {sources}")
 
 

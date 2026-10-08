@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Everclean Facility Services invoice to account 6430 (Facilities Services), cost centre CC5220, with 95% confidence and no policy flags raised. All three comparable janitorial invoices for the Miami hub (July 2026), including a prior one from Everclean Facility Services itself, were coded to 6430. Approval routes to Ana Gallagher (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 3241
+ }
+}

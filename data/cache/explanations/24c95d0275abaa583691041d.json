@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Ironwatch Security Group invoice to account 6450 (Security Services), cost centre CC5240, with 98.8% confidence. Three prior Ironwatch invoices for access control system support (June and August 2026) were all coded to 6450. Paying by 2026-10-17 captures a 2% early-payment discount of USD 1,022.31, and approval routes to Paolo Doyle (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1823
+ }
+}

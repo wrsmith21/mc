@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Pinecrest Building Services invoice to account 6430 (Facilities Services), cost centre CC5220, with a confidence of 0.909. This matches the supplier's history: the three prior elevator maintenance contract invoices (Feb, Jun and Jul 2026) were all coded to 6430. No flags were raised, and the invoice is routed to Ana Gallagher (Director) for approval.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2635
+ }
+}

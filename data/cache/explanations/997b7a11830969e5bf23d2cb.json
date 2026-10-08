@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Crossfield Networks invoice to 6360 IT Consumables (below capitalisation threshold), cost centre CC4480, at 98.3% confidence, instead of the vendor default 1530 Network Equipment. Fourteen past invoices for these items were coded to 6360, and the 1530 default has been used only for the next-gen firewall appliance HA (4 invoices). It also recommends accruing $1,384.11 use tax (8.45%) to 2220 Use Tax Payable, because the Massachusetts seller charged no sales tax on $16,380.00 of taxable goods shipped to Missouri. Approval routes to Shreya Singh (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2320
+ }
+}

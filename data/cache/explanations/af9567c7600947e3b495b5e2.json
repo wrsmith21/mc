@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Learnwell Training Group invoice to account 6910 (Training), cost centre CC8120, with a confidence of 0.879. Three prior \"Facilitated workshop \u2013 Negotiation Skills\" invoices were all coded to 6910: one from Learnwell itself (2025-11-11) and similar ones from Pathwise Academy and Skillforge Training Group in August 2026. No policy flags were raised, and the invoice routes to Ruth Lewis (Director) for approval.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2298
+ }
+}

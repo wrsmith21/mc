@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Brightpath Advisory invoice to account 6510 (Professional Fees \u2013 Consulting) under cost centre CC7100, with 0.99 confidence. Three prior Brightpath invoices for the finance process-mapping workshop (April, August and September 2026) were all coded to 6510. Because Diana Moreno is the requester, separation-of-duties rules route approval to Grace Okafor (VP, Finance Operations).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 3664
+ }
+}

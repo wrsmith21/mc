@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Harbor Telecom invoice to account 6310 (Telecommunications), cost centre CC4420, with 0.96 confidence. The three prior Harbor Telecom invoices for 10Gbps dedicated internet access (June, July and August 2026 service) were all coded to 6310, and no policy flags were raised. Approval routes to Shreya Singh (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1923
+ }
+}

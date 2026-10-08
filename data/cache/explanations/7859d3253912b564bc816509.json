@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Baker Street Kitchens invoice to account 6720 (Meals & Catering) under cost centre CC5250, with a confidence of 0.979 and no flags raised. Two earlier Baker Street Kitchens invoices for the \"Working lunch \u2013 Customer Advisory Board\" (2026-05-02 and 2026-08-01) were coded to 6720. A matching Saffron Catering invoice dated 2026-09-15 was also coded to 6720. Approval is routed to Alejandro Larsen as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2377
+ }
+}

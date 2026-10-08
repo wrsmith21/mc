@@ -1,0 +1,38 @@
+{
+ "fields": {
+  "vendor_name": "Haldane Labs",
+  "vendor_tax_id": "56-9019695",
+  "invoice_num": "006501",
+  "invoice_date": "2026-10-12",
+  "due_date": "2026-12-11",
+  "currency": "USD",
+  "bill_to": "Accounts Payable \u2013 US Operating Entity (US01), GBSC Finance, O'Fallon, MO",
+  "po_reference": null,
+  "service_period_start": null,
+  "service_period_end": null,
+  "matter": null,
+  "named_contact": null,
+  "remit_account_last4": "2303",
+  "remit_routing_number": "207465150",
+  "lines": [
+   {
+    "description": "Premium support tier \u2013 Sep 2026",
+    "qty": 1,
+    "unit_price": 6660.19,
+    "amount": 6660.19
+   }
+  ],
+  "subtotal": 6660.19,
+  "tax": 0,
+  "total": 6660.19,
+  "notes": "Terms: NET60. Line description references Sep 2026 but no explicit service period printed."
+ },
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 4401,
+  "input_tokens": 3030,
+  "output_tokens": 295,
+  "request_id": "req_011Cfp4j3X8Xjus7QLuG6F1J"
+ }
+}

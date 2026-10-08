@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends routing this Halden Consulting invoice to 3-way match against open PO 4500022403 (Controls design review \u2013 phase 2, fixed fee, $48,000.00 open, raised 2026-08-18 by Samuel Whitaker) instead of non-PO coding. If coded, it recommends account 6510 (Professional Fees \u2013 Consulting), cost centre CC7100, at 0.879 confidence, consistent with three prior Halden controls design review invoices (Feb, Mar and May 2026) all coded to 6510. Approval sits with Diana Moreno (Director), and paying by 2026-10-19 captures a 2% early-payment discount of USD 960.00.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2661
+ }
+}

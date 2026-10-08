@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Corelytics Labs invoice to account 6350 (Software Subscriptions), cost centre CC4460, with 0.99 confidence and no flags raised. All three prior Corelytics Labs invoices in the evidence, API usage overages for Feb, Jun and Jul 2026, were coded to account 6350. Approval routes to Laura Gallagher (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2904
+ }
+}

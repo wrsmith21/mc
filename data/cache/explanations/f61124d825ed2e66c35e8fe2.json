@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Pressline Graphics invoice to account 6480 (Printing & Reprographics) under cost centre CC5250, with 95.8% confidence and no policy flags. The recommendation rests on three recent invoices from similar printing vendors (Inkwell Print, Sharpline Graphics and Inkwell Graphics, June\u2013September 2026), all for large-format printing at the Arlington office and all coded to 6480. It is awaiting confirmation from Alejandro Larsen, the cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2965
+ }
+}

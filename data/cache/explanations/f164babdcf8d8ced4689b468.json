@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Frontline Managed Services invoice to account 6420 (Repairs & Maintenance), cost centre CC4450, with 95% confidence and no flags raised. This matches the three prior printer fleet managed service invoices from this supplier (April, July and August 2026), all of which were coded to 6420. Approval routes to Carlos Walsh as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1709
+ }
+}

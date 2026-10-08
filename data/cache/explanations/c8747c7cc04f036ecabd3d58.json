@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Ironbridge Managed Services invoice to account 6420 (Repairs & Maintenance), cost centre CC4470, with a confidence of 0.911 and no flags raised. The recommendation is supported by three recent comparable \"Services \u2013 Aug 2026\" invoices from Allied IT Services, Prestige Building Services and Frontline Technical Services, all coded to 6420 in September 2026. Approval is routed to Olu Anand as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1973
+ }
+}

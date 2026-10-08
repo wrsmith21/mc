@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Brightlane Labs invoice to account 6350 (Software Subscriptions), cost centre CC4440, with 0.98 confidence and no flags raised. Prior Brightlane Labs platform subscriptions from March and July 2025 were both coded to 6350, and a comparable Pivotra Analytics subscription used the same account. Approval routes to Laura Gallagher (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1846
+ }
+}

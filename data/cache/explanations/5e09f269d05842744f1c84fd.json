@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Northwind Logic HQ invoice to account 6350 (Software Subscriptions), cost centre CC9110, with 96.9% confidence. The basis is a prior Northwind Logic HQ premium support charge from April 2026, plus similar August 2026 premium support invoices from Nimbusly Cloud and Skyloft HQ, all booked to 6350. Paying by 2026-10-17 captures a 2% early-payment discount (USD 452.28), and the item is awaiting confirmation with approval routed to Amara Torres (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2743
+ }
+}

@@ -1,0 +1,52 @@
+{
+ "answer": {
+  "summary": "Coding confidence was low (0.125) only because the line just says \"As per agreement \u2013 Sep 2026\". The closest matches for that wording all came from other suppliers and were coded to six different accounts. Heartland Gas Co.'s own records are clear: it is an active utilities vendor with default GL 6440 and CC5230, and its last six invoices (July\u2013September 2026) were all coded to 6440. At USD 282.30, this invoice sits within its usual USD 224.75\u2013324.34 range, and the bank account (NEFT, ending 0488) and remit email match the vendor master, so the reviewer should code it to 6440 / CC5230 using those past invoices.",
+  "evidence": [
+   {
+    "text": "The closest matches to 'As per agreement' all come from other suppliers (Staffwise, Fresh Fork, Uptime, etc.) and are coded to different accounts (6530, 6720, 6420, 6350, 6510), so the wording can't drive the coding.",
+    "tool_call_id": "T30"
+   },
+   {
+    "text": "The last six Heartland invoices (INV-2026-07191 to INV-2026-07204, July\u2013September 2026) were all coded to account 6440, with no PO; most were requested by Shreya Nakamura.",
+    "tool_call_id": "T31"
+   },
+   {
+    "text": "Vendor V9786 is an active utilities vendor with default GL 6440 and CC5230. Its typical invoice range is USD 224.75\u2013324.34, and its bank details on file are NEFT ending 0488 with remit email ar@heartlandgasco.example, matching this invoice.",
+    "tool_call_id": "T32"
+   }
+  ],
+  "next_action": "Code manually starting from the closest past invoices",
+  "confidence": 0.85
+ },
+ "calls": [
+  {
+   "tool": "history.similar_lines",
+   "args": {
+    "vendor_id": "V9786",
+    "description": "As per agreement \u2013 Sep 2026"
+   }
+  },
+  {
+   "tool": "history.vendor_invoices",
+   "args": {
+    "vendor_id": "V9786",
+    "limit": 6
+   }
+  },
+  {
+   "tool": "vendor.profile",
+   "args": {
+    "vendor_id": "V9786"
+   }
+  }
+ ],
+ "call_ids": [
+  "T30",
+  "T31",
+  "T32"
+ ],
+ "meta": {
+  "model": "claude-opus-5-5",
+  "latency_ms": 12291
+ }
+}

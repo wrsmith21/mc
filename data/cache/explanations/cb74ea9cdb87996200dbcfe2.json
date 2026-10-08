@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Saffron Kitchens invoice to account 6720 (Meals & Catering) under cost centre CC5230, with 88% confidence and no policy flags. This matches the most recent comparable Chicago cafeteria subsidy invoices from Saffron Kitchens (May 2025) and Harvest Table Kitchens (Aug 2026), though an earlier Saffron Kitchens invoice (Mar 2025) was coded to 6820. Approval routes to Chris Calloway as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 4666
+ }
+}

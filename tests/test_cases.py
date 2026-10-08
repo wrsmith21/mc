@@ -101,5 +101,11 @@ def test_close_dashboard_counts_value_at_risk(svc):
 
 
 def test_case_investigation_falls_back_without_a_model(svc):
-    out = svc.investigate_case(laptop(svc)["case_id"], CONTROLLER)
+    smallest = min((c for c in svc.cases.all() if c["source"] == "ap_ledger"), key=lambda c: c["amount"])
+    out = svc.investigate_case(smallest["case_id"], CONTROLLER)
     assert out["next_action"] == "Approve the proposed reclass" and out["source"] == "template"
+
+
+def test_warmed_case_investigation_replays_from_cache(svc):
+    out = svc.investigate_case(laptop(svc)["case_id"], CONTROLLER)
+    assert out["source"] == "cache" and out["evidence"]

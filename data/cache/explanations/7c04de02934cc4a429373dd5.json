@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Ashby Lowe LLP invoice to account 6610 (Legal Fees), cost centre CC5100, with a confidence of 94.7%. The three prior Ashby Lowe LLP invoices shown (15 Sep, 3 Sep and 29 Jul 2026, all professional fees for legal matters) were coded to 6610, and no policy flags were raised. It recommends routing approval to Marcus Feld (Legal Operations) and then Hannah Leclerc (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2785
+ }
+}

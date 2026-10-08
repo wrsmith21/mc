@@ -1,0 +1,28 @@
+{
+ "answer": {
+  "summary": "RCPT-20261014-011398 for $17,640.00 from DELTA SVGS BK OF ARIZONA quotes INV 9100347412. The case file says RCPT-20261013-004512 already settled that invoice, so applying this receipt to it again creates a credit balance. Delta Savings Bank of Arizona (customer 29356) has only three open invoices: 9100241907 for $50,341.24, 9100241912 for $1,114.26 and 9100241915 for $40,335.77. None of them is $17,640.00, so the receipt can't be moved to another invoice with any confidence. Unapply it and hold the cash on account, as the proposed fix does, then ask the customer whether this is a second payment by mistake or meant for something else.",
+  "evidence": [
+   {
+    "text": "Customer 29356 has three open items: 9100241907 for $50,341.24, 9100241912 for $1,114.26 and 9100241915 for $40,335.77. None equals $17,640.00.",
+    "tool_call_id": "T01"
+   }
+  ],
+  "next_action": "Hold the cash on account and contact the customer",
+  "confidence": 0.85
+ },
+ "calls": [
+  {
+   "tool": "ar.customer_items",
+   "args": {
+    "customer_id": "29356"
+   }
+  }
+ ],
+ "call_ids": [
+  "T01"
+ ],
+ "meta": {
+  "model": "claude-opus-5-5",
+  "latency_ms": 8724
+ }
+}

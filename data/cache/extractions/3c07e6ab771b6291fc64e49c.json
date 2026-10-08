@@ -1,0 +1,38 @@
+{
+ "fields": {
+  "vendor_name": "India GBSC Entity",
+  "vendor_tax_id": null,
+  "invoice_num": "IC-IN01-2609-031",
+  "invoice_date": "2026-10-03",
+  "due_date": "2026-11-02",
+  "currency": "USD",
+  "bill_to": "Accounts Payable \u2013 US Operating Entity (US01), GBSC Finance, O'Fallon, MO",
+  "po_reference": null,
+  "service_period_start": "2026-09-01",
+  "service_period_end": "2026-09-30",
+  "matter": null,
+  "named_contact": null,
+  "remit_account_last4": null,
+  "remit_routing_number": null,
+  "lines": [
+   {
+    "description": "GBSC shared-services recharge \u2013 AP and GL operations, Sep 2026",
+    "qty": 1,
+    "unit_price": 186420.0,
+    "amount": 186420.0
+   }
+  ],
+  "subtotal": 186420.0,
+  "tax": 0.0,
+  "total": 186420.0,
+  "notes": "Intercompany recharge invoice. The vendor is named 'India GBSC Entity' but its printed address is in Wentzville, MO (US). The Federal Tax ID field shows only a dash, so no tax ID is printed. Remit to: check payable to supplier; no bank details are given. Terms are printed as 'None', yet a due date of 2026-11-02 is shown. The service period is taken from the line description 'Sep 2026'."
+ },
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 6489,
+  "input_tokens": 3037,
+  "output_tokens": 437,
+  "request_id": "req_011Cfp5FYzFbaVKomsGHrXPE"
+ }
+}

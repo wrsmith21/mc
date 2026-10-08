@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Swiftline Logistics invoice to account 6470 (Postage & Courier), cost centre CC7110, with 95% confidence. The three most recent Swiftline Logistics courier shipment invoices (Nov 2025, Jan 2026 and Feb 2026) were all coded to 6470, and no policy flags were raised. Approval routes to Amara Walsh as cost-centre owner.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 1785
+ }
+}

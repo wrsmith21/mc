@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Haldane Technologies invoice to account 6350 (Software Subscriptions), cost centre CC4450, with 98.1% confidence. That matches the three prior Haldane user-licence invoices (Oct 2025, Nov 2025, and Feb 2026), which were all coded to 6350. It needs approval from Laura Gallagher (Director), and paying by 2026-10-19 captures a 2% early-payment discount of USD 788.03.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2426
+ }
+}

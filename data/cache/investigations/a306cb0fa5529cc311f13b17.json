@@ -1,0 +1,32 @@
+{
+ "answer": {
+  "summary": "JE-US01-2609-00957 line 1 debits $85,000 to 6510 Professional Fees \u2013 Consulting. Its description is \"Sep-26 accrual \u2013 statutory audit fee \u2013 interim billing 2\", so it belongs in 6520 Professional Fees \u2013 Audit & Tax. The credit side (line 2) correctly goes to accrual account 2150, and different people prepared and approved the entry (E35123 and E35051), so the only error is the expense account. Approve the proposed October reclass: debit 6520 and credit 6510 for $85,000 on CC7150, with a reference back to September.",
+  "evidence": [
+   {
+    "text": "Line 1 debits 6510, CC7150, $85,000, described as 'Sep-26 accrual \u2013 statutory audit fee \u2013 interim billing 2', batch SEP-26 Manual Journals \u2013 GL Team.",
+    "tool_call_id": "T01"
+   },
+   {
+    "text": "Line 2 credits accrual account 2150 for $85,000, so only the expense account is wrong. E35123 prepared the entry and a different person, E35051, approved it on 2026-10-02.",
+    "tool_call_id": "T01"
+   }
+  ],
+  "next_action": "Approve the proposed reclass",
+  "confidence": 0.93
+ },
+ "calls": [
+  {
+   "tool": "journal.entry",
+   "args": {
+    "je_id": "JE-US01-2609-00957"
+   }
+  }
+ ],
+ "call_ids": [
+  "T01"
+ ],
+ "meta": {
+  "model": "claude-opus-5-5",
+  "latency_ms": 6927
+ }
+}

@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Bastion Protective Services invoice to account 6450 (Security Services) under cost centre CC5240, with a confidence of 0.879. The recommendation follows prior history: Bastion's two earlier \"CCTV maintenance \u2013 Pune GBSC\" invoices (January and April 2026) were posted to 6450, as was a matching Sentinel Security Group invoice in June 2026. No flags were raised, and the item routes to Paolo Doyle (Director) for approval.",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 6566
+ }
+}

@@ -9,6 +9,7 @@ import { dateTime, money } from '../format'
 export default function Requester() {
   const [params] = useSearchParams()
   const person = params.get('person') ?? undefined
+  const token = params.get('t') ?? undefined
   const { toast } = useApp()
   const [tasks, setTasks] = useState<Json[]>([])
   const [done, setDone] = useState<Json[]>([])
@@ -23,7 +24,7 @@ export default function Requester() {
 
   const confirm = async (t: Json) => {
     try {
-      await api.confirmReceipt(t.intake_id, notes[t.intake_id] || 'Service received as invoiced.', t.assignee_id)
+      await api.confirmReceipt(t.intake_id, notes[t.intake_id] || 'Service received as invoiced.', t.assignee_id, token)
       setDone((d) => [{ ...t, confirmed_at: new Date().toISOString() }, ...d])
       setTasks((ts) => ts.filter((x) => x.intake_id !== t.intake_id))
       toast('Thanks — Accounts Payable can now approve it')

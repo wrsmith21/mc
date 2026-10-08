@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends fast-tracking this Ridgeline Communications invoice to account 6310 (Telecommunications), cost centre CC4480, with 95% confidence. The three prior Ridgeline invoices on file, all for 10Gbps dedicated internet access, were coded to 6310, and no policy flags were raised. Approval routes to Shreya Singh (Director).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2270
+ }
+}

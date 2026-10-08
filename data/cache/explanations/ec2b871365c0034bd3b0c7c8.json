@@ -1,0 +1,8 @@
+{
+ "text": "The agent recommends coding this Servicepoint Technical Services invoice to account 6420 (Repairs & Maintenance), cost centre CC4480, with 0.99 confidence. The three prior printer fleet managed service invoices from this supplier (Apr, Jun and Jul 2026) were all coded to 6420. One payment-check flag applies: the bank details were changed 7 days ago through the supplier portal, and call-back verification has been completed. The recommendation is awaiting confirmation from Mateo Quinn (Cost-centre owner).",
+ "meta": {
+  "source": "live",
+  "model": "claude-opus-5-5",
+  "latency_ms": 2013
+ }
+}
