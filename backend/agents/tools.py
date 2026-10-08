@@ -478,6 +478,28 @@ def build_registry(store, state, checks, policy, rec):
                  lambda r: f"closest: {r['candidates'][0]['name']} ({r['candidates'][0]['score']:.0f}%)"
                  if r["candidates"] else "none", kind="state", investigator=True))
 
+    def journal_entry(je_id):
+        lines = [j for j in s.journals if j["je_id"] == je_id]
+        return {"lines": [{k: j[k] for k in ("je_line", "account", "cost_centre", "dr", "cr", "description",
+                                             "created_by", "approved_by", "created_at", "batch", "reference")}
+                          for j in lines]}
+
+    reg.add(Tool("journal.entry", "investigator", "Every line of a journal entry with who prepared and approved it.",
+                 journal_entry, {"je_id": S}, {"lines": A}, lambda r: f"{len(r['lines'])} line(s)", kind="state",
+                 investigator=True))
+
+    def customer_items(customer_id):
+        items = [a for a in s.ar_items if a["customer_id"] == customer_id]
+        c = s.customers.get(customer_id, {})
+        return {"customer": {k: c.get(k) for k in ("customer_id", "name", "aliases")},
+                "open_items": [{k: a.get(k) for k in ("ar_invoice", "amount", "currency", "due_date", "status")}
+                               for a in items if a["status"] == "OPEN"][:15]}
+
+    reg.add(Tool("ar.customer_items", "investigator", "A customer's names and open receivables.", customer_items,
+                 {"customer_id": S}, {"open_items": A},
+                 lambda r: f"{r['customer'].get('name')}: {len(r['open_items'])} open item(s)", kind="state",
+                 investigator=True))
+
     # ---------- explanation ----------
     reg.add(Tool("llm.explain", "supervisor", "Claude writes the reviewer-facing reason from the findings; a "
                  "deterministic template is the fallback.",

@@ -20,9 +20,18 @@ LLM_TOOLS = ["vendor.profile", "vendor.bank_change_log", "history.vendor_invoice
 NEXT_ACTIONS = ["Reject as a duplicate", "Hold for vendor-master call-back", "Reject as suspected fraud",
                 "Send to supplier onboarding", "Ask the supplier for a corrected invoice",
                 "Code manually starting from the closest past invoices", "Ask the requester to confirm the coding",
-                "Route to three-way match against the open PO", "Release after the check is cleared"]
+                "Route to three-way match against the open PO", "Release after the check is cleared",
+                "Approve the proposed reclass", "Dismiss: valid as posted", "Reverse the duplicate accrual",
+                "Re-apply the receipt to the correct customer", "Hold the cash on account and contact the customer",
+                "Escalate to the SOX control owner"]
+CASE_TOOLS = ["journal.entry", "ar.customer_items"]
 DEFAULT_ACTION = {"HELD": "Hold for vendor-master call-back", "NEEDS_CODING": "Ask the requester to confirm the coding",
-                  "VENDOR_ONBOARDING": "Send to supplier onboarding"}
+                  "VENDOR_ONBOARDING": "Send to supplier onboarding", "MISCODED": "Approve the proposed reclass",
+                  "AP_MISCODE": "Approve the proposed reclass", "DUPLICATE_ENTRY": "Reverse the duplicate accrual",
+                  "SELF_APPROVED": "Escalate to the SOX control owner",
+                  "MISAPPLIED": "Re-apply the receipt to the correct customer",
+                  "DOUBLE_APPLICATION": "Hold the cash on account and contact the customer",
+                  "UNAPPLIED_MATCH": "Re-apply the receipt to the correct customer"}
 
 SYSTEM = (
     "You are the exception investigator in an accounts-payable agent at a global payments company. The deterministic "
@@ -47,9 +56,9 @@ ANSWER_SCHEMA = {
 }
 
 
-def _tool_defs(registry):
+def _tool_defs(registry, extra=()):
     out = []
-    for name in LLM_TOOLS:
+    for name in LLM_TOOLS + list(extra):
         t = registry[name]
         props = {k: {kk: vv for kk, vv in v.items() if kk != "optional"} for k, v in t.inputs.items()}
         out.append({"name": name.replace(".", "_"), "description": t.description,
@@ -73,11 +82,22 @@ def case_file(r):
             "flags": [{"code": f["code"], "severity": f["severity"], "detail": f["detail"]} for f in r["flags"]]}
 
 
+def case_file_for(case):
+    f = case["finding"]
+    return {"case_id": case["case_id"], "type": case["type"], "what": case["type_label"],
+            "reference": case["reference"], "amount": case["amount"], "currency": case["currency"],
+            "entity": case["entity"], "detail": case["detail"], "proposed_fix": case["fix"],
+            "finding": {k: v for k, v in f.items() if k not in ("evidence", "score")}}
+
+
 def fallback(r, calls, reason):
-    holds = [f for f in r["flags"] if f["severity"] == "hold"] or r["flags"]
-    summary = holds[0]["detail"] if holds else "No exception detail available."
+    if "finding" in r:
+        summary, status = r["detail"], r["type"]
+    else:
+        holds = [f for f in r["flags"] if f["severity"] == "hold"] or r["flags"]
+        summary, status = (holds[0]["detail"] if holds else "No exception detail available."), r["agent_status"]
     return {"summary": summary, "evidence": [{"text": c["summary"], "tool_call_id": c["id"]} for c in calls[:4]],
-            "next_action": DEFAULT_ACTION.get(r["agent_status"], NEXT_ACTIONS[-1]), "confidence": 0.5,
+            "next_action": DEFAULT_ACTION.get(status, NEXT_ACTIONS[8]), "confidence": 0.5,
             "source": "template", "reason": reason}
 
 
@@ -91,7 +111,7 @@ def _validate(answer, call_ids):
 
 def investigate(ctx, r):
     """Run inside the supervisor's 'investigate' step; every tool call is recorded on the run."""
-    case = case_file(r)
+    case = case_file_for(r) if "finding" in r else case_file(r)
     key = llm._key(case, llm.MODEL, PROMPT_VERSION, SYSTEM)
     cached = llm._cache_get(llm.CACHE / "investigations", key)
     step_calls = []
@@ -121,7 +141,7 @@ def investigate(ctx, r):
     if not llm.live_enabled():
         return {**fallback(r, step_calls, "Replay mode and no cached investigation"), "tool_calls": []}
 
-    tools = _tool_defs(ctx.registry)
+    tools = _tool_defs(ctx.registry, CASE_TOOLS if "finding" in r else [])
     messages = [{"role": "user", "content": "Case file:\n" + json.dumps(case, indent=1, default=str)}]
     t0 = time.time()
     used, record = 0, []
@@ -151,7 +171,7 @@ def investigate(ctx, r):
             results = []
             for b in uses:
                 name = b.name.replace("_", ".", 1)
-                if name not in LLM_TOOLS or used >= MAX_CALLS:
+                if name not in LLM_TOOLS + CASE_TOOLS or used >= MAX_CALLS:
                     results.append({"type": "tool_result", "tool_use_id": b.id, "is_error": True,
                                     "content": "Tool not available or call budget used. Answer now."})
                     continue

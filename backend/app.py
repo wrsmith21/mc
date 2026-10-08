@@ -166,6 +166,68 @@ def model_info():
                         "pos": len(svc().s.pos)}}
 
 
+def _case_call(fn, *args):
+    try:
+        return fn(*args)
+    except KeyError:
+        raise HTTPException(404, "Unknown case")
+    except PermissionError as e:
+        raise HTTPException(403, str(e))
+    except ValueError as e:
+        _bad(e)
+
+
+@app.get("/api/cases")
+def cases(source: str | None = None, status: str | None = None):
+    out = svc().cases.all()
+    return [c for c in out if (not source or c["source"] == source) and (not status or c["status"] == status)]
+
+
+@app.get("/api/close")
+def close_dashboard():
+    return svc().cases.dashboard()
+
+
+@app.get("/api/cases/batches/{batch}.csv")
+def case_batch(batch: str):
+    return PlainTextResponse(_case_call(svc().cases.batch_csv, batch), media_type="text/csv",
+                             headers={"Content-Disposition": f"attachment; filename={batch}.csv"})
+
+
+@app.post("/api/cases/bulk-prepare")
+def cases_bulk(body: dict = Body(...)):
+    return _case_call(svc().cases.bulk_prepare, body["by"], float(body.get("min_confidence", 0.95)))
+
+
+@app.post("/api/cases/export")
+def cases_export(body: dict = Body(...)):
+    return _case_call(svc().cases.export, body["kind"], body["by"])
+
+
+@app.get("/api/cases/{case_id}")
+def case(case_id: str):
+    c = _case_call(svc().cases.get, case_id)
+    c["investigation"] = svc().state.get(f"caseinv:{case_id}")
+    return c
+
+
+@app.post("/api/cases/{case_id}/{action}")
+def case_action(case_id: str, action: str, body: dict = Body(...)):
+    c = svc().cases
+    by = body["by"]
+    if action == "prepare":
+        return _case_call(c.prepare, case_id, by, body.get("note", ""), body.get("account"))
+    if action == "approve":
+        return _case_call(c.approve, case_id, by, body.get("note", ""))
+    if action == "send-back":
+        return _case_call(c.send_back, case_id, by, body.get("reason", ""))
+    if action == "dismiss":
+        return _case_call(c.dismiss, case_id, by, body.get("reason"), body.get("note", ""))
+    if action == "investigate":
+        return _case_call(svc().investigate_case, case_id, by)
+    raise HTTPException(404, "Unknown action")
+
+
 @app.get("/api/agents")
 def agents():
     return svc().agents()

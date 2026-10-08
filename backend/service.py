@@ -10,6 +10,9 @@ from datetime import datetime, timedelta
 
 from . import clock
 from .agents.supervisor import STATUS_LABEL, Supervisor
+from .agents.base import RunContext
+from .agents.investigator import investigate
+from .cases import Cases
 from .engine import exports
 from .engine.anomaly import AnomalyLayer
 from .state import BufferedState, get_state, now_iso
@@ -54,6 +57,7 @@ class DemoService:
         self.by_key = {q["storyboard_key"]: q["intake_id"] for q in self.s.intake if q.get("storyboard_key")}
         self._anomaly = None
         self._lock = threading.Lock()
+        self.cases = Cases(self)
         if not self.state.get("meta:seeded"):
             self.reset()
         self.sync_clock()
@@ -213,6 +217,18 @@ class DemoService:
             except Exception as e:
                 yield {"type": "error", "intake_id": iid, "message": f"{type(e).__name__}: {e}"}
         yield {"type": "done", "count": len(todo), "ms": round((time.perf_counter() - t) * 1000)}
+
+    def investigate_case(self, case_id, actor):
+        case = self.cases.get(case_id)
+        ctx = RunContext(self.agent.registry, case_id, "manual", actor)
+        with ctx.step("investigator", "investigate", "Investigate the case", 8):
+            result = investigate(ctx, case)
+        run = ctx.finish()
+        out = {**result, "trace": ctx.trace, "tokens": run["tokens"], "ms": run["ms"]}
+        self.state.put(f"caseinv:{case_id}", out)
+        self.state.add_event(case_id, "AGENT", "CASE_INVESTIGATED", {"next_action": result["next_action"],
+                                                                     "source": result["source"]})
+        return out
 
     def agents(self):
         return {"tools": self.agent.registry.describe()}
