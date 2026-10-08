@@ -247,6 +247,11 @@ def case_action(case_id: str, action: str, request: Request, body: dict = Body(.
     raise HTTPException(404, "Unknown action")
 
 
+@app.get("/api/operations")
+def operations():
+    return svc().operations()
+
+
 @app.get("/api/agents")
 def agents():
     return svc().agents()

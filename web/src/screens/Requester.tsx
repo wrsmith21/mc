@@ -23,7 +23,7 @@ export default function Requester() {
 
   const confirm = async (t: Json) => {
     try {
-      await api.confirmReceipt(t.intake_id, t.assignee_id, notes[t.intake_id] || 'Service received as invoiced.')
+      await api.confirmReceipt(t.intake_id, notes[t.intake_id] || 'Service received as invoiced.', t.assignee_id)
       setDone((d) => [{ ...t, confirmed_at: new Date().toISOString() }, ...d])
       setTasks((ts) => ts.filter((x) => x.intake_id !== t.intake_id))
       toast('Thanks — Accounts Payable can now approve it')

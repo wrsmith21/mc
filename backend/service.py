@@ -8,7 +8,7 @@ import uuid
 from collections import Counter, defaultdict
 from datetime import datetime, timedelta
 
-from . import clock
+from . import clock, llm
 from .agents.supervisor import STATUS_LABEL, Supervisor
 from .agents.base import RunContext
 from .agents.investigator import investigate
@@ -243,6 +243,46 @@ class DemoService:
                                                                      "source": result["source"]})
         return out
 
+    def operations(self):
+        """Run health from the stored run records: volume, latency, model use and failures."""
+        results = self._results()
+        runs = [r for v in self.state.prefix("runs:").values() for r in v]
+        pct = lambda xs, q: sorted(xs)[min(len(xs) - 1, int(q * len(xs)))] if xs else None  # noqa: E731
+        per_agent = defaultdict(list)
+        sources = {"reason": Counter(), "extraction": Counter(), "investigation": Counter()}
+        tokens = {"input": 0, "output": 0}
+        failed, calls = [], 0
+        for r in results.values():
+            for st in r.get("trace", []):
+                per_agent[st.get("agent") or st["key"]].append(st.get("ms") or 0)
+                for tc in st.get("tool_calls", []):
+                    calls += 1
+                    if tc.get("error"):
+                        failed.append({"intake_id": r["intake_id"], "tool": tc["tool"], "error": tc["error"]})
+            sources["reason"][(r.get("explanation_meta") or {}).get("source", "none")] += 1
+            if r.get("pdf"):
+                sources["extraction"][(r.get("extraction") or {}).get("source", "none")] += 1
+            if r.get("investigation"):
+                sources["investigation"][r["investigation"]["source"]] += 1
+            for k in tokens:
+                tokens[k] += ((r.get("run") or {}).get("tokens") or {}).get(k, 0)
+        ms = [r["ms"] for r in runs if r.get("ms")]
+        model_calls = sum(sources["reason"].values()) + sum(sources["extraction"].values())
+        cached = sources["reason"]["cache"] + sources["extraction"]["cache"]
+        denied = [e for e in self.state.events("security") if e["kind"] == "ACCESS_DENIED"]
+        return {
+            "runs": len(runs), "by_trigger": Counter(r["trigger"] for r in runs),
+            "run_ms": {"p50": pct(ms, 0.5), "p95": pct(ms, 0.95), "max": max(ms) if ms else None},
+            "agents": sorted([{"agent": a, "p50": pct(v, 0.5), "p95": pct(v, 0.95), "steps": len(v)}
+                              for a, v in per_agent.items()], key=lambda x: -(x["p95"] or 0)),
+            "tool_calls": calls, "failed_calls": failed[:20], "failed": len(failed),
+            "sources": {k: dict(v) for k, v in sources.items()},
+            "cache_hit_rate": round(cached / model_calls, 3) if model_calls else None,
+            "tokens": tokens, "est_cost_usd": round(tokens["input"] / 1e6 * 4 + tokens["output"] / 1e6 * 20, 4),
+            "access_denied": len(denied), "recent_denied": denied[-5:],
+            "invoices_worked": len(results), "model": llm.MODEL,
+        }
+
     def agents(self):
         return {"tools": self.agent.registry.describe()}
 
@@ -272,6 +312,9 @@ class DemoService:
                          "storyboard_key": o.get("storyboard_key"), "scene": o.get("scene"),
                          "pdf": bool(o.get("pdf")), "wildcard": iid.startswith("WC-"),
                          "worked_at": (o.get("run") or {}).get("started_at"),
+                         "next_approver": (o["decision"]["chain"][len(o["decision"]["approvals"])]
+                                           if o.get("decision") and o["decision"]["status"] == "IN_APPROVAL" else None),
+                         "decided": bool(o.get("decision")),
                          "trigger": (o.get("run") or {}).get("trigger")})
         rows.sort(key=lambda x: x["received_at"], reverse=True)
         return rows

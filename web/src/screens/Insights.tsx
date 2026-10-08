@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api, type Json } from '../api'
 import Plot from '../components/Plot'
+import { useApp, useCan } from '../context'
 import { compact, money, num, pct } from '../format'
 
 // Validated with the dataviz palette checker (CVD ΔE 23.5, contrast ≥ 3:1 on white). Orange always means "needs attention".
@@ -10,11 +11,24 @@ const ATTENTION = '#E85400'
 export default function Insights() {
   const [p, setP] = useState<Json | null>(null)
   const [s, setS] = useState<Json | null>(null)
+  const [requested, setRequested] = useState<Record<string, string>>({})
+  const { toast } = useApp()
+  const can = useCan()
 
   useEffect(() => {
     api.procurement().then(setP)
     api.summary().then(setS)
   }, [])
+
+  const request = async (c: Json) => {
+    try {
+      const r = await api.requestPo(c.vendor_id, c.recommendation)
+      setRequested((x) => ({ ...x, [c.vendor_id]: r.kind }))
+      toast(`${r.kind} requested for ${c.vendor}; procurement owns it now`)
+    } catch (e) {
+      toast((e as Error).message, 'error')
+    }
+  }
 
   if (!p || !s) return <p className="muted">Loading 18 months of AP history…</p>
   const months = p.by_month.map((m: Json) => m.month)
@@ -84,7 +98,10 @@ export default function Insights() {
               {p.blanket_po_candidates.map((c: Json) => (
                 <tr key={c.vendor_id}>
                   <td><b>{c.vendor}</b></td><td>{c.category}</td><td className="num">{c.invoices_12m}</td>
-                  <td className="num">{c.months_billed}</td><td className="num">{money(c.value_12m, 'USD', 0)}</td><td>{c.recommendation}</td>
+                  <td className="num">{c.months_billed}</td><td className="num">{money(c.value_12m, 'USD', 0)}</td>
+                  <td>{requested[c.vendor_id] ? <span className="ok-text">{requested[c.vendor_id]} requested</span> : can('po_request') ? (
+                    <button type="button" className="btn small" onClick={() => request(c)}>Request {c.recommendation.toLowerCase()}</button>
+                  ) : c.recommendation}</td>
                 </tr>
               ))}
             </tbody>

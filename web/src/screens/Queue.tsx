@@ -1,23 +1,26 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { api, type Json } from '../api'
+import { api, mailboxStream, type Json } from '../api'
 import StatusChip from '../components/StatusChip'
-import { useApp } from '../context'
+import { useApp, useCan } from '../context'
 import { dateTime, money, num, pct } from '../format'
 
 const FILTERS: { key: string; label: string; test: (r: Json) => boolean }[] = [
-  { key: 'attention', label: 'Needs a person', test: (r) => !['APPROVED', 'IN_APPROVAL', 'FAST_TRACK', 'REJECTED'].includes(r.status) },
-  { key: 'story', label: 'Workshop scenarios', test: (r) => !!r.scene || ['eu_vat', 'open_po', 'unknown_vendor', 'learning_1', 'learning_2', 'po_breach_marketing', 'utility_spike', 'wildcard'].includes(r.storyboard_key) },
+  { key: 'new', label: "This morning's mailbox", test: (r) => r.status === 'NEW' },
+  { key: 'attention', label: 'Needs a person', test: (r) => !['APPROVED', 'IN_APPROVAL', 'FAST_TRACK', 'REJECTED', 'NEW', 'ROUTED_OUT'].includes(r.status) },
+  { key: 'story', label: 'Workshop scenarios', test: (r) => !!r.storyboard_key },
   { key: 'held', label: 'Held by controls', test: (r) => ['HELD', 'VENDOR_ONBOARDING', 'MATCH_TO_PO'].includes(r.status) },
   { key: 'fast', label: 'Fast-tracked', test: (r) => r.agent_status === 'FAST_TRACK' },
   { key: 'all', label: 'All', test: () => true },
 ]
 
 export default function Queue() {
-  const { version } = useApp()
+  const { version, bump, toast } = useApp()
   const [rows, setRows] = useState<Json[]>([])
   const [summary, setSummary] = useState<Json | null>(null)
-  const [filter, setFilter] = useState('story')
+  const [filter, setFilter] = useState('new')
+  const [mailbox, setMailbox] = useState<{ done: number; total: number; running: boolean }>({ done: 0, total: 0, running: false })
+  const can = useCan()
   const [q, setQ] = useState('')
   const navigate = useNavigate()
 
@@ -35,6 +38,24 @@ export default function Queue() {
       .sort((a, b) => (filter === 'story' ? (a.scene ?? 9) - (b.scene ?? 9) || a.received_at.localeCompare(b.received_at) : 0))
   }, [rows, filter, q])
 
+  const runMailbox = () => {
+    setMailbox({ done: 0, total: 0, running: true })
+    setFilter('all')
+    mailboxStream((e) => {
+      if (e.type === 'start') setMailbox({ done: 0, total: e.count, running: true })
+      if (e.type === 'invoice') {
+        setMailbox((m) => ({ ...m, done: m.done + 1 }))
+        setRows((rs) => rs.map((r) => (r.intake_id === e.intake_id ? { ...r, status: e.status, status_label: e.status_label, just: true } : r)))
+      }
+      if (e.type === 'done') {
+        setMailbox((m) => ({ ...m, running: false }))
+        toast(`Agent worked ${e.count} invoices in ${(e.ms / 1000).toFixed(1)} s`)
+        bump()
+      }
+    })
+  }
+  const fresh = rows.filter((r) => r.status === 'NEW').length
+
   return (
     <>
       <div className="page-head">
@@ -46,11 +67,16 @@ export default function Queue() {
             routes it to someone allowed to approve it. A person approves every posting.
           </p>
         </div>
+        {can('run_agent') && (fresh > 0 || mailbox.running) && (
+          <button type="button" className="btn accent" onClick={runMailbox} disabled={mailbox.running} data-tour="run-mailbox">
+            {mailbox.running ? `Agent working ${mailbox.done} of ${mailbox.total}…` : `Run the agent on ${fresh} new invoices`}
+          </button>
+        )}
       </div>
 
       {summary && (
         <section className="kpis" data-tour="kpis" aria-label="Today at a glance">
-          <div className="kpi"><b>{summary.processed}</b><span>Invoices read by the agent</span></div>
+          <div className="kpi"><b>{summary.processed}</b><span>Worked by the agent · {summary.new} waiting</span></div>
           <div className="kpi"><b>{summary.fast_tracked}</b><span>Fast-tracked within policy</span></div>
           <div className="kpi"><b>{pct(summary.touchless_rate)}</b><span>Approved without re-coding</span></div>
           <div className="kpi"><b>{summary.held}</b><span>Held by controls · {money(summary.held_value_usd, 'USD', 0)}</span></div>
@@ -79,7 +105,7 @@ export default function Queue() {
           </thead>
           <tbody>
             {shown.map((r) => (
-              <tr key={r.intake_id} className={r.scene ? 'story' : ''} onClick={() => navigate(`/invoice/${r.intake_id}`)}
+              <tr key={r.intake_id} className={`${r.scene ? 'story' : ''}${r.just ? ' just' : ''}`} onClick={() => navigate(`/invoice/${r.intake_id}`)}
                 data-tour={r.storyboard_key ? `row-${r.storyboard_key}` : undefined}>
                 <td className="small">{dateTime(r.received_at)}</td>
                 <td className="vendor-cell">

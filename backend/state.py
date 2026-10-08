@@ -16,7 +16,7 @@ _default_db = Path("/tmp/mc-demo-state.db") if os.environ.get("VERCEL") else \
     Path(__file__).resolve().parent.parent / "data" / "state.db"
 SQLITE_PATH = Path(os.environ.get("STATE_DB", _default_db))
 
-_lock = threading.Lock()
+_lock = threading.RLock()
 
 
 def now_iso():
@@ -42,13 +42,15 @@ class SqliteState:
 
     def events(self, key=None):
         q = "SELECT id, invoice_key, ts, actor, kind, payload FROM events"
-        rows = self.conn.execute(q + (" WHERE invoice_key=? ORDER BY id" if key else " ORDER BY id"),
-                                 (key,) if key else ()).fetchall()
+        with _lock:  # one connection is shared across request threads: reads must not interleave
+            rows = self.conn.execute(q + (" WHERE invoice_key=? ORDER BY id" if key else " ORDER BY id"),
+                                     (key,) if key else ()).fetchall()
         return [{"id": r[0], "invoice_key": r[1], "ts": r[2], "actor": r[3], "kind": r[4],
                  "payload": json.loads(r[5])} for r in rows]
 
     def get(self, key, default=None):
-        row = self.conn.execute("SELECT value FROM kv WHERE key=?", (key,)).fetchone()
+        with _lock:
+            row = self.conn.execute("SELECT value FROM kv WHERE key=?", (key,)).fetchone()
         return json.loads(row[0]) if row else default
 
     def put(self, key, value):
@@ -58,7 +60,8 @@ class SqliteState:
             self.conn.commit()
 
     def prefix(self, prefix):
-        rows = self.conn.execute("SELECT key, value FROM kv WHERE key LIKE ?", (prefix + "%",)).fetchall()
+        with _lock:
+            rows = self.conn.execute("SELECT key, value FROM kv WHERE key LIKE ?", (prefix + "%",)).fetchall()
         return {k: json.loads(v) for k, v in rows}
 
     def reset(self):

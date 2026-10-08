@@ -1,7 +1,7 @@
 import type { Json } from '../api'
 
 // The agent's checks mapped onto the eight steps of a good non-PO process (brief, section 2).
-export const STEP_ORDER = ['intake', 'read', 'supplier', 'validity', 'po', 'coding', 'treatment', 'receipt', 'risk', 'approval']
+export const STEP_ORDER = ['intake', 'read', 'supplier', 'validity', 'po', 'coding', 'treatment', 'price', 'receipt', 'risk', 'approval', 'investigate', 'decide']
 const PROCESS_LABEL: Record<number, string> = {
   0: 'Intake', 1: 'Step 1', 2: 'Step 2', 3: 'Step 3', 4: 'Step 4', 5: 'Step 5', 6: 'Step 6', 7: 'Step 7', 8: 'Step 8',
 }
@@ -9,6 +9,7 @@ const LABELS: Record<string, string> = {
   intake: 'Received', read: 'Read the invoice', supplier: 'Should this be here?', validity: 'Is the invoice valid?',
   po: 'Should it have been a PO?', coding: 'What is it, where does it go?', treatment: 'Capitalise or prepay?',
   receipt: 'Who asked, did we get it?', risk: 'Is it safe to pay?', approval: 'Who can approve it?',
+  price: 'Is the price right?', investigate: 'Investigate the exception', decide: 'Decide and explain',
 }
 
 type Props = { steps: Record<string, Json>; running?: string | null; compact?: boolean }
@@ -16,7 +17,7 @@ type Props = { steps: Record<string, Json>; running?: string | null; compact?: b
 export default function ProcessRail({ steps, running, compact }: Props) {
   return (
     <ol className="rail" data-tour="process-rail">
-      {STEP_ORDER.map((key) => {
+      {STEP_ORDER.filter((key) => key !== 'investigate' || steps[key] || running === key).map((key) => {
         const s = steps[key]
         const state = s ? s.status : running === key ? 'running' : 'pending'
         return (
