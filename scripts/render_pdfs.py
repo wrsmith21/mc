@@ -25,7 +25,9 @@ EU_STREETS = ["Chaussée de Bruxelles", "Rue du Commerce", "Avenue des Arts", "B
 STYLE_BY_KEY = {"telecoms": "telecom", "dell": "dell", "legal": "law", "duplicate": "law", "saas": "saas",
                 "bank_change": "contractor", "sod": "consult", "eu_vat": "eu", "open_po": "consult",
                 "unknown_vendor": "scan", "learning_1": "generic_b", "learning_2": "generic_b",
-                "po_breach_marketing": "agency", "utility_spike": "utility"}
+                "po_breach_marketing": "agency", "utility_spike": "utility", "rate_variance": "law",
+                "split_cc": "generic_a", "split_entity": "saas_seats", "cutoff": "generic_c", "use_tax": "generic_b",
+                "intercompany": "generic_c", "reimbursement": "scan_receipt"}
 ZIP_BASE = {"MO": 63100, "TX": 78600, "IL": 60600, "GA": 30300, "NC": 28200, "OH": 43200, "CO": 80200, "MN": 55400,
             "NY": 10000, "CT": 6900, "NJ": 7100, "MA": 2100, "AZ": 85000, "TN": 37200, "IN": 46200, "NE": 68100,
             "WA": 98100, "FL": 33100}
@@ -193,7 +195,8 @@ def context(item, vendor):
     elif style == "law":
         ctx.update(font="Georgia, 'Times New Roman', serif", accent="#2b2b2b", title="INVOICE",
                    matter=d.get("matter"), matter_desc=d.get("matter_desc"), client_contact=d.get("client_contact"),
-                   extra_meta=[("Billing period", "Aug 1 – Sep 30, 2026")],
+                   extra_meta=[("Billing period", "Aug 1 – Sep 30, 2026")] if d.get("matter") else
+                   [("Engagement letter", d.get("engagement_letter"))],
                    note="Detailed time entries available on request. Please quote the invoice number with payment.")
     elif style == "saas":
         sp = d.get("service_period", {})
@@ -215,6 +218,14 @@ def context(item, vendor):
                    page_extra="transform: rotate(-0.7deg); filter: grayscale(1) contrast(1.08); "
                               "background: repeating-linear-gradient(0deg, #fbfbf7, #fbfbf7 3px, #f3f3ee 4px);",
                    note="Thank you for your business! — Quickfix Plumbing LLC, licensed & insured")
+    elif style == "saas_seats":
+        sp = d.get("service_period", {})
+        ctx.update(accent="#3a36db", title="Invoice", extra_meta=[("Subscription term", f"{sp.get('start')} → {sp.get('end')}")],
+                   summary="Monthly seat billing by user entity")
+    elif style == "scan_receipt":
+        ctx.update(font="'Courier New', monospace", accent="#333", radius="0", title="RECEIPT",
+                   page_extra="transform: rotate(-0.5deg); filter: grayscale(1) contrast(1.05);",
+                   note="Paid by personal card ending 4471. Please reimburse the employee.")
     elif style == "agency":
         ctx.update(accent="#c2410c", extra_meta=[("Campaign", "Q4 brand campaign")])
     elif style == "utility":

@@ -200,7 +200,7 @@ def build_vendors(rng: random.Random):
     summit = next(v for v in vendors if v["vendor_id"] == "V4120")
     old = summit["bank"]["account_last4"]
     summit["bank"] = _bank(rng, "USD")
-    summit["bank_change_log"].append({"date": date(2026, 10, 12).isoformat(), "changed_by": "E30655",
+    summit["bank_change_log"].append({"date": date(2026, 10, 13).isoformat(), "changed_by": "E30655",
                                       "old_last4": old, "new_last4": summit["bank"]["account_last4"],
                                       "request_channel": "Email from accounts@summitfaci1ity.example",
                                       "callback_verified": False})

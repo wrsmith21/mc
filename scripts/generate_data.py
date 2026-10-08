@@ -9,6 +9,7 @@ from pathlib import Path
 
 from scripts.datagen import reference as ref
 from scripts.datagen.cash import CashBuilder
+from scripts.datagen.contracts import build_contracts
 from scripts.datagen.catalog import CATEGORIES, LEGAL_MATTERS
 from scripts.datagen.history import HistoryBuilder
 from scripts.datagen.intake import IntakeBuilder
@@ -44,7 +45,10 @@ def main():
     journals, journal_planted = jb.build()
     clerks = [p["id"] for p in people if p["cost_centre"] == "CC7170" and p["level"] == "Staff"]
     customers, ar, receipts, cash_planted = CashBuilder(rng, clerks).build()
-    queue = IntakeBuilder(rng, hb, vendors, pos).build()
+    accrued = {j["reference"] for j in journals if j["category"] == "Accrual" and (j["reference"] or "").startswith("V")}
+    ib = IntakeBuilder(rng, hb, vendors, pos, people, accrued)
+    queue = ib.build()
+    contracts = build_contracts(vendors, invoices, hb, people, queue)
 
     truth = {
         "miscoded_lines": [
@@ -78,11 +82,13 @@ def main():
         "categories": {k: {"label": c["label"], "gl": c["gl"], "freq": c["freq"]} for k, c in CATEGORIES.items()},
         "legal_matters": [{"matter": m, "description": d, "practice_area": a,
                            "requesting_lawyer_id": hb.matter_lawyer[m]} for m, d, a in LEGAL_MATTERS],
-        "fx_monthly": ref.FX_MONTHLY,
+        "fx_monthly": ref.FX_MONTHLY, "close_calendar": ref.CLOSE_CALENDAR,
     }
     policies = {"approval_matrix": ref.APPROVAL_MATRIX, "approval_limits": ref.APPROVAL_LIMITS,
                 "capitalisation": ref.CAPITALISATION_POLICY, "po_policy": ref.PO_POLICY,
-                "prepaid": ref.PREPAID_POLICY, "risk": ref.RISK_POLICY}
+                "prepaid": ref.PREPAID_POLICY, "risk": ref.RISK_POLICY, "cutoff": ref.CUTOFF_POLICY,
+                "tax": ref.TAX_POLICY, "receipt": ref.RECEIPT_POLICY, "payment": ref.PAYMENT_POLICY,
+                "routing": ref.ROUTING_POLICY, "price": ref.PRICE_POLICY}
 
     sizes = {
         "reference": write("reference", reference), "policies": write("policies", policies),
@@ -91,6 +97,7 @@ def main():
         "journals_sep26": write("journals_sep26", journals), "customers": write("customers", customers),
         "ar_open_items": write("ar_open_items", ar), "cash_receipts_20261014": write("cash_receipts_20261014", receipts),
         "intake_queue": write("intake_queue", queue), "_truth": write("_truth", truth),
+        "receipt_evidence": write("receipt_evidence", ib.evidence), "contracts": write("contracts", contracts),
     }
 
     lines = [l for i in invoices for l in i["lines"]]

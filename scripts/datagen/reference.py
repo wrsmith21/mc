@@ -252,3 +252,60 @@ def to_usd(amount: float, currency: str, month: str) -> float:
     if currency == "EUR":
         return round(amount * eur_usd, 2)
     return round(amount / usd_inr, 2)
+
+CLOSE_CALENDAR = {
+    "periods": [
+        {"period": "AUG-26", "start": "2026-08-01", "end": "2026-08-31", "status": "CLOSED", "closed_on": "2026-09-08"},
+        {"period": "SEP-26", "start": "2026-09-01", "end": "2026-09-30", "status": "CLOSED", "closed_on": "2026-10-07"},
+        {"period": "OCT-26", "start": "2026-10-01", "end": "2026-10-31", "status": "OPEN", "closed_on": None},
+    ],
+    "close_day": "WD5",
+    "holidays": ["2026-10-12", "2026-11-11", "2026-11-26", "2026-12-25"],
+}
+
+CUTOFF_POLICY = {
+    "materiality_usd": 25_000,
+    "label": "Services consumed in a closed period should have been accrued. Unaccrued amounts of $25k or more are "
+             "reported to Record-to-Report as out-of-period expense.",
+}
+
+TAX_POLICY = {
+    "use_tax_rate": 0.0845,
+    "use_tax_account": "2220",
+    "jurisdiction": "Missouri – St. Charles County (ship-to O'Fallon)",
+    "taxable_categories": ["it_hardware", "network_hw", "furniture", "office_supplies", "printing"],
+    "label": "When a seller does not charge sales tax on taxable goods shipped to Missouri, the buyer accrues use tax.",
+}
+
+RECEIPT_POLICY = {
+    "reminder_business_days": 3,
+    "escalate_business_days": 5,
+    "supplier_contact_business_days": 8,
+    "evidence_kinds": {"asset_register_scan": "Asset register scan", "signed_order_form": "Signed order form",
+                       "sow_acceptance": "Statement-of-work acceptance", "goods_in": "Goods-in record",
+                       "asset_signoff": "Creative asset sign-off"},
+    "evidence_window_days": 60,
+    "label": "Receipt is evidenced by an existing record where one exists; otherwise the requester confirms. "
+             "Reminder after 3 business days, escalation to the cost-centre owner after 5, supplier asked for a "
+             "named contact after 8.",
+}
+
+PAYMENT_POLICY = {
+    "discount_terms": {"2/10 NET30": {"discount": 0.02, "days": 10, "net": 30}},
+    "min_discount_usd": 50,
+    "label": "Early-payment discounts are captured when the discount date has not passed; held invoices are "
+             "excluded from every payment run.",
+}
+
+ROUTING_POLICY = {
+    "intercompany": {"route": "Intercompany settlement (R12 AGIS)", "owner": "Intercompany Accounting"},
+    "employee_reimbursement": {"route": "Concur expense claim", "owner": "T&E team"},
+    "label": "Intercompany recharges and employee reimbursements are not non-PO invoices and leave this queue.",
+}
+
+PRICE_POLICY = {
+    "rate_tolerance": 0.0,
+    "matter_budget_warn_share": 0.9,
+    "label": "Billed hourly rates must not exceed the engagement-letter rate for the role; matters over 90% of "
+             "budget are flagged to the requesting lawyer.",
+}
