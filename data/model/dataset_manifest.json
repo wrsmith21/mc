@@ -1,0 +1,65 @@
+[
+ {
+  "dataset": "invoice_history",
+  "rows": 12340,
+  "from": "2025-04-01",
+  "to": "2026-09-30",
+  "used_by": "Coding & treatment, price, risk, duplicate check"
+ },
+ {
+  "dataset": "coded invoice lines",
+  "rows": 27157,
+  "from": "2025-04-01",
+  "to": "2026-09-30",
+  "used_by": "Model training and evidence"
+ },
+ {
+  "dataset": "purchase_orders",
+  "rows": 5078,
+  "from": "2025-02-20",
+  "to": "2026-10-14",
+  "used_by": "Supplier & validity (open-PO match)"
+ },
+ {
+  "dataset": "vendors",
+  "rows": 405,
+  "from": "2015-06-04",
+  "to": "2024-09-13",
+  "used_by": "Supplier & validity, risk"
+ },
+ {
+  "dataset": "people",
+  "rows": 167,
+  "from": null,
+  "to": null,
+  "used_by": "Approval & receipt"
+ },
+ {
+  "dataset": "journals_sep26",
+  "rows": 4142,
+  "from": "2026-09-01",
+  "to": "2026-09-30",
+  "used_by": "Anomaly sweep, cut-off"
+ },
+ {
+  "dataset": "cash_receipts_20261014",
+  "rows": 11400,
+  "from": null,
+  "to": null,
+  "used_by": "Anomaly sweep (cash)"
+ },
+ {
+  "dataset": "ar_open_items",
+  "rows": 29608,
+  "from": null,
+  "to": null,
+  "used_by": "Anomaly sweep (cash)"
+ },
+ {
+  "dataset": "intake_queue",
+  "rows": 142,
+  "from": "2026-10-06",
+  "to": "2026-10-15",
+  "used_by": "Intake"
+ }
+]

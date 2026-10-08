@@ -157,6 +157,15 @@ def advance_clock(body: dict = Body(...)):
     return svc().advance_clock(float(body.get("hours", 24)), body.get("by", "E34120"))
 
 
+@app.get("/api/model")
+def model_info():
+    from . import model as ds
+    return {"metrics": ds.metrics(), "card": ds.card(), "manifest": ds.manifest(),
+            "calibration": ds._calibration(),
+            "history": {"invoices": len(svc().s.history), "lines": len(svc().s.lines), "vendors": len(svc().s.vendors),
+                        "pos": len(svc().s.pos)}}
+
+
 @app.get("/api/agents")
 def agents():
     return svc().agents()

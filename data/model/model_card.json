@@ -1,0 +1,27 @@
+{
+ "name": "Non-PO GL coding recommender",
+ "version": "2026.10.07",
+ "production_model": "champion",
+ "intended_use": "Recommend GL account and cost centre for non-PO invoice lines, with evidence, for a person to accept or override. Also used by the anomaly sweep to spot miscoded lines.",
+ "out_of_scope": [
+  "Deciding capitalisation (Fixed Asset Accounting decides)",
+  "Approving or paying invoices",
+  "PO-backed invoices (matched, not coded)",
+  "T&E (Concur) and intercompany"
+ ],
+ "training_data": "19,157 coded invoice lines, Apr 2025 \u2013 Apr 2026, 405 suppliers, final (post-reclass) coding as the label.",
+ "evaluation": "Time-based hold-out Jul \u2013 Sep 2026 (4,852 lines): first-time-right 95.4%, top-3 99.7%, calibration error 0.002 after isotonic calibration on May \u2013 Jun 2026.",
+ "limitations": [
+  "New suppliers with no history fall back to category-level evidence and lower confidence",
+  "Free-text descriptions that do not say what was bought need a person",
+  "Synthetic data: real accuracy is established by back-testing on the client's history"
+ ],
+ "monitoring": {
+  "override_rate_alert": 0.08,
+  "psi_alert": 0.2,
+  "retrain_trigger": "Override rate above 8% for two consecutive weeks, or confidence PSI above 0.2 week on week; otherwise quarterly"
+ },
+ "owner": "GBSC Finance Automation CoE (model owner) \u00b7 Controllership (accounting policy owner)",
+ "approval": "Pending model risk review before production use",
+ "data_use": "Trained only on the client's own coded history inside its tenant. No client data is used to train third-party models."
+}

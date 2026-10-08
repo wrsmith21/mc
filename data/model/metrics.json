@@ -1,0 +1,853 @@
+{
+ "version": "2026.10.07",
+ "trained_at": "2026-10-07",
+ "production_model": "champion",
+ "split": {
+  "train": [
+   "2025-04",
+   "2026-04"
+  ],
+  "calibrate": [
+   "2026-05",
+   "2026-06"
+  ],
+  "test": [
+   "2026-07",
+   "2026-09"
+  ]
+ },
+ "lines": {
+  "train": 19157,
+  "calibrate": 3148,
+  "test": 4852
+ },
+ "models": {
+  "champion": {
+   "model": "champion",
+   "test_lines": 4852,
+   "first_time_right": 0.9536,
+   "top3": 0.9973,
+   "macro_f1": 0.9621,
+   "cost_centre_accuracy": 0.8662,
+   "ece_raw": 0.0744,
+   "ece_calibrated": 0.0023,
+   "reliability": [
+    {
+     "bin": "0.1\u20130.2",
+     "confidence": 0.125,
+     "accuracy": 0.727,
+     "n": 11
+    },
+    {
+     "bin": "0.8\u20130.9",
+     "confidence": 0.878,
+     "accuracy": 0.881,
+     "n": 1069
+    },
+    {
+     "bin": "0.9\u20131.0",
+     "confidence": 0.974,
+     "accuracy": 0.975,
+     "n": 3772
+    }
+   ],
+   "bands": {
+    "fast_track": {
+     "share": 0.7141,
+     "accuracy": 0.983,
+     "lines": 3465
+    },
+    "review": {
+     "share": 0.2859,
+     "accuracy": 0.8803,
+     "lines": 1387
+    },
+    "manual": {
+     "share": 0.0,
+     "accuracy": null,
+     "lines": 0
+    }
+   },
+   "by_category": [
+    {
+     "category": "contract_labour",
+     "lines": 638,
+     "accuracy": 0.9781
+    },
+    {
+     "category": "facilities",
+     "lines": 568,
+     "accuracy": 0.9401
+    },
+    {
+     "category": "office_supplies",
+     "lines": 528,
+     "accuracy": 0.9697
+    },
+    {
+     "category": "it_services",
+     "lines": 457,
+     "accuracy": 0.9934
+    },
+    {
+     "category": "marketing",
+     "lines": 335,
+     "accuracy": 0.9104
+    },
+    {
+     "category": "consulting",
+     "lines": 286,
+     "accuracy": 0.9441
+    },
+    {
+     "category": "catering",
+     "lines": 255,
+     "accuracy": 0.9725
+    },
+    {
+     "category": "saas",
+     "lines": 231,
+     "accuracy": 0.9697
+    },
+    {
+     "category": "telecoms",
+     "lines": 230,
+     "accuracy": 0.8957
+    },
+    {
+     "category": "it_hardware",
+     "lines": 199,
+     "accuracy": 0.9899
+    },
+    {
+     "category": "utilities",
+     "lines": 171,
+     "accuracy": 0.9942
+    },
+    {
+     "category": "legal",
+     "lines": 133,
+     "accuracy": 0.9474
+    },
+    {
+     "category": "courier",
+     "lines": 125,
+     "accuracy": 0.872
+    },
+    {
+     "category": "training",
+     "lines": 120,
+     "accuracy": 0.9667
+    },
+    {
+     "category": "market_data",
+     "lines": 103,
+     "accuracy": 0.9029
+    },
+    {
+     "category": "printing",
+     "lines": 100,
+     "accuracy": 1.0
+    },
+    {
+     "category": "cloud",
+     "lines": 89,
+     "accuracy": 0.7528
+    },
+    {
+     "category": "security",
+     "lines": 84,
+     "accuracy": 0.9405
+    },
+    {
+     "category": "events",
+     "lines": 80,
+     "accuracy": 0.9375
+    },
+    {
+     "category": "recruitment",
+     "lines": 40,
+     "accuracy": 0.95
+    },
+    {
+     "category": "furniture",
+     "lines": 33,
+     "accuracy": 1.0
+    },
+    {
+     "category": "network_hw",
+     "lines": 20,
+     "accuracy": 1.0
+    },
+    {
+     "category": "audit_tax",
+     "lines": 9,
+     "accuracy": 1.0
+    },
+    {
+     "category": "translation",
+     "lines": 8,
+     "accuracy": 1.0
+    },
+    {
+     "category": "memberships",
+     "lines": 6,
+     "accuracy": 1.0
+    },
+    {
+     "category": "research",
+     "lines": 2,
+     "accuracy": 1.0
+    },
+    {
+     "category": "insurance",
+     "lines": 2,
+     "accuracy": 1.0
+    }
+   ],
+   "confusions": [
+    {
+     "actual": "6420",
+     "predicted": "6430",
+     "lines": 34
+    },
+    {
+     "actual": "6820",
+     "predicted": "6810",
+     "lines": 29
+    },
+    {
+     "actual": "6350",
+     "predicted": "6340",
+     "lines": 21
+    },
+    {
+     "actual": "6420",
+     "predicted": "6310",
+     "lines": 19
+    },
+    {
+     "actual": "6510",
+     "predicted": "6530",
+     "lines": 17
+    },
+    {
+     "actual": "6360",
+     "predicted": "6460",
+     "lines": 16
+    },
+    {
+     "actual": "6430",
+     "predicted": "6470",
+     "lines": 16
+    },
+    {
+     "actual": "6530",
+     "predicted": "6510",
+     "lines": 13
+    },
+    {
+     "actual": "6350",
+     "predicted": "6370",
+     "lines": 10
+    },
+    {
+     "actual": "6340",
+     "predicted": "6350",
+     "lines": 8
+    }
+   ],
+   "reclasses_avoided": {
+    "historic_miscodes_in_test": 22,
+    "model_predicts_corrected_account": 22
+   },
+   "proposed_bands": {
+    "fast_track": 0.944,
+    "review": 0.125
+   }
+  },
+  "challenger": {
+   "model": "challenger",
+   "test_lines": 4852,
+   "first_time_right": 0.9487,
+   "top3": 0.9996,
+   "macro_f1": 0.9582,
+   "cost_centre_accuracy": 0.8615,
+   "ece_raw": 0.0162,
+   "ece_calibrated": 0.0057,
+   "reliability": [
+    {
+     "bin": "0.0\u20130.1",
+     "confidence": 0.0,
+     "accuracy": 1.0,
+     "n": 2
+    },
+    {
+     "bin": "0.2\u20130.3",
+     "confidence": 0.252,
+     "accuracy": 0.5,
+     "n": 8
+    },
+    {
+     "bin": "0.4\u20130.5",
+     "confidence": 0.4,
+     "accuracy": 0.556,
+     "n": 18
+    },
+    {
+     "bin": "0.6\u20130.7",
+     "confidence": 0.652,
+     "accuracy": 0.694,
+     "n": 183
+    },
+    {
+     "bin": "0.7\u20130.8",
+     "confidence": 0.759,
+     "accuracy": 0.757,
+     "n": 251
+    },
+    {
+     "bin": "0.8\u20130.9",
+     "confidence": 0.853,
+     "accuracy": 0.856,
+     "n": 584
+    },
+    {
+     "bin": "0.9\u20131.0",
+     "confidence": 0.988,
+     "accuracy": 0.991,
+     "n": 3806
+    }
+   ],
+   "bands": {
+    "fast_track": {
+     "share": 0.8089,
+     "accuracy": 0.9888,
+     "lines": 3925
+    },
+    "review": {
+     "share": 0.1911,
+     "accuracy": 0.7789,
+     "lines": 927
+    },
+    "manual": {
+     "share": 0.0,
+     "accuracy": null,
+     "lines": 0
+    }
+   },
+   "by_category": [
+    {
+     "category": "contract_labour",
+     "lines": 638,
+     "accuracy": 0.9781
+    },
+    {
+     "category": "facilities",
+     "lines": 568,
+     "accuracy": 0.9349
+    },
+    {
+     "category": "office_supplies",
+     "lines": 528,
+     "accuracy": 0.9451
+    },
+    {
+     "category": "it_services",
+     "lines": 457,
+     "accuracy": 0.9934
+    },
+    {
+     "category": "marketing",
+     "lines": 335,
+     "accuracy": 0.9104
+    },
+    {
+     "category": "consulting",
+     "lines": 286,
+     "accuracy": 0.951
+    },
+    {
+     "category": "catering",
+     "lines": 255,
+     "accuracy": 0.9725
+    },
+    {
+     "category": "saas",
+     "lines": 231,
+     "accuracy": 0.961
+    },
+    {
+     "category": "telecoms",
+     "lines": 230,
+     "accuracy": 0.8783
+    },
+    {
+     "category": "it_hardware",
+     "lines": 199,
+     "accuracy": 0.9899
+    },
+    {
+     "category": "utilities",
+     "lines": 171,
+     "accuracy": 0.9942
+    },
+    {
+     "category": "legal",
+     "lines": 133,
+     "accuracy": 0.9398
+    },
+    {
+     "category": "courier",
+     "lines": 125,
+     "accuracy": 0.84
+    },
+    {
+     "category": "training",
+     "lines": 120,
+     "accuracy": 0.9667
+    },
+    {
+     "category": "market_data",
+     "lines": 103,
+     "accuracy": 0.8835
+    },
+    {
+     "category": "printing",
+     "lines": 100,
+     "accuracy": 1.0
+    },
+    {
+     "category": "cloud",
+     "lines": 89,
+     "accuracy": 0.7865
+    },
+    {
+     "category": "security",
+     "lines": 84,
+     "accuracy": 0.9524
+    },
+    {
+     "category": "events",
+     "lines": 80,
+     "accuracy": 0.925
+    },
+    {
+     "category": "recruitment",
+     "lines": 40,
+     "accuracy": 0.95
+    },
+    {
+     "category": "furniture",
+     "lines": 33,
+     "accuracy": 1.0
+    },
+    {
+     "category": "network_hw",
+     "lines": 20,
+     "accuracy": 1.0
+    },
+    {
+     "category": "audit_tax",
+     "lines": 9,
+     "accuracy": 1.0
+    },
+    {
+     "category": "translation",
+     "lines": 8,
+     "accuracy": 1.0
+    },
+    {
+     "category": "memberships",
+     "lines": 6,
+     "accuracy": 1.0
+    },
+    {
+     "category": "research",
+     "lines": 2,
+     "accuracy": 1.0
+    },
+    {
+     "category": "insurance",
+     "lines": 2,
+     "accuracy": 1.0
+    }
+   ],
+   "confusions": [
+    {
+     "actual": "6420",
+     "predicted": "6430",
+     "lines": 35
+    },
+    {
+     "actual": "6820",
+     "predicted": "6810",
+     "lines": 29
+    },
+    {
+     "actual": "6350",
+     "predicted": "6340",
+     "lines": 19
+    },
+    {
+     "actual": "6420",
+     "predicted": "6310",
+     "lines": 16
+    },
+    {
+     "actual": "6460",
+     "predicted": "6360",
+     "lines": 15
+    },
+    {
+     "actual": "6510",
+     "predicted": "6530",
+     "lines": 15
+    },
+    {
+     "actual": "6430",
+     "predicted": "6470",
+     "lines": 15
+    },
+    {
+     "actual": "6360",
+     "predicted": "6460",
+     "lines": 14
+    },
+    {
+     "actual": "6530",
+     "predicted": "6510",
+     "lines": 13
+    },
+    {
+     "actual": "6310",
+     "predicted": "6420",
+     "lines": 12
+    }
+   ],
+   "reclasses_avoided": {
+    "historic_miscodes_in_test": 22,
+    "model_predicts_corrected_account": 21
+   },
+   "proposed_bands": {
+    "fast_track": 0.867,
+    "review": 0.0
+   }
+  },
+  "blend": {
+   "model": "blend",
+   "test_lines": 4852,
+   "first_time_right": 0.9512,
+   "top3": 0.9994,
+   "macro_f1": 0.9601,
+   "cost_centre_accuracy": null,
+   "ece_raw": 0.0584,
+   "ece_calibrated": 0.0054,
+   "reliability": [
+    {
+     "bin": "0.0\u20130.1",
+     "confidence": 0.029,
+     "accuracy": 1.0,
+     "n": 2
+    },
+    {
+     "bin": "0.1\u20130.2",
+     "confidence": 0.156,
+     "accuracy": 1.0,
+     "n": 2
+    },
+    {
+     "bin": "0.4\u20130.5",
+     "confidence": 0.422,
+     "accuracy": 0.459,
+     "n": 37
+    },
+    {
+     "bin": "0.6\u20130.7",
+     "confidence": 0.692,
+     "accuracy": 0.656,
+     "n": 93
+    },
+    {
+     "bin": "0.7\u20130.8",
+     "confidence": 0.738,
+     "accuracy": 0.808,
+     "n": 26
+    },
+    {
+     "bin": "0.8\u20130.9",
+     "confidence": 0.877,
+     "accuracy": 0.864,
+     "n": 677
+    },
+    {
+     "bin": "0.9\u20131.0",
+     "confidence": 0.976,
+     "accuracy": 0.978,
+     "n": 4015
+    }
+   ],
+   "bands": {
+    "fast_track": {
+     "share": 0.709,
+     "accuracy": 0.9892,
+     "lines": 3440
+    },
+    "review": {
+     "share": 0.291,
+     "accuracy": 0.8584,
+     "lines": 1412
+    },
+    "manual": {
+     "share": 0.0,
+     "accuracy": null,
+     "lines": 0
+    }
+   },
+   "by_category": [
+    {
+     "category": "contract_labour",
+     "lines": 638,
+     "accuracy": 0.9781
+    },
+    {
+     "category": "facilities",
+     "lines": 568,
+     "accuracy": 0.9349
+    },
+    {
+     "category": "office_supplies",
+     "lines": 528,
+     "accuracy": 0.9489
+    },
+    {
+     "category": "it_services",
+     "lines": 457,
+     "accuracy": 0.9934
+    },
+    {
+     "category": "marketing",
+     "lines": 335,
+     "accuracy": 0.9164
+    },
+    {
+     "category": "consulting",
+     "lines": 286,
+     "accuracy": 0.951
+    },
+    {
+     "category": "catering",
+     "lines": 255,
+     "accuracy": 0.9725
+    },
+    {
+     "category": "saas",
+     "lines": 231,
+     "accuracy": 0.961
+    },
+    {
+     "category": "telecoms",
+     "lines": 230,
+     "accuracy": 0.9043
+    },
+    {
+     "category": "it_hardware",
+     "lines": 199,
+     "accuracy": 0.9899
+    },
+    {
+     "category": "utilities",
+     "lines": 171,
+     "accuracy": 0.9942
+    },
+    {
+     "category": "legal",
+     "lines": 133,
+     "accuracy": 0.9474
+    },
+    {
+     "category": "courier",
+     "lines": 125,
+     "accuracy": 0.84
+    },
+    {
+     "category": "training",
+     "lines": 120,
+     "accuracy": 0.9667
+    },
+    {
+     "category": "market_data",
+     "lines": 103,
+     "accuracy": 0.9029
+    },
+    {
+     "category": "printing",
+     "lines": 100,
+     "accuracy": 1.0
+    },
+    {
+     "category": "cloud",
+     "lines": 89,
+     "accuracy": 0.764
+    },
+    {
+     "category": "security",
+     "lines": 84,
+     "accuracy": 0.9524
+    },
+    {
+     "category": "events",
+     "lines": 80,
+     "accuracy": 0.9375
+    },
+    {
+     "category": "recruitment",
+     "lines": 40,
+     "accuracy": 0.95
+    },
+    {
+     "category": "furniture",
+     "lines": 33,
+     "accuracy": 1.0
+    },
+    {
+     "category": "network_hw",
+     "lines": 20,
+     "accuracy": 1.0
+    },
+    {
+     "category": "audit_tax",
+     "lines": 9,
+     "accuracy": 1.0
+    },
+    {
+     "category": "translation",
+     "lines": 8,
+     "accuracy": 1.0
+    },
+    {
+     "category": "memberships",
+     "lines": 6,
+     "accuracy": 1.0
+    },
+    {
+     "category": "research",
+     "lines": 2,
+     "accuracy": 1.0
+    },
+    {
+     "category": "insurance",
+     "lines": 2,
+     "accuracy": 1.0
+    }
+   ],
+   "confusions": [
+    {
+     "actual": "6420",
+     "predicted": "6430",
+     "lines": 36
+    },
+    {
+     "actual": "6820",
+     "predicted": "6810",
+     "lines": 29
+    },
+    {
+     "actual": "6350",
+     "predicted": "6340",
+     "lines": 21
+    },
+    {
+     "actual": "6420",
+     "predicted": "6310",
+     "lines": 17
+    },
+    {
+     "actual": "6430",
+     "predicted": "6470",
+     "lines": 16
+    },
+    {
+     "actual": "6510",
+     "predicted": "6530",
+     "lines": 15
+    },
+    {
+     "actual": "6360",
+     "predicted": "6460",
+     "lines": 14
+    },
+    {
+     "actual": "6460",
+     "predicted": "6360",
+     "lines": 13
+    },
+    {
+     "actual": "6530",
+     "predicted": "6510",
+     "lines": 13
+    },
+    {
+     "actual": "6350",
+     "predicted": "6370",
+     "lines": 10
+    }
+   ],
+   "reclasses_avoided": {
+    "historic_miscodes_in_test": 22,
+    "model_predicts_corrected_account": 22
+   },
+   "proposed_bands": {
+    "fast_track": 0.911,
+    "review": 0.0
+   }
+  }
+ },
+ "learning_loop": [
+  {
+   "month": "2026-07",
+   "lines": 1556,
+   "frozen": 0.9557,
+   "with_corrections": 0.9569
+  },
+  {
+   "month": "2026-08",
+   "lines": 1677,
+   "frozen": 0.9523,
+   "with_corrections": 0.9541
+  },
+  {
+   "month": "2026-09",
+   "lines": 1619,
+   "frozen": 0.9531,
+   "with_corrections": 0.9537
+  }
+ ],
+ "anomaly": {
+  "ap_ledger": {
+   "flags": 33,
+   "true_miscodes_flagged": 32,
+   "precision": 0.97,
+   "recall": 0.653,
+   "open_miscodes_in_window": 49
+  },
+  "journals": {
+   "flags": 5,
+   "planted": 4,
+   "planted_found": 4,
+   "lines_scanned": 1295
+  },
+  "cash": {
+   "flags": 2,
+   "receipts_scanned": 11400,
+   "planted": 4
+  }
+ },
+ "features": {
+  "challenger": 9118,
+  "word_ngrams": 2374,
+  "char_ngrams": 6307,
+  "suppliers": 405
+ },
+ "note": "Measured on synthetic data. Not a product accuracy claim."
+}

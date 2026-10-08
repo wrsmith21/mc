@@ -23,6 +23,13 @@ class AnomalyLayer:
         self.rec = recommender
         self.cap_rules = {r["account"]: r for r in store.policies["capitalisation"]["rules"]}
 
+    def _vendor_uses(self, vendor_id, account, share=0.10):
+        idx = self.s.lines_by_vendor.get(vendor_id or "", [])
+        if not idx:
+            return False
+        n = sum(1 for i in idx if self.s.lines[i]["gl"] == account)
+        return n / len(idx) >= share
+
     # ---------------- journals ----------------
     def predict_account(self, description):
         sims = self.rec.similar_lines(None, _strip_prefix(description))
@@ -56,10 +63,13 @@ class AnomalyLayer:
                 continue
             scanned += 1
             p = self.predict_account(j["description"])
-            if not p or p["best_similarity"] < 0.30 or p["share"] < 0.6:
+            # Flag only when similar history points clearly elsewhere and almost nothing like it was ever posted here.
+            if not p or p["best_similarity"] < 0.25 or p["share"] < 0.5:
                 continue
             if p["shares"].get(j["account"], 0) >= 0.15 or p["account"] == j["account"]:
                 continue
+            if self._vendor_uses(j.get("reference"), j["account"]):
+                continue  # this supplier is legitimately coded to the posted account; not an error
             posted, predicted = self.s.coa[j["account"]]["name"], self.s.coa[p["account"]]["name"]
             detail = (f"Description reads as {predicted} ({p['share']:.0%} of similar history coded {p['account']}); "
                       f"posted to {j['account']} {posted}.")
@@ -150,7 +160,7 @@ class AnomalyLayer:
                 if l["invoice_date"] < since:
                     continue
                 scanned += 1
-                if l["posted_gl"] != norm and not l["reclassified"]:
+                if l["posted_gl"] != norm and not l["reclassified"] and not self._vendor_uses(vid, l["posted_gl"]):
                     flags.append({"type": "AP_MISCODE", "severity": "medium" if l["amount_usd"] < 25_000 else "high",
                                   "invoice_id": l["invoice_id"], "invoice_num": l["invoice_num"],
                                   "vendor": l["vendor_name"], "date": l["invoice_date"],

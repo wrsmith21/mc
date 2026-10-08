@@ -21,6 +21,10 @@ MONTH_ABBR = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oc
 
 DEMO_MEDIANS = {"V1102": 42_500, "V2007": 58_000, "V4120": 3_520, "V5031": 13_800, "V6208": 15_900}
 DEMO_VENDOR_IDS = {"V1043", "V1102", "V2007", "V3015", "V4120", "V5031", "V6208"}
+NOISE_SEED = 20261016
+VAGUE = ["Services – {mon}", "Professional services rendered – {mon}", "Invoice charges – ref {ref}",
+         "Monthly charges – {mon}", "As per agreement – {mon}", "Services per quote Q{ref}",
+         "Work completed – order {ref}", "Fees – {mon}"]
 DEMO_COUNTS = {"V1043": 60, "V2007": 14, "V5031": 10}
 
 
@@ -47,6 +51,12 @@ def period_name(d: date):
 
 class HistoryBuilder:
     def __init__(self, rng: random.Random, vendors, people_by_id, cost_centres):
+        # A separate stream for history noise, so adding it leaves every other generated record unchanged.
+        self.noise = random.Random(NOISE_SEED)
+        self.mixed = {v["vendor_id"]: round(self.noise.uniform(0.10, 0.30), 2) for v in vendors
+                      if v["vendor_id"] not in DEMO_VENDOR_IDS and CATEGORIES[v["category"]].get("confusable")
+                      and CATEGORIES[v["category"]]["confusable"] not in ("1540", "1310", "1320")
+                      and self.noise.random() < 0.25}
         self.rng = rng
         self.vendors = vendors
         self.people = people_by_id
@@ -110,6 +120,10 @@ class HistoryBuilder:
     def pick_cc(self, v):
         cat = CATEGORIES[v["category"]]
         if v["vendor_id"] in DEMO_VENDOR_IDS or self.rng.random() < 0.96:
+            if v["vendor_id"] not in DEMO_VENDOR_IDS and self.noise.random() < 0.12:
+                options = [c for c, _ in cat["ccs"] if self.ccs[c]["entity"] == v["entity"] and c != v["default_cc"]]
+                if options:
+                    return self.noise.choice(options), "legit_variation"
             return v["default_cc"], "normal"
         options = [c for c, _ in cat["ccs"] if self.ccs[c]["entity"] == v["entity"] and c != v["default_cc"]]
         if not options:
@@ -214,8 +228,18 @@ class HistoryBuilder:
         lines = []
         for t, w in zip(picks, weights):
             amt = round(target * w / s, 2)
-            lines.append({"description": self.fill(t, d, period, matter), "qty": 1, "unit_price": amt, "amount": amt,
-                          "base_gl": cat["gl"]})
+            line = {"description": self.fill(t, d, period, matter), "qty": 1, "unit_price": amt, "amount": amt,
+                    "base_gl": cat["gl"]}
+            if v["vendor_id"] not in DEMO_VENDOR_IDS:
+                # Real AP history is noisier than a catalogue: vague lines, and suppliers that teams code two ways.
+                if self.noise.random() < 0.10:
+                    mon = f"{MONTH_ABBR[d.month - 1]} {d.year}"
+                    line["description"] = self.noise.choice(VAGUE).format(mon=mon, ref=self.noise.randint(1000, 9999))
+                share = self.mixed.get(v["vendor_id"])
+                if share and self.noise.random() < share:
+                    line["base_gl"] = cat["confusable"]
+                    line["_label"] = "legit_variation"
+            lines.append(line)
         if cat["alt"] and self.rng.random() < 0.04:
             gl, t = self.rng.choice(cat["alt"])
             amt = round(target * self.rng.uniform(0.05, 0.25), 2)

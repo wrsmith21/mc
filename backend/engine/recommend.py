@@ -6,6 +6,7 @@ Policy (capitalisation per unit, prepaid) is applied after scoring so the reason
 from collections import Counter, defaultdict
 from datetime import date
 
+from .. import model as ds
 from .text import TfIdfIndex, tokens
 
 W_TEXT, W_VENDOR, W_AMOUNT = 0.60, 0.25, 0.15
@@ -149,6 +150,18 @@ class Recommender:
                                     f"{prepaid_acct} Prepaid and amortise ${amount_usd / months:,.2f}/month to "
                                     f"{expense_account}.")
 
+        raw_confidence = confidence
+        confidence = round(ds.calibrate("champion", raw_confidence), 3)
+        second = None
+        ch = ds.challenger()
+        if ch:
+            v = self.s.vendors.get(vendor_id, {})
+            p = ch.proba(description, vendor_id, category, v.get("entity"), amount_usd, unit_price)
+            k = int(p.argmax())
+            second = {"model": "challenger", "account": ch.classes[k],
+                      "confidence": round(ds.calibrate("challenger", float(p[k])), 3),
+                      "agrees": ch.classes[k] == top_gl}
+        meta = ds.metrics() or {}
         cc, cc_conf = self.recommend_cc(vendor_id, top_gl, sims, requester_cc)
         evidence = self.evidence(vendor_id, sims, top_gl)
         alternatives = [{"account": g, "name": self.s.coa.get(g, {}).get("name"), "score": round(s, 3),
@@ -157,7 +170,10 @@ class Recommender:
         return {
             "account": account, "account_name": self.s.coa.get(account, {}).get("name"),
             "scored_account": top_gl, "cost_centre": cc, "cost_centre_confidence": cc_conf,
-            "confidence": confidence, "components": {
+            "confidence": confidence, "raw_confidence": raw_confidence,
+            "model": {"production": meta.get("production_model", "champion"), "version": meta.get("version"),
+                      "calibrated": bool(meta), "second_opinion": second},
+            "components": {
                 "text_vote": round(text_share.get(top_gl, 0), 3), "vendor_freq": round(vfreq.get(top_gl, 0), 3),
                 "amount_fit": fits[top_gl], "lead_over_runner_up": round(share, 3),
                 "similar_same_vendor": same_n, "similar_same_category": cat_n, "similar_other_vendors": other_n,
