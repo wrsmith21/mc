@@ -83,6 +83,18 @@ def test_policy_changes_need_an_admin_and_mark_runs_stale(client):
     assert versions[-1]["changes"][0]["before"] == 2.5 and versions[-1]["by"] == ADMIN
 
 
+def test_another_instance_picks_up_a_policy_change(client):
+    sv = app_module.svc()
+    iid = sv.by_key["telecoms"]
+    sv.run(iid)
+    as_(client, ADMIN)
+    body = {"changes": {"risk.amount_vs_norm_multiple": 3}, "reason": "Fewer false holds on seasonal suppliers"}
+    assert client.post("/api/policies", json=body).status_code == 200
+    sv.s.policy_version, sv.s.policies["risk"]["amount_vs_norm_multiple"], sv._gen = 1, 2.5, "before-the-change"
+    assert "Policy changed to version 2" in client.get(f"/api/invoices/{iid}").json()["stale"]
+    assert sv.s.policies["risk"]["amount_vs_norm_multiple"] == 3
+
+
 def test_policy_rejects_out_of_range_values(client):
     as_(client, ADMIN)
     r = client.post("/api/policies", json={"changes": {"risk.confidence_bands.review": 0.99}, "reason": "Testing bounds"})

@@ -28,6 +28,8 @@ def svc() -> DemoService:
     global _svc
     if _svc is None:
         _svc = DemoService()
+    else:
+        _svc.sync()
     return _svc
 
 

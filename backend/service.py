@@ -82,6 +82,7 @@ class DemoService:
         if not self.state.get("meta:seeded"):
             self.reset()
         self.sync_clock()
+        self._gen = self.state.get("meta:gen")
 
     # ---------- results & runs ----------
     def _batch_results(self):
@@ -633,7 +634,9 @@ class DemoService:
 
     def update_policy(self, by, changes, reason):
         self.authorize(by, "policy_edit")
-        return self.policies.update(by, self.s.people[by]["name"], changes, reason)
+        out = self.policies.update(by, self.s.people[by]["name"], changes, reason)
+        self._bump()
+        return out
 
     def sync_clock(self):
         self.policies.apply() if hasattr(self, "policies") else None
@@ -641,11 +644,23 @@ class DemoService:
         for v in self.state.prefix("onboarded:").values():
             self.s.vendors.setdefault(v["vendor_id"], v["record"])
 
+    def sync(self):
+        """Serverless instances share state but not memory: one key read tells this one another changed a setting."""
+        gen = self.state.get("meta:gen")
+        if gen != self._gen:
+            self._gen = gen
+            self.sync_clock()
+
+    def _bump(self):
+        self._gen = uuid.uuid4().hex
+        self.state.put("meta:gen", self._gen)
+
     def advance_clock(self, hours, by):
         self.authorize(by, "clock")
         offset = clock.offset_hours() + hours
         self.state.put("meta:clock", {"offset_hours": offset, "by": by})
         clock.set_offset_hours(offset)
+        self._bump()
         self.state.add_event("system", by, "CLOCK_ADVANCED", {"hours": hours, "now": now_iso()})
         fired = self.apply_sla()
         return {"now": now_iso(), "offset_hours": offset, "sla_events": fired}
@@ -768,6 +783,7 @@ class DemoService:
             "category_label": cat["label"], "entity": doc["entity"], "terms": "NET30", "since": clock.today(),
             "record": record})
         self.s.vendors[vid] = record
+        self._bump()
         self.state.add_event(intake_id, by, "SUPPLIER_ONBOARDED", {"vendor_id": vid, "tax_id": tax_id,
                                                                    "category": cat["label"]})
         return self.run(intake_id, "rerun", by)
@@ -818,6 +834,7 @@ class DemoService:
             self.state = real
             self.agent.bind_state(real)
         buffered.flush()
+        self._gen = None
 
     def _alternate_cc(self, r):
         """Second most common cost centre this supplier has been coded to, if any."""
