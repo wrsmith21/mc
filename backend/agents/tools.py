@@ -81,8 +81,14 @@ def build_registry(store, state, checks, policy, rec):
                  lambda r: f"${r['usd']:,.2f} at {r['rate']}"))
 
     # ---------- supplier & validity ----------
+    def resolve(doc):
+        onboarded = state.get(f"onboarded:{(doc.get('vendor_name') or '').lower()}")
+        if onboarded:
+            return {"found": True, **onboarded}
+        return checks.resolve_vendor(doc)
+
     reg.add(Tool("vendor.resolve", "supplier", "Match the supplier to the vendor master by name, corroborated by "
-                 "tax ID.", lambda doc: checks.resolve_vendor(doc), {"doc": O},
+                 "tax ID.", resolve, {"doc": O},
                  {"found": B, "vendor_id": S, "match_score": N},
                  lambda r: f"{r['vendor_id']} {r['name']} ({r['match_score']:.0f}%)" if r["found"]
                  else f"Not in vendor master (closest: {r.get('closest')})", investigator=False))
@@ -204,10 +210,21 @@ def build_registry(store, state, checks, policy, rec):
                  lambda r: f"Task {r['status']} ({r['assignee_name']})" if r else "No task yet", kind="state"))
 
     # ---------- risk & approval ----------
+    def verified_callback(vendor_id, risk):
+        cb = state.get(f"callback:{vendor_id}")
+        if not cb or cb.get("outcome") != "verified":
+            return risk
+        for f in risk["flags"]:
+            if f["code"] == "RECENT_BANK_CHANGE":
+                f["severity"] = "low"
+                f["detail"] += f" Call-back completed by {cb['by_name']} on {cb['at'][:10]}: details verified."
+        risk["flags"] = [f for f in risk["flags"] if f["code"] != "LOOKALIKE_DOMAIN" or not cb.get("domain_ok")]
+        return risk
+
     reg.add(Tool("risk.payment_risk", "risk", "Fraud and error signals before payment: amount vs supplier norm, "
                  "recent bank change, remit-to mismatch, look-alike domain, shortened terms.",
                  lambda vendor_id, doc, total_usd, sender, as_of, account=None:
-                 checks.payment_risk(vendor_id, doc, total_usd, sender, as_of, account),
+                 verified_callback(vendor_id, checks.payment_risk(vendor_id, doc, total_usd, sender, as_of, account)),
                  {"vendor_id": S, "doc": O, "total_usd": N, "sender": S, "as_of": S, "account": opt(S)},
                  {"flags": A, "notes": A},
                  lambda r: f"{len(r['flags'])} signal(s)" + (f"; {r['ratio_to_norm']}× norm" if r.get('ratio_to_norm')
@@ -219,6 +236,145 @@ def build_registry(store, state, checks, policy, rec):
                  {"amount_usd": N, "category": S, "cost_centre": S, "requester_id": opt(S)}, {"steps": A, "tier": S},
                  lambda r: " → ".join(st["person"]["name"] for st in r["steps"]) +
                            (" (SoD reroute)" if r["sod_reroute"] else "")))
+
+    # ---------- price (step 5) ----------
+    def rate_card(vendor_id, doc):
+        letter = s.letters.get(doc.get("engagement_letter")) or s.letters_by_vendor.get(vendor_id)
+        if not letter:
+            return {"letter": None, "lines": [], "variances": []}
+        card = {r["role"]: r["hourly_rate_usd"] for r in letter["rates"]}
+        lines, variances = [], []
+        for l in doc["lines"]:
+            role = l["description"].split(" – ")[0].strip()
+            if role not in card:
+                continue
+            rate = card[role]
+            row = {"role": role, "hours": l["qty"], "billed_rate": l["unit_price"], "card_rate": rate,
+                   "amount": l["amount"], "excess": round(max(0, l["unit_price"] - rate) * l["qty"], 2)}
+            lines.append(row)
+            if l["unit_price"] > rate * (1 + s.policies["price"]["rate_tolerance"]):
+                variances.append(row)
+        return {"letter": letter["engagement_letter"], "kind": letter["kind"], "lines": lines,
+                "variances": variances, "hours": round(sum(r["hours"] for r in lines), 2)}
+
+    reg.add(Tool("price.rate_card", "price", "Compare billed hourly rates by role with the engagement letter or "
+                 "master services agreement.", rate_card, {"vendor_id": S, "doc": O}, {"variances": A},
+                 lambda r: ("No rate card on file" if not r["letter"] else
+                            f"{len(r['lines'])} timekeeper line(s) vs {r['letter']}: {len(r['variances'])} over card"),
+                 investigator=True))
+
+    def matter_budget(matter, amount_usd):
+        m = s.matter_budgets.get(matter)
+        if not m:
+            return None
+        after = m["billed_to_date_usd"] + amount_usd
+        return {**m, "after_invoice_usd": round(after, 2), "share_after": round(after / m["budget_usd"], 3)}
+
+    reg.add(Tool("price.matter_budget", "price", "Check the legal matter's budget consumed including this invoice.",
+                 matter_budget, {"matter": S, "amount_usd": N}, {"share_after": N},
+                 lambda r: f"{r['matter']}: {r['share_after']:.0%} of ${r['budget_usd']:,.0f} budget after this "
+                           f"invoice" if r else "No matter budget", kind="state", investigator=True))
+
+    def sow(vendor_id, doc):
+        text = " ".join(l["description"] for l in doc["lines"]).lower()
+        for w_ in s.sows.values():
+            if w_["vendor_id"] == vendor_id and (w_["description"].lower() in text or
+                                                 abs(w_["fixed_fee_usd"] - doc["subtotal"]) < 0.01):
+                return {**w_, "matches_fee": abs(w_["fixed_fee_usd"] - doc["subtotal"]) < 0.01}
+        return None
+
+    reg.add(Tool("price.sow", "price", "Match a fixed-fee invoice to its signed statement of work.", sow,
+                 {"vendor_id": S, "doc": O}, {"sow": S, "matches_fee": B},
+                 lambda r: f"{r['sow']} fixed fee ${r['fixed_fee_usd']:,.0f}: " +
+                           ("matches" if r["matches_fee"] else "DIFFERS") if r else "No SOW", kind="state"))
+
+    # ---------- treatment: splits, cut-off, tax ----------
+    def split(lines, entity):
+        import re as _re
+        out = []
+        for i, l in enumerate(lines):
+            cc = _re.search(r"\((CC\d{4})\)", l["description"])
+            ent = _re.search(r"\b(US01|EU01|IN01)\b", l["description"])
+            out.append({"line": i, "cost_centre": cc.group(1) if cc and cc.group(1) in s.cost_centres else None,
+                        "entity": ent.group(1) if ent else entity, "amount": l["amount"]})
+        named = [o for o in out if o["cost_centre"] or o["entity"] != entity]
+        return {"allocations": out if named else [], "entities": sorted({o["entity"] for o in out}),
+                "cost_centres": sorted({o["cost_centre"] for o in out if o["cost_centre"]})}
+
+    reg.add(Tool("coding.split", "coding", "Read cost-centre and entity allocations named on the invoice lines.",
+                 split, {"lines": A, "entity": S}, {"allocations": A},
+                 lambda r: (f"Split across {len(r['cost_centres']) or len(r['entities'])} "
+                            f"{'cost centres' if r['cost_centres'] else 'entities'}") if r["allocations"]
+                 else "Single allocation"))
+
+    def cutoff(vendor_id, service_period, amount_usd):
+        cal = {p_["period"]: p_ for p_ in s.reference["close_calendar"]["periods"]}
+        if not service_period or not service_period.get("start"):
+            return {"closed_share": 0}
+        start, end = date.fromisoformat(service_period["start"]), date.fromisoformat(service_period["end"])
+        days = (end - start).days + 1
+        closed_days, periods = 0, []
+        for p_ in cal.values():
+            if p_["status"] != "CLOSED":
+                continue
+            ps, pe = date.fromisoformat(p_["start"]), date.fromisoformat(p_["end"])
+            overlap = (min(end, pe) - max(start, ps)).days + 1
+            if overlap > 0:
+                closed_days += overlap
+                periods.append(p_["period"])
+        if not closed_days:
+            return {"closed_share": 0}
+        in_closed = round(amount_usd * closed_days / days, 2)
+        accruals = [j for j in s.journals if j["reference"] == vendor_id and j["category"] == "Accrual"
+                    and j["account"] == "2150"]
+        accrued = round(sum(j["cr"] for j in accruals), 2)
+        return {"closed_share": round(closed_days / days, 3), "periods": periods, "amount_in_closed_usd": in_closed,
+                "accrued_usd": accrued, "accrual_je": accruals[0]["je_id"] if accruals else None,
+                "variance_usd": round(in_closed - accrued, 2),
+                "materiality_usd": s.policies["cutoff"]["materiality_usd"]}
+
+    reg.add(Tool("cutoff.check", "coding", "For services consumed in a closed period, find the period-end accrual "
+                 "and measure what was not accrued.", cutoff,
+                 {"vendor_id": S, "service_period": opt(O), "amount_usd": N}, {"accrued_usd": N, "variance_usd": N},
+                 lambda r: "Service in open period" if not r["closed_share"] else
+                 (f"{', '.join(r['periods'])}: ${r['amount_in_closed_usd']:,.0f} consumed, "
+                  f"${r['accrued_usd']:,.0f} accrued ({r['accrual_je'] or 'no accrual'})"), kind="history",
+                 investigator=True))
+
+    def use_tax(vendor_id, doc):
+        v = s.vendors[vendor_id]
+        pol = s.policies["tax"]
+        if v["category"] not in pol["taxable_categories"] or doc.get("tax") or doc.get("entity") != "US01" \
+                or v.get("region") == "MO" or v["currency"] != "USD":
+            return {"due": False}
+        amount = round(doc["subtotal"] * pol["use_tax_rate"], 2)
+        return {"due": True, "taxable_usd": doc["subtotal"], "rate": pol["use_tax_rate"], "amount_usd": amount,
+                "account": pol["use_tax_account"], "jurisdiction": pol["jurisdiction"],
+                "seller_region": v.get("region")}
+
+    reg.add(Tool("tax.use_tax", "coding", "Accrue use tax when an out-of-state seller charged no sales tax on "
+                 "taxable goods shipped to Missouri.", use_tax, {"vendor_id": S, "doc": O}, {"due": B},
+                 lambda r: f"Use tax ${r['amount_usd']:,.2f} due ({r['rate']:.2%})" if r["due"] else "No use tax due"))
+
+    # ---------- payment ----------
+    def terms(vendor_id, doc, today):
+        v = s.vendors[vendor_id]
+        pol = s.policies["payment"]["discount_terms"].get(v["payment_terms"])
+        inv = date.fromisoformat(doc["invoice_date"])
+        out = {"terms": v["payment_terms"], "due_date": doc.get("due_date"), "discount": None}
+        if pol:
+            by = inv + timedelta(days=pol["days"])
+            amount = round(doc["total"] * pol["discount"], 2)
+            out["discount"] = {"rate": pol["discount"], "pay_by": by.isoformat(), "amount": amount,
+                               "currency": doc["currency"], "open": today <= by.isoformat() and
+                               amount >= s.policies["payment"]["min_discount_usd"]}
+        return out
+
+    reg.add(Tool("payment.terms", "risk", "Due date from agreed terms and any early-payment discount still open.",
+                 terms, {"vendor_id": S, "doc": O, "today": S}, {"due_date": S, "discount": O},
+                 lambda r: f"{r['terms']}, due {r['due_date']}" + (
+                     f"; discount {r['discount']['amount']:,.2f} by {r['discount']['pay_by']}"
+                     f" ({'open' if r['discount']['open'] else 'missed'})" if r["discount"] else "")))
 
     # ---------- explanation ----------
     reg.add(Tool("llm.explain", "supervisor", "Claude writes the reviewer-facing reason from the findings; a "

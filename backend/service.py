@@ -56,7 +56,7 @@ class DemoService:
         self._lock = threading.Lock()
         if not self.state.get("meta:seeded"):
             self.reset()
-        clock.set_offset_hours((self.state.get("meta:clock") or {}).get("offset_hours", 0))
+        self.sync_clock()
 
     # ---------- results & runs ----------
     def _batch_results(self):
@@ -186,8 +186,8 @@ class DemoService:
                 events.put(None)
 
         yield {"type": "start", "intake_id": intake_id, "steps": ["intake", "read", "supplier", "validity", "po",
-                                                                   "coding", "treatment", "receipt", "risk",
-                                                                   "approval", "decide"]}
+                                                                   "coding", "treatment", "price", "receipt",
+                                                                   "risk", "approval", "decide"]}
         threading.Thread(target=work, daemon=True).start()
         while True:
             ev = events.get()
@@ -343,6 +343,7 @@ class DemoService:
         return task
 
     def tasks(self, person_id=None):
+        self.apply_sla()
         out = [t for t in self.state.prefix("receipt:").values() if t["status"] == "pending"]
         if person_id:
             out = [t for t in out if t["assignee_id"] == person_id]
@@ -521,6 +522,150 @@ class DemoService:
         self.state.put(f"wildcard:{iid}", item)
         self.state.add_event(iid, "AGENT", "RECEIVED", {"channel": "Live upload", "file": filename}, None)
         return iid
+
+    # ---------- demo clock & receipt SLAs ----------
+    def sync_clock(self):
+        clock.set_offset_hours((self.state.get("meta:clock") or {}).get("offset_hours", 0))
+        for v in self.state.prefix("onboarded:").values():
+            self.s.vendors.setdefault(v["vendor_id"], v["record"])
+
+    def advance_clock(self, hours, by):
+        offset = clock.offset_hours() + hours
+        self.state.put("meta:clock", {"offset_hours": offset, "by": by})
+        clock.set_offset_hours(offset)
+        self.state.add_event("system", by, "CLOCK_ADVANCED", {"hours": hours, "now": now_iso()})
+        fired = self.apply_sla()
+        return {"now": now_iso(), "offset_hours": offset, "sla_events": fired}
+
+    def _business_days(self, start_iso, end_iso):
+        holidays = set(self.s.reference["close_calendar"]["holidays"])
+        d = datetime.fromisoformat(start_iso[:19]).date()
+        end = datetime.fromisoformat(end_iso[:19]).date()
+        n = 0
+        while d < end:
+            d += timedelta(days=1)
+            if d.weekday() < 5 and d.isoformat() not in holidays:
+                n += 1
+        return n
+
+    def apply_sla(self):
+        """Remind, escalate and go back to the supplier on receipt tasks that are not confirmed in time."""
+        pol = self.s.policies["receipt"]
+        stages = [("reminder", pol["reminder_business_days"]), ("escalated", pol["escalate_business_days"]),
+                  ("supplier", pol["supplier_contact_business_days"])]
+        fired = []
+        now = now_iso()
+        for key, task in self.state.prefix("receipt:").items():
+            if task["status"] != "pending":
+                continue
+            iid = task["intake_id"]
+            age = self._business_days(task["requested_at"], now)
+            done = task.setdefault("sla", {})
+            changed = False
+            for stage, days in stages:
+                if age >= days and stage not in done:
+                    done[stage] = now
+                    changed = True
+                    if stage == "reminder":
+                        self.state.add_event(iid, "AGENT", "RECEIPT_REMINDER", {"to": task["assignee_name"],
+                                                                                "business_days": age})
+                    elif stage == "escalated":
+                        r = self.latest(iid)
+                        cc = self.s.cost_centres.get((r.get("coding") or {}).get("cost_centre") or "", {})
+                        owner = self.s.people.get(cc.get("owner_id"))
+                        if owner and owner["id"] != task["assignee_id"]:
+                            task.update(escalated_from=task["assignee_name"], assignee_id=owner["id"],
+                                        assignee_name=owner["name"])
+                        self.state.add_event(iid, "AGENT", "RECEIPT_ESCALATED", {
+                            "to": task["assignee_name"], "from": task.get("escalated_from"), "business_days": age})
+                    else:
+                        self.state.add_event(iid, "AGENT", "SUPPLIER_CONTACTED", {
+                            "why": "No one has claimed the invoice; supplier asked for the name of the person who "
+                                   "ordered", "business_days": age})
+                    fired.append({"intake_id": iid, "stage": stage, "business_days": age})
+            if changed:
+                self.state.put(key, task)
+        return fired
+
+    # ---------- work queues: vendor master, onboarding, procurement ----------
+    def work(self):
+        rows = self.queue()
+        results = self._results()
+        callbacks = self.state.prefix("callback:")
+        vendor_review, onboarding = [], []
+        for r in rows:
+            full = results.get(r["intake_id"])
+            if not full or r["status"] in ("APPROVED", "REJECTED"):
+                continue
+            codes = {f["code"] for f in r["flags"]}
+            if "PAYMENT_RISK" in codes:
+                vid = r["vendor_id"]
+                change = (self.s.vendors[vid]["bank_change_log"] or [{}])[-1]
+                vendor_review.append({**r, "task": "Call-back verification", "bank_change": change,
+                                      "signals": [f["detail"] for f in full["risk"]["flags"]],
+                                      "callback": callbacks.get(f"callback:{vid}")})
+            if r["agent_status"] == "VENDOR_ONBOARDING":
+                onboarding.append({**r, "task": "Supplier onboarding", "document": full["document"],
+                                   "checklist": ["W-9 and tax ID", "OFAC screen", "Bank account verified by call-back",
+                                                 "Category and default coding"]})
+        return {"vendor_review": vendor_review, "onboarding": onboarding,
+                "po_requests": list(self.state.prefix("poreq:").values()),
+                "receipts": self.tasks(), "routed_out": [r for r in rows if r["agent_status"] == "ROUTED_OUT"]}
+
+    def callback(self, vendor_id, outcome, by, note=""):
+        if outcome not in ("verified", "fraud"):
+            raise ValueError("Outcome must be verified or fraud")
+        person = self.s.people[by]
+        rec = {"vendor_id": vendor_id, "outcome": outcome, "by": by, "by_name": person["name"], "at": now_iso(),
+               "note": note, "domain_ok": outcome == "verified"}
+        self.state.put(f"callback:{vendor_id}", rec)
+        affected = [r["intake_id"] for r in self.queue()
+                    if r["vendor_id"] == vendor_id and any(f["code"] == "PAYMENT_RISK" for f in r["flags"])
+                    and r["status"] not in ("APPROVED", "REJECTED")]
+        for iid in affected:
+            self.state.add_event(iid, by, "CALLBACK_COMPLETED", {"outcome": outcome, "note": note})
+            if outcome == "fraud":
+                self.submit(iid, "reject", by, f"Bank-detail change not made by the supplier (call-back "
+                                               f"{rec['at'][:10]}). Fraud attempt: invoice rejected, vendor master "
+                                               f"change reversed.")
+            else:
+                self.run(iid, "rerun", by)
+        return {"callback": rec, "invoices": affected}
+
+    def onboard(self, intake_id, by, tax_id, category="facilities"):
+        r = self.latest(intake_id)
+        if not r or r["agent_status"] != "VENDOR_ONBOARDING":
+            raise ValueError("This invoice is not waiting for supplier onboarding")
+        doc = r["document"]
+        cat = self.s.reference["categories"][category]
+        vid = f"V{9800 + len(self.state.prefix('onboarded:')) + 1}"
+        record = {"vendor_id": vid, "name": doc["vendor_name"], "category": category, "category_label": cat["label"],
+                  "status": "ACTIVE", "entity": doc["entity"], "currency": doc["currency"], "site_code": "MAIN",
+                  "city": (doc.get("vendor_city") or ", ").split(",")[0], "region": "MO", "tax_id": tax_id,
+                  "default_gl": cat["gl"], "default_cc": "CC5200", "payment_terms": "NET30",
+                  "invoice_format": "plain", "bank": {"type": "Check", "account_last4": None, "routing_number": None},
+                  "bank_change_log": [], "created_date": clock.today(), "sanctions_screened": True,
+                  "po_required_category": False, "remit_email": None}
+        self.state.put(f"onboarded:{doc['vendor_name'].lower()}", {
+            "vendor_id": vid, "name": doc["vendor_name"], "match_score": 100.0, "status": "ACTIVE",
+            "tax_id_match": True, "default_gl": cat["gl"], "default_cc": "CC5200", "category": category,
+            "category_label": cat["label"], "entity": doc["entity"], "terms": "NET30", "since": clock.today(),
+            "record": record})
+        self.s.vendors[vid] = record
+        self.state.add_event(intake_id, by, "SUPPLIER_ONBOARDED", {"vendor_id": vid, "tax_id": tax_id,
+                                                                   "category": cat["label"]})
+        return self.run(intake_id, "rerun", by)
+
+    def request_po(self, vendor_id, kind, by):
+        if kind not in ("Blanket PO", "Standing approval rule"):
+            raise ValueError("Kind must be Blanket PO or Standing approval rule")
+        v = self.s.vendors[vendor_id]
+        req = {"vendor_id": vendor_id, "vendor": v["name"], "kind": kind, "by": by,
+               "by_name": self.s.people[by]["name"], "at": now_iso(), "status": "Requested",
+               "owner": "Procurement – Category management"}
+        self.state.put(f"poreq:{vendor_id}", req)
+        self.state.add_event("procurement", by, "PO_REQUESTED", req)
+        return req
 
     # ---------- reset & seed ----------
     def reset(self):

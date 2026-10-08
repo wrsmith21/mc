@@ -6,7 +6,8 @@ from ..engine.checks import Checks
 from ..engine.policy import Policy
 from ..engine.recommend import Recommender
 from .base import RunContext
-from .specialists import ApprovalAgent, CodingAgent, IntakeAgent, RiskAgent, SupplierAgent, Work
+from .. import clock
+from .specialists import ApprovalAgent, CodingAgent, IntakeAgent, PriceAgent, RiskAgent, SupplierAgent, Work
 from .tools import build_registry
 
 BASELINE_MINUTES = {"research_coding": 6, "find_approver": 4, "chase_receipt": 5, "key_invoice": 3}
@@ -17,7 +18,8 @@ STATUS_LABEL = {"NEW": "New – not yet worked", "FAST_TRACK": "Fast-track", "RE
                 "MATCH_TO_PO": "Match to PO", "VENDOR_ONBOARDING": "Held – unknown supplier",
                 "ROUTED_OUT": "Routed out of AP", "APPROVED": "Approved", "REJECTED": "Rejected",
                 "IN_APPROVAL": "In approval"}
-PROCESS_ORDER = ["intake", "read", "supplier", "validity", "po", "coding", "treatment", "receipt", "risk", "approval"]
+PROCESS_ORDER = ["intake", "read", "supplier", "validity", "po", "coding", "treatment", "price", "receipt", "risk",
+                 "approval", "decide"]
 
 
 class Supervisor:
@@ -30,7 +32,7 @@ class Supervisor:
         self.registry = build_registry(store, state, self.checks, self.policy, self.rec)
         self.registry.store = store
         self.agents = {"intake": IntakeAgent(), "supplier": SupplierAgent(), "coding": CodingAgent(),
-                       "approval": ApprovalAgent(), "risk": RiskAgent()}
+                       "price": PriceAgent(), "approval": ApprovalAgent(), "risk": RiskAgent()}
 
     def bind_state(self, state):
         """Point the registry's state-backed tools at a different store (seeding uses a buffered one)."""
@@ -40,13 +42,14 @@ class Supervisor:
 
     def process(self, item, live=False, trigger="manual", actor="AGENT", on_event=None):
         ctx = RunContext(self.registry, item["intake_id"], trigger, actor, on_event)
-        w = Work(item, live)
+        w = Work(item, live, today=clock.today() if trigger != "batch" else None)
         a = self.agents
         a["intake"].run(ctx, w)
         terminal = a["supplier"].run(ctx, w)
         if terminal:
             return self._finish(ctx, w, terminal)
         a["coding"].run(ctx, w)
+        a["price"].run(ctx, w)
         a["approval"].run_receipt(ctx, w)
         a["risk"].run(ctx, w)
         a["approval"].run_approval(ctx, w)

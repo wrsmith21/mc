@@ -3,16 +3,20 @@
 The supervisor calls them in a fixed order on every invoice, so every control always runs. A specialist can stop the
 run (unknown supplier, routed out of AP) by returning a terminal status.
 """
+import re
 from datetime import date
+
+TIMEKEEPER = re.compile(r"^(Partner|Senior Associate|Associate|Paralegal|Principal|Senior Consultant|Consultant) – ")
 
 
 class Work:
     """The invoice being worked: shared, mutable state the specialists read and extend."""
 
-    def __init__(self, item, live):
+    def __init__(self, item, live, today=None):
         self.item = item
         self.live = live
         self.as_of = item["received_at"][:10]
+        self.today = today or self.as_of
         self.flags = []
         self.result = {"intake_id": item["intake_id"], "received_at": item["received_at"], "channel": item["channel"],
                        "sender": item["sender"], "subject": item["subject"],
@@ -169,13 +173,31 @@ class CodingAgent:
         with ctx.step(self.name, "coding", "What is it, where does it go?", 4) as st:
             guess = ctx.call("requester.identify", vendor_id=w.vid, doc=doc)
             req_cc = guess["person"]["cost_centre"] if guess.get("person") else None
+            timed = [l for l in doc["lines"] if TIMEKEEPER.match(l["description"])]
+            fees_usd = w.usd(ctx, sum(l["amount"] for l in timed)) if timed else 0
+            label = "Legal services" if w.vrec["category"] == "legal" else "Professional services"
             for l in doc["lines"]:
                 amt = w.usd(ctx, l["amount"])
                 unit = w.usd(ctx, l["unit_price"])
-                r = ctx.call("coding.recommend_line", vendor_id=w.vid, description=l["description"], qty=l["qty"],
+                desc, qty = l["description"], l["qty"]
+                if TIMEKEEPER.match(desc):
+                    # Hourly lines are one professional-fees charge: score the service, at the fee total.
+                    desc = f"{label} – " + TIMEKEEPER.sub("", desc).split(" (")[0]
+                    qty, unit = 1, fees_usd
+                r = ctx.call("coding.recommend_line", vendor_id=w.vid, description=desc, qty=qty,
                              unit_usd=unit, amount_usd=amt, service_period=doc.get("service_period"),
                              requester_cc=req_cc, as_of=w.as_of)
+                if desc != l["description"]:
+                    r["scored_description"] = desc
                 w.line_recs.append({**l, "amount_usd": amt, "rec": r})
+            split = ctx.call("coding.split", lines=doc["lines"], entity=doc.get("entity"))
+            for alloc in split["allocations"]:
+                lr = w.line_recs[alloc["line"]]
+                lr["entity"] = alloc["entity"]
+                if alloc["cost_centre"] and alloc["cost_centre"] != lr["rec"]["cost_centre"]:
+                    lr["rec"]["history_cost_centre"] = lr["rec"]["cost_centre"]
+                    lr["rec"]["cost_centre"] = alloc["cost_centre"]
+                    lr["rec"]["cost_centre_source"] = "Named on the invoice line"
             learned = ctx.call("coding.learned_corrections", vendor_id=w.vid)
             for lr in w.line_recs:
                 for lesson in learned.values():
@@ -219,8 +241,20 @@ class CodingAgent:
                           if c["past_miscodes_reclassified"] else ""))
             if any(lr["rec"].get("learned") for lr in lrs):
                 st["facts"].append("Applied a reviewer correction learned from an earlier invoice")
+            if split["allocations"]:
+                parts = split["cost_centres"] or split["entities"]
+                w.result["coding"]["splits"] = [{"line": a_["line"], "description": doc["lines"][a_["line"]]["description"],
+                                                 "entity": a_["entity"], "cost_centre": w.line_recs[a_["line"]]["rec"]["cost_centre"],
+                                                 "account": w.line_recs[a_["line"]]["rec"]["account"],
+                                                 "amount": a_["amount"]} for a_ in split["allocations"]]
+                cross_entity = len(split["entities"]) > 1
+                st["facts"].append(f"Split across {', '.join(parts)} as named on the invoice lines")
+                w.flag("SPLIT", "info", 4, "Coded across " + ("entities" if cross_entity else "cost centres"),
+                       f"Lines are allocated to {', '.join(parts)}."
+                       + (" Distribution lines carry the user entity; R12 generates the intercompany balancing "
+                          "lines for the cross-entity share." if cross_entity else ""))
 
-        with ctx.step(self.name, "treatment", "Capitalise or prepay?", 4) as st:
+        with ctx.step(self.name, "treatment", "Capitalise, prepay, cut-off, tax?", 4) as st:
             caps = [lr for lr in w.line_recs if lr["rec"]["capitalise"]]
             amort = next((lr["rec"]["amortisation"] for lr in w.line_recs if lr["rec"]["amortisation"]), None)
             w.result["capitalisation"] = None
@@ -253,8 +287,84 @@ class CodingAgent:
                 st["facts"] = [f"Service period {amort['start']} → {amort['end']}",
                                "Amortisation journal drafted for Record-to-Report (GL_INTERFACE)"]
                 w.flag("PREPAID", "info", 4, "Prepaid with amortisation", st["detail"] + ".")
+            cut = ctx.call("cutoff.check", vendor_id=w.vid, service_period=doc.get("service_period"),
+                           amount_usd=w.subtotal_usd)
+            w.result["cutoff"] = cut if cut["closed_share"] else None
+            if cut["closed_share"]:
+                if cut["accrued_usd"]:
+                    st["facts"].append(f"{', '.join(cut['periods'])} service: accrued ${cut['accrued_usd']:,.2f} in "
+                                       f"{cut['accrual_je']}, reversed 1 Oct; this invoice books against the reversal")
+                elif cut["amount_in_closed_usd"] >= cut["materiality_usd"]:
+                    st["status"] = "warn"
+                    w.flag("CUTOFF_UNACCRUED", "warn", 4, "Not accrued in a closed period",
+                           f"${cut['amount_in_closed_usd']:,.2f} of service in {', '.join(cut['periods'])} was not "
+                           f"accrued at close, so it lands in October. Above the ${cut['materiality_usd']:,} "
+                           f"materiality threshold: reported to Record-to-Report as out-of-period expense.")
+            tax = ctx.call("tax.use_tax", vendor_id=w.vid, doc=doc)
+            w.result["use_tax"] = tax if tax["due"] else None
+            if tax["due"]:
+                st["status"] = "warn" if st["status"] == "ok" else st["status"]
+                st["facts"].append(f"Use tax ${tax['amount_usd']:,.2f} accrued to {tax['account']} "
+                                   f"({tax['jurisdiction']})")
+                w.flag("USE_TAX", "info", 2, "Use tax accrued",
+                       f"Seller in {tax['seller_region']} charged no sales tax on ${tax['taxable_usd']:,.2f} of "
+                       f"taxable goods shipped to Missouri. Accrue ${tax['amount_usd']:,.2f} use tax "
+                       f"({tax['rate']:.2%}) to {tax['account']} Use Tax Payable.")
             if not caps and not amort:
-                st["detail"] = "Expense in period — no capitalisation or prepaid treatment"
+                st["detail"] = st["detail"] or "Expense in period — no capitalisation or prepaid treatment"
+            if not st["detail"] and (w.result["cutoff"] or w.result["use_tax"]):
+                st["detail"] = "Cut-off and tax treatment applied"
+
+
+class PriceAgent:
+    """Step 5: is the price right? Rate cards, statements of work, matter budgets."""
+    name, title = "price", "Price"
+
+    def run(self, ctx, w):
+        doc = w.doc
+        with ctx.step(self.name, "price", "Is the price right?", 5) as st:
+            facts = []
+            card = ctx.call("price.rate_card", vendor_id=w.vid, doc=doc)
+            if card["lines"]:
+                facts.append(f"{card['hours']:g} hours across {len(card['lines'])} roles checked against "
+                             f"{card['letter']}")
+                for v in card["variances"]:
+                    st["status"] = "warn"
+                    w.flag("RATE_VARIANCE", "warn", 5, f"{v['role']} billed above the agreed rate",
+                           f"{v['role']} billed at ${v['billed_rate']:,.0f}/hr against ${v['card_rate']:,.0f}/hr in "
+                           f"{card['letter']} ({v['hours']:g} hrs): ${v['excess']:,.2f} over. Ask the firm for a "
+                           f"credit note or the written rate approval.")
+            w.result["price"] = {"rate_card": card}
+            if doc.get("matter"):
+                budget = ctx.call("price.matter_budget", matter=doc["matter"], amount_usd=w.result["total_usd"])
+                w.result["price"]["matter_budget"] = budget
+                if budget:
+                    facts.append(f"Matter {budget['matter']}: {budget['share_after']:.0%} of the "
+                                 f"${budget['budget_usd']:,.0f} budget used after this invoice")
+                    if budget["share_after"] >= ctx.registry.store.policies["price"]["matter_budget_warn_share"]:
+                        st["status"] = "warn"
+                        w.flag("MATTER_BUDGET", "warn", 5, "Matter budget nearly used",
+                               f"{budget['share_after']:.0%} of the matter budget is used after this invoice.")
+            sow = ctx.call("price.sow", vendor_id=w.vid, doc=doc)
+            w.result["price"]["sow"] = sow
+            if sow:
+                facts.append(f"{sow['sow']} fixed fee ${sow['fixed_fee_usd']:,.2f}: "
+                             f"{'invoice matches' if sow['matches_fee'] else 'invoice differs'}")
+                if not sow["matches_fee"]:
+                    st["status"] = "warn"
+                    w.flag("SOW_MISMATCH", "warn", 5, "Differs from the statement of work",
+                           f"Invoice subtotal ${doc['subtotal']:,.2f} vs fixed fee ${sow['fixed_fee_usd']:,.2f}.")
+            stats = ctx.call("vendor.stats", vendor_id=w.vid)
+            if stats["median_usd"]:
+                facts.append(f"{w.result['total_usd'] / stats['median_usd']:.1f}× this supplier's median invoice "
+                             f"(${stats['median_usd']:,.0f})")
+            st["facts"] = facts
+            if card["variances"]:
+                st["detail"] = f"{len(card['variances'])} rate(s) above the engagement letter"
+            elif card["lines"] or sow:
+                st["detail"] = "Rates and fees agree with the contract"
+            else:
+                st["detail"] = "No contract rates apply; amount checked against supplier history"
 
 
 class ApprovalAgent:
@@ -321,7 +431,15 @@ class RiskAgent:
             amount = next((f for f in risk["flags"] if f["code"] == "AMOUNT_VS_NORM"), None)
             for f in risk["flags"]:
                 st["facts"].append(f["detail"])
-            if high or (amount and any(f["code"] == "RECENT_BANK_CHANGE" for f in risk["flags"])):
+            open_change = any(f["code"] == "RECENT_BANK_CHANGE" and f["severity"] != "low" for f in risk["flags"])
+            terms = ctx.call("payment.terms", vendor_id=w.vid, doc=w.doc, today=w.today)
+            w.result["payment"] = terms
+            st["facts"].append(f"Terms {terms['terms']}, due {terms['due_date']}")
+            if terms["discount"] and terms["discount"]["open"]:
+                d = terms["discount"]
+                w.flag("DISCOUNT", "info", 7, "Early-payment discount available",
+                       f"Pay by {d['pay_by']} to take {d['rate']:.0%} ({d['currency']} {d['amount']:,.2f}).")
+            if high or (amount and open_change):
                 st["status"] = "fail"
                 st["detail"] = "Hold before payment — route to vendor master review"
                 w.flag("PAYMENT_RISK", "hold", 7, "Payment risk — vendor master review",
@@ -335,4 +453,4 @@ class RiskAgent:
                 st["detail"] = "Bank details stable, amount within normal range"
 
 
-SPECIALISTS = [IntakeAgent, SupplierAgent, CodingAgent, ApprovalAgent, RiskAgent]
+SPECIALISTS = [IntakeAgent, SupplierAgent, CodingAgent, PriceAgent, ApprovalAgent, RiskAgent]

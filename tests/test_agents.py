@@ -30,8 +30,8 @@ def test_morning_mailbox_is_not_worked_until_the_agent_runs(svc):
 def test_every_step_records_its_tool_calls(svc):
     r = svc.run(svc.by_key["dell"])
     keys = [s["key"] for s in r["trace"]]
-    assert keys == ["intake", "read", "supplier", "validity", "po", "coding", "treatment", "receipt", "risk",
-                    "approval", "decide"]
+    assert keys == ["intake", "read", "supplier", "validity", "po", "coding", "treatment", "price", "receipt",
+                    "risk", "approval", "decide"]
     for step in r["trace"][1:]:
         assert step["tool_calls"], step["key"]
     tools = {c["tool"] for s in r["trace"] for c in s["tool_calls"]}
@@ -46,7 +46,7 @@ def test_events_stream_as_the_run_happens(svc):
     assert kinds[0] == "start" and kinds[-1] == "result"
     last_step = len(kinds) - 1 - kinds[::-1].index("step")
     assert kinds.index("tool") < last_step < kinds.index("result")
-    assert kinds.count("stage") == kinds.count("step") == 11
+    assert kinds.count("stage") == kinds.count("step") == 12
     assert events[-1]["result"]["run"]["run_id"]
 
 

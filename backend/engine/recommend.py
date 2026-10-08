@@ -95,8 +95,11 @@ class Recommender:
             return None
         scores, fits = {}, {}
         for g in candidates:
+            # Fit against similar lines and this supplier's own history on the account (the brief's amount range).
             ref = [lines[li]["unit_price"] for li, sim, same, _k in sims if lines[li]["gl"] == g or
                    lines[li]["amortise_to"] == g]
+            ref += [lines[i]["unit_price"] for i in self.s.lines_by_vendor.get(vendor_id, [])
+                    if lines[i]["gl"] == g or lines[i]["amortise_to"] == g]
             if not ref:
                 fit = 0.4
             else:

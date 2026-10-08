@@ -8,7 +8,7 @@ from fastapi import Body, FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse, StreamingResponse
 
-from . import llm
+from . import clock, llm
 from .integrations import external
 from .service import DemoService
 from .store import ROOT
@@ -63,7 +63,8 @@ def login(body: dict = Body(...)):
 @app.get("/api/meta")
 def meta():
     s = svc()
-    return {"demo_date": s.s.demo_date, "mode": "live" if llm.live_enabled() else "replay", "model": llm.MODEL,
+    s.sync_clock()
+    return {"demo_date": s.s.demo_date, "now": clock.now_iso(), "clock_offset_hours": clock.offset_hours(), "mode": "live" if llm.live_enabled() else "replay", "model": llm.MODEL,
             "wildcard": WILDCARD, "personas": persona_list(s),
             "counts": {"history_invoices": len(s.s.history), "history_lines": len(s.s.lines),
                        "vendors": len(s.s.vendors), "people": len(s.s.people), "pos": len(s.s.pos),
@@ -120,6 +121,40 @@ def runs(intake_id: str):
 @app.get("/api/mailbox/run")
 def run_mailbox(actor: str = "E34120"):
     return _sse(svc().run_mailbox(actor=actor))
+
+
+@app.get("/api/work")
+def work():
+    return svc().work()
+
+
+@app.post("/api/vendors/{vendor_id}/callback")
+def callback(vendor_id: str, body: dict = Body(...)):
+    try:
+        return svc().callback(vendor_id, body["outcome"], body["by"], body.get("note", ""))
+    except ValueError as e:
+        _bad(e)
+
+
+@app.post("/api/invoices/{intake_id}/onboard")
+def onboard(intake_id: str, body: dict = Body(...)):
+    try:
+        return svc().onboard(intake_id, body["by"], body["tax_id"], body.get("category", "facilities"))
+    except ValueError as e:
+        _bad(e)
+
+
+@app.post("/api/procurement/requests")
+def po_request(body: dict = Body(...)):
+    try:
+        return svc().request_po(body["vendor_id"], body["kind"], body["by"])
+    except ValueError as e:
+        _bad(e)
+
+
+@app.post("/api/clock/advance")
+def advance_clock(body: dict = Body(...)):
+    return svc().advance_clock(float(body.get("hours", 24)), body.get("by", "E34120"))
 
 
 @app.get("/api/agents")
