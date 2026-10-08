@@ -127,6 +127,7 @@ class RunContext:
         return result
 
     def _record(self, tc):
+        self.last_call = tc
         if self._step is not None:
             self._step["tool_calls"].append(tc)
         self.run["tool_calls"] = self._calls

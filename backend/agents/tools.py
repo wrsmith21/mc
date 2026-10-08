@@ -376,6 +376,108 @@ def build_registry(store, state, checks, policy, rec):
                      f"; discount {r['discount']['amount']:,.2f} by {r['discount']['pay_by']}"
                      f" ({'open' if r['discount']['open'] else 'missed'})" if r["discount"] else "")))
 
+    # ---------- read-only lookups for the investigator ----------
+    def vendor_profile(vendor_id):
+        v = s.vendors.get(vendor_id)
+        if not v:
+            return {"error": f"No vendor {vendor_id}"}
+        return {k: v.get(k) for k in ("vendor_id", "name", "category_label", "status", "entity", "currency",
+                                      "city", "region", "payment_terms", "default_gl", "default_cc",
+                                      "created_date", "remit_email", "typical_invoice")} | {
+            "bank": {"type": v["bank"].get("type"), "account_last4": v["bank"].get("account_last4")}}
+
+    reg.add(Tool("vendor.profile", "investigator", "Vendor master record: category, terms, defaults, typical invoice "
+                 "range, remit email and masked bank account.", vendor_profile, {"vendor_id": S}, {"name": S},
+                 lambda r: r.get("name") or r.get("error"), kind="state", investigator=True))
+    reg.add(Tool("vendor.bank_change_log", "investigator", "Every change to the supplier's bank details, with "
+                 "channel and call-back status.", lambda vendor_id: {"changes": s.vendors[vendor_id]["bank_change_log"]}
+                 if vendor_id in s.vendors else {"changes": []}, {"vendor_id": S}, {"changes": A},
+                 lambda r: f"{len(r['changes'])} change(s)", kind="state", investigator=True))
+
+    def vendor_invoices(vendor_id, limit=10):
+        invs = s.history_by_vendor.get(vendor_id, [])[-int(limit):]
+        return {"invoices": [{"invoice_num": i["invoice_num"], "date": i["invoice_date"], "total_usd": i["total_usd"],
+                              "accounts": sorted({l["corrected_gl"] or l["gl"] for l in i["lines"]
+                                                  if l.get("line_type") != "TAX"}),
+                              "requester": s.people.get(i["requester_id"], {}).get("name"),
+                              "po_number": i["po_number"], "matter": i.get("matter"),
+                              "service_period": i.get("service_period")} for i in invs],
+                "count_18m": len(s.history_by_vendor.get(vendor_id, []))}
+
+    reg.add(Tool("history.vendor_invoices", "investigator", "The supplier's most recent invoices: amounts, accounts, "
+                 "requesters, POs and service periods.", vendor_invoices, {"vendor_id": S, "limit": opt(N)},
+                 {"invoices": A}, lambda r: f"{len(r['invoices'])} of {r['count_18m']} invoices", kind="history",
+                 investigator=True))
+
+    def similar_lines(vendor_id, description, limit=6):
+        out = []
+        for li, sim, same, _k in rec.similar_lines(vendor_id, description)[:int(limit)]:
+            l = s.lines[li]
+            out.append({"vendor": l["vendor_name"], "same_supplier": same, "invoice_num": l["invoice_num"],
+                        "date": l["invoice_date"], "description": l["description"], "account": l["gl"],
+                        "cost_centre": l["cc"], "unit_price": l["unit_price"], "similarity": round(sim, 2)})
+        return {"lines": out}
+
+    reg.add(Tool("history.similar_lines", "investigator", "Past invoice lines most similar to a description, with "
+                 "how each was coded.", similar_lines, {"vendor_id": S, "description": S, "limit": opt(N)},
+                 {"lines": A}, lambda r: f"{len(r['lines'])} similar line(s)", kind="history", investigator=True))
+
+    def find_invoice(invoice_num, vendor_id=None):
+        num = str(invoice_num).lower().lstrip("inv-").lstrip("0")
+        hits = []
+        for q in s.intake:
+            d = q["document"]
+            if str(d.get("invoice_num", "")).lower().lstrip("inv-").lstrip("0") == num and \
+                    (not vendor_id or q.get("vendor_hint") == vendor_id):
+                hits.append({"source": "queue", "intake_id": q["intake_id"], "received_at": q["received_at"],
+                             "invoice_num": d["invoice_num"], "invoice_date": d["invoice_date"], "total": d["total"],
+                             "currency": d["currency"], "service_period": d.get("service_period"),
+                             "lines": [l["description"] for l in d["lines"]]})
+        for i in s.history_by_vendor.get(vendor_id, []) if vendor_id else []:
+            if str(i["invoice_num"]).lower().lstrip("inv-").lstrip("0") == num:
+                hits.append({"source": "history", "invoice_num": i["invoice_num"], "invoice_date": i["invoice_date"],
+                             "total": i["total"], "paid_date": i.get("paid_date")})
+        return {"matches": hits}
+
+    reg.add(Tool("invoice.find", "investigator", "Find an invoice by number (format-insensitive) in today's queue "
+                 "and the supplier's history, to compare with the one being worked.", find_invoice,
+                 {"invoice_num": S, "vendor_id": opt(S)}, {"matches": A}, lambda r: f"{len(r['matches'])} match(es)",
+                 kind="history", investigator=True))
+    reg.add(Tool("po.open_for_vendor", "investigator", "Open purchase orders for the supplier.",
+                 lambda vendor_id: {"pos": [{k: p_[k] for k in ("po_number", "description", "open_amount",
+                                                               "created_date", "status")}
+                                            for p_ in s.open_pos_by_vendor.get(vendor_id, [])][:10]},
+                 {"vendor_id": S}, {"pos": A}, lambda r: f"{len(r['pos'])} open PO(s)", kind="state",
+                 investigator=True))
+    reg.add(Tool("policy.approval_matrix", "investigator", "The approval matrix: amount tiers, category rules and "
+                 "limits by level.", lambda: {"matrix": s.policies["approval_matrix"],
+                                             "limits": s.policies["approval_limits"]},
+                 {}, {"matrix": O}, lambda r: f"{len(r['matrix']['tiers'])} tiers", investigator=True))
+
+    def directory(query):
+        from rapidfuzz import fuzz, process
+        names = {pid: p_["name"] for pid, p_ in s.people.items()}
+        hits = process.extract(query, names, scorer=fuzz.WRatio, limit=5, score_cutoff=70)
+        by_cc = [pid for pid, p_ in s.people.items() if p_["cost_centre"] == query]
+        ids = [h[2] for h in hits] + by_cc[:5]
+        return {"people": [s.person_brief(pid) | {"email": s.people[pid]["email"]} for pid in dict.fromkeys(ids)]}
+
+    reg.add(Tool("people.directory", "investigator", "Look up people by name or cost-centre code: title, cost "
+                 "centre, approval limit.", directory, {"query": S}, {"people": A},
+                 lambda r: f"{len(r['people'])} person(s)", kind="state", investigator=True))
+
+    def search_vendors(name):
+        from rapidfuzz import fuzz, process
+        names = {vid: v["name"] for vid, v in s.vendors.items()}
+        return {"candidates": [{"vendor_id": h[2], "name": h[0], "score": round(h[1], 1),
+                                "category": s.vendors[h[2]]["category_label"]}
+                               for h in process.extract(name, names, scorer=fuzz.token_sort_ratio, limit=5)]}
+
+    reg.add(Tool("vendor.search", "investigator", "Search the vendor master for names close to a supplier name.",
+                 search_vendors, {"name": S}, {"candidates": A},
+                 lambda r: f"closest: {r['candidates'][0]['name']} ({r['candidates'][0]['score']:.0f}%)"
+                 if r["candidates"] else "none", kind="state", investigator=True))
+
     # ---------- explanation ----------
     reg.add(Tool("llm.explain", "supervisor", "Claude writes the reviewer-facing reason from the findings; a "
                  "deterministic template is the fallback.",

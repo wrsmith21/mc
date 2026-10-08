@@ -6,6 +6,7 @@ from ..engine.checks import Checks
 from ..engine.policy import Policy
 from ..engine.recommend import Recommender
 from .base import RunContext
+from .investigator import TRIGGERS, investigate
 from .. import clock
 from .specialists import ApprovalAgent, CodingAgent, IntakeAgent, PriceAgent, RiskAgent, SupplierAgent, Work
 from .tools import build_registry
@@ -83,6 +84,14 @@ class Supervisor:
         r["trace"] = ctx.trace
         base = sum(BASELINE_MINUTES.values())
         r["minutes"] = {"baseline": base, "agent": AGENT_MINUTES.get(status, 5), "note": "Illustrative handling-time model"}
+        r["investigation"] = None
+        if status in TRIGGERS:
+            with ctx.step("investigator", "investigate", "Investigate the exception", 8) as st:
+                inv = investigate(ctx, r)
+                r["investigation"] = inv
+                st["status"] = "warn"
+                st["detail"] = f"{inv['next_action']} ({inv['source']})"
+                st["facts"] = [inv["summary"]]
         with ctx.step("supervisor", "decide", "Decide and explain", 8) as st:
             out = ctx.call("llm.explain", findings=self._findings(r), fallback=self._template_reason(r),
                            show={"status": status, "flags": [f["code"] for f in w.flags]})
