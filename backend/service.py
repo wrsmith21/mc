@@ -75,6 +75,7 @@ class DemoService:
         self.by_key = {q["storyboard_key"]: q["intake_id"] for q in self.s.intake if q.get("storyboard_key")}
         self._anomaly = None
         self._lock = threading.Lock()
+        self._briefs_ok = False
         self.cases = Cases(self)
         self.policies = Policies(self.s, self.state)
         self.policies.apply()
@@ -309,6 +310,12 @@ class DemoService:
         return {k.split(":", 1)[1]: v for k, v in self.state.prefix("result:").items()}
 
     def _briefs(self):
+        if not self._briefs_ok:
+            if not self.state.get("meta:briefs"):  # state seeded before brief rows existed
+                for r in self.state.prefix("result:").values():
+                    self.state.put(f"brief:{r['intake_id']}", _brief(r))
+                self.state.put("meta:briefs", {"at": now_iso()})
+            self._briefs_ok = True
         return {k.split(":", 1)[1]: v for k, v in self.state.prefix("brief:").items()}
 
     def queue(self):
@@ -830,6 +837,7 @@ class DemoService:
                     "tool_calls": r["run"]["tool_calls"], "status": r["agent_status"]}, at[:16])
                 self._seed(r)
             buffered.put("meta:seeded", {"at": now_iso()})
+            buffered.put("meta:briefs", {"at": now_iso()})
         finally:
             self.state = real
             self.agent.bind_state(real)

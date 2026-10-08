@@ -95,6 +95,17 @@ def test_another_instance_picks_up_a_policy_change(client):
     assert sv.s.policies["risk"]["amount_vs_norm_multiple"] == 3
 
 
+def test_state_seeded_before_brief_rows_still_lists_and_summarises(client):
+    sv = app_module.svc()
+    worked = sum(1 for r in sv.queue() if r["status"] != "NEW")
+    sv.state.conn.execute("DELETE FROM kv WHERE key LIKE 'brief:%' OR key = 'meta:briefs'")
+    sv.state.conn.commit()
+    sv._briefs_ok = False
+    as_(client, AP)
+    assert client.get("/api/summary").status_code == 200
+    assert sum(1 for r in client.get("/api/queue").json() if r["status"] != "NEW") == worked
+
+
 def test_policy_rejects_out_of_range_values(client):
     as_(client, ADMIN)
     r = client.post("/api/policies", json={"changes": {"risk.confidence_bands.review": 0.99}, "reason": "Testing bounds"})
