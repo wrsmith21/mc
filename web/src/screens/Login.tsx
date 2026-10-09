@@ -19,6 +19,7 @@ export default function Login({ onDone }: { onDone: () => void }) {
       }}>
         {brand.logo && <img src={brand.logo} alt={brand.client} />}
         <h2 style={{ marginTop: 14 }}>{brand.product}</h2>
+        <p className="small">{brand.expansion}</p>
         <p className="muted small">{brand.disclaimer}</p>
         <input type="password" placeholder="Session passcode" value={code} onChange={(e) => setCode(e.target.value)} autoFocus aria-label="Session passcode" />
         {error && <p className="small" style={{ color: 'var(--red-ink)', marginBottom: 10 }}>{error}</p>}

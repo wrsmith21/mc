@@ -8,7 +8,7 @@ import uuid
 from collections import Counter, defaultdict
 from datetime import datetime, timedelta
 
-from . import clock, llm
+from . import brand, clock, llm
 from .agents.supervisor import STATUS_LABEL, Supervisor
 from .agents.base import RunContext
 from .agents.investigator import investigate
@@ -537,7 +537,7 @@ class DemoService:
                 e["actor_name"] = self.s.people[e["actor"]]["name"]
                 e["actor_title"] = self.s.people[e["actor"]]["title"]
             else:
-                e["actor_name"] = "Non-PO agent" if e["actor"] == "AGENT" else e["actor"]
+                e["actor_name"] = brand.PRODUCT if e["actor"] == "AGENT" else e["actor"]
         return events
 
     # ---------- anomaly & insights ----------

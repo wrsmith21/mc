@@ -1,4 +1,4 @@
-"""HTTP API for the Non-PO Invoice Agent demo."""
+"""HTTP API for the CLEAR demo (Coding, Ledger, Exceptions, Approvals, Reconciliation)."""
 import hashlib
 import hmac
 import json
@@ -8,7 +8,7 @@ from fastapi import Body, FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTextResponse, StreamingResponse
 
-from . import auth, clock, llm
+from . import auth, brand, clock, llm
 from . import model as ds
 from .integrations import external
 from .service import DemoService
@@ -18,7 +18,7 @@ PASSWORD = os.environ.get("DEMO_PASSWORD")
 TOKEN = hashlib.sha256(f"mc-nonpo::{PASSWORD}".encode()).hexdigest() if PASSWORD else None
 WILDCARD = os.environ.get("ENABLE_WILDCARD", "1") == "1"
 
-app = FastAPI(title="Non-PO Invoice Agent", version="1.0")
+app = FastAPI(title=brand.PRODUCT, version="1.0")
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5174", "http://127.0.0.1:5174"],
                    allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 _svc = None
@@ -462,7 +462,7 @@ def audit_log(actor: str | None = None, kind: str | None = None, key: str | None
         if (actor and e["actor"] != actor) or (kind and e["kind"] != kind) or (key and e["invoice_key"] != key):
             continue
         e["actor_name"] = s.s.people[e["actor"]]["name"] if e["actor"] in s.s.people else \
-            ("Non-PO agent" if e["actor"] == "AGENT" else e["actor"])
+            (brand.PRODUCT if e["actor"] == "AGENT" else e["actor"])
         out.append(e)
         if len(out) >= limit:
             break

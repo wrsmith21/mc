@@ -1,4 +1,7 @@
-# Demo runbook — Non-PO Invoice Agent (15 Oct 2026)
+# Demo runbook — CLEAR (15 Oct 2026)
+
+CLEAR: Coding, Ledger, Exceptions, Approvals, Reconciliation. The agent that works non-PO invoices end to end,
+then sweeps the close journals, the AP subledger and cash application for the same mistakes.
 
 ## Run it locally
 

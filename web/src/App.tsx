@@ -153,7 +153,7 @@ export default function App() {
         <header className="topbar" data-tour="topbar">
           {brand.logo && <img className="logo" src={brand.logo} alt={brand.client} />}
           <div className="product">
-            <b>{brand.product}</b>
+            <b title={brand.expansion}>{brand.product}</b>
             <span>{brand.unit}</span>
           </div>
           <div className="spacer" />

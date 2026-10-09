@@ -13,7 +13,7 @@ export type TourStep = {
 export const TOUR: TourStep[] = [
   { id: 'who', scene: 'Set-up', path: '/', target: 'persona', title: 'Signed in as a real role',
     body: 'Alex Rivera, AP specialist. Every screen shows Alex’s own work, and the server checks every action against Alex’s role. Switching user is logged.',
-    talk: '“Synthetic data, built in a week. Everything you see uses the patterns we would build on your stack.”' },
+    talk: '“This is CLEAR: coding, ledger, exceptions, approvals and reconciliation, worked by one agent with a person deciding. Synthetic data, built in a week, on the patterns we would build on your stack.”' },
   { id: 'inbox', scene: 'Set-up', path: '/', target: 'inbox', title: 'This morning’s mailbox, not yet worked',
     body: '102 invoices were worked by the agent as they arrived overnight. 40 more landed this morning and nobody has touched them, not even the agent.' },
   { id: 'mailbox', scene: 'Set-up', path: '/', target: 'run-mailbox', title: 'Run the agent on the mailbox',

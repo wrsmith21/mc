@@ -1,4 +1,4 @@
-# Non-PO Invoice Agent — Brief Review & Implementation Plan
+# CLEAR (formerly Non-PO Invoice Agent) — Brief Review & Implementation Plan
 
 Baseline: *Mastercard_Demo_Brief_NonPO_Invoice_Agent_v0.2* (Ciklum, draft). Demo: Thu 15 Oct 2026, O'Fallon, ~12 min slot. Today: Wed 7 Oct.
 

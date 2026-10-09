@@ -3,7 +3,8 @@ const neutral = import.meta.env.VITE_BRAND === 'neutral'
 
 export const brand = {
   client: neutral ? 'Global Business Services' : 'Mastercard',
-  product: 'Non-PO Invoice Agent',
+  product: 'CLEAR',
+  expansion: 'Coding, Ledger, Exceptions, Approvals, Reconciliation',
   unit: 'GBSC Finance · Accounts Payable',
   logo: neutral ? null : '/brand/mastercard-symbol.svg',
   wordmark: neutral ? null : '/brand/mastercard-logo.svg',

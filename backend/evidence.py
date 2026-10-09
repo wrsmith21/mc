@@ -5,7 +5,7 @@ who confirmed receipt, who decided, who approved in what order, and what was sen
 """
 from html import escape as e
 
-from . import clock
+from . import brand, clock
 
 STYLE = """
 body{font:13px/1.45 'Helvetica Neue',Arial,sans-serif;color:#141413;margin:32px auto;max-width:1000px;padding:0 24px}
@@ -33,8 +33,8 @@ def render(svc, r, events):
     a(f"<h1>SOX evidence pack · {e(doc.get('vendor_name') or '')} · invoice {e(str(doc.get('invoice_num')))}</h1>")
     a(f"<div class='meta'>{e(r['intake_id'])} · received {e(r['received_at'])} via {e(r['channel'])} · "
       f"status <b>{e(r['status_label'])}</b> · generated {e(clock.now_iso())}</div>")
-    a("<div class='banner'>Demonstration on synthetic data · built by Ciklum. Generated from the run record and the "
-      "event log; nothing on this page is typed by hand.</div>")
+    a(f"<div class='banner'>{brand.PRODUCT} · demonstration on synthetic data · built by Ciklum. Generated from the run "
+      "record and the event log; nothing on this page is typed by hand.</div>")
     a("<p class='noprint'><button onclick='window.print()'>Print or save as PDF</button></p>")
 
     a("<h2>1 · The document and what was read</h2><div class='grid'>")

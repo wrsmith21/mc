@@ -45,7 +45,7 @@ export default function SignIn({ onDone, current }: { onDone: (s: Json) => void;
         <header>
           {brand.logo && <img src={brand.logo} alt={brand.client} />}
           <div>
-            <h1>Sign in as</h1>
+            <h1>Sign in to {brand.product}</h1>
             <p className="muted">Each person sees their own work and can only do what their role allows. The server checks every action and logs refusals.</p>
           </div>
         </header>

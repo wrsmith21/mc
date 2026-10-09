@@ -1,4 +1,4 @@
-# Non-PO Invoice Agent: production-grade rebuild — design
+# CLEAR (formerly Non-PO Invoice Agent): production-grade rebuild — design
 
 Date: 7 Oct 2026 · Owner: Rayford Smith · Deadline: freeze Wed 14 Oct evening, workshop Thu 15 Oct (O'Fallon)
 Baseline: v0.2 brief (`~/Downloads/Mastercard_Demo_Brief_NonPO_Invoice_Agent_v0.2.docx`), `docs/PLAN.md`, current code at `48e49be`.
