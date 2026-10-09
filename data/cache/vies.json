@@ -1,0 +1,11 @@
+{
+ "BE0942360146": {
+  "vat_number": "BE0942360146",
+  "valid": false,
+  "name": null,
+  "request_date": null,
+  "source": "cached",
+  "checked_at": "2026-10-09T02:25:19+00:00",
+  "latency_ms": 446
+ }
+}

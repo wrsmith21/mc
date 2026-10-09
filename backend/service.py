@@ -241,7 +241,7 @@ class DemoService:
         t = time.perf_counter()
         for iid in todo:
             try:
-                r = self.run(iid, "mailbox", actor)
+                r = self.run(iid, "mailbox", actor, live=False)  # bulk: public registries answer from cache
                 yield {"type": "invoice", "intake_id": iid, "status": r["status"], "status_label": r["status_label"],
                        "ms": r["run"]["ms"], "tool_calls": r["run"]["tool_calls"],
                        "vendor": (r.get("vendor") or {}).get("name") or r["document"].get("vendor_name")}

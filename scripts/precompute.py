@@ -6,6 +6,7 @@
 1. Invoices received before this morning's mailbox are worked as the overnight batch and saved as their first run.
 2. A throwaway demo state is reset and every invoice is run as a reviewer would run it, so opening or re-running any
    invoice is served from cache. The storyboard follow-ups (receipt confirmed, a correction learned) are run too.
+3. EU VIES answers for every VAT number the demo can query are bundled, so a bulk run never waits on VIES.
 """
 import json
 import os
@@ -17,9 +18,24 @@ os.environ["STATE_DB"] = os.path.join(tempfile.mkdtemp(), "state.db")
 os.environ.pop("DATABASE_URL", None)
 
 from backend.agents.supervisor import Supervisor  # noqa: E402
+from backend.integrations import external  # noqa: E402
 from backend.service import MAILBOX_CUTOFF, DemoService  # noqa: E402
 from backend.state import BufferedState  # noqa: E402
 from backend.store import CACHE, get_store  # noqa: E402
+
+
+# Public-data answers go into the bundle, not /tmp, so a fresh serverless instance has them.
+external.WRITABLE = external.CACHE
+
+
+def warm_vies():
+    s = get_store()
+    masters = {v["tax_id"] for v in s.vendors.values()}
+    vats = sorted({i["document"]["vendor_tax_id"] for i in s.intake if i["document"].get("currency") == "EUR"
+                   and i["document"].get("vendor_tax_id") and i["document"]["vendor_tax_id"] not in masters})
+    for vat in vats:
+        r = external.vies_check(vat, live=True)
+        print(f"VIES {vat}: valid={r.get('valid')} ({r.get('source')})")
 
 
 class _Empty:
@@ -60,6 +76,7 @@ def main():
         svc.investigate_case(c["case_id"], "E30233")
     print(f"investigated {len(picks)} close cases")
     print(f"warmed {len(svc.items)} invoices from the starting state in {time.time() - t:.1f}s · reason sources {sources}")
+    warm_vies()
 
 
 if __name__ == "__main__":

@@ -21,7 +21,7 @@ Delete `data/state.db` (or press Reset demo) to return to the morning of 15 Octo
 |---|---|---|
 | Data generators | `uv run python -m scripts.generate_data` then `uv run python -m scripts.render_pdfs` | Seeded; PDFs + previews use local Chrome |
 | History or the recommender | `uv run python -m scripts.train` | Back-test, calibration, model card in `data/model/` |
-| Any agent logic, prompt or data | `uv run --env-file .env python -m scripts.precompute` | Overnight batch + warms every Claude call the demo can make |
+| Any agent logic, prompt or data | `uv run --env-file .env python -m scripts.precompute` | Overnight batch, warms every Claude call the demo can make, bundles EU VIES answers so the mailbox run never waits on VIES |
 | Anything | `uv run pytest` and `pnpm --dir web build` | CI runs the same; a failure blocks deploy |
 
 `tests/test_engine.py::test_every_invoice_opens_from_cache` fails if a logic change was pushed without re-running
@@ -74,7 +74,7 @@ precompute: that would mean live model calls on first open.
 | 4 | Hartwell & Pryce INV-0098 | Held: duplicate; investigator explains |
 | 4 | Summit Facility Services SFS-55120 | Held: 2.6× norm, bank change 2 days ago from a look-alike domain; investigator recommends; vendor master call-back (fraud → rejected) |
 | 4 | Brightpath Advisory BPA-3391 | SoD: Diana Moreno is requester → Grace Okafor; SOW-BPA-0926 fixed fee matches |
-| Extra | Wavre Workplace Solutions | VAT not on EU VIES (live) |
+| Extra | Wavre Workplace Solutions | VAT not on EU VIES: the mailbox run uses the bundled answer; Re-run the agent asks VIES live |
 | Extra | Halden Consulting | Matches open PO → three-way match |
 | Extra | Rate-variance law firm | Senior associate billed $720 against a $650 card |
 | Extra | Training (split), analytics seats (entity split), tax advisory (unaccrued September), access points (use tax), 2/10 vendors (discount), IC recharge and reimbursement (routed out), Quickfix Plumbing (onboarding) | Each step of the 8-step process, built |

@@ -23,6 +23,20 @@ def codes(r):
     return {f["code"] for f in r["flags"]}
 
 
+def test_mailbox_run_never_waits_on_a_live_registry(svc, monkeypatch, tmp_path):
+    from backend.integrations import external
+
+    def no_network(*a, **k):
+        raise AssertionError("a bulk run called a public registry live")
+    monkeypatch.setattr(external, "WRITABLE", tmp_path)
+    monkeypatch.setattr(external.httpx, "post", no_network)
+    events = list(svc.run_mailbox("E34120"))
+    assert not [e for e in events if e["type"] == "error"]
+    assert events[-1]["type"] == "done" and events[-1]["count"] == 40
+    wavre = svc.latest(svc.by_key["eu_vat"])
+    assert wavre["agent_status"] == "HELD" and "cached" in str(wavre)
+
+
 def test_hartwell_rates_match_the_engagement_letter_and_budget_is_tracked(svc):
     r = svc.run(svc.by_key["legal"])
     card = r["price"]["rate_card"]
