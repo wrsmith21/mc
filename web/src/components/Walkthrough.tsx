@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import type { TourStep } from '../walkthrough'
 
@@ -29,75 +29,107 @@ type Props = { steps: TourStep[]; active: boolean; onClose: () => void; resolveP
 
 export default function Walkthrough({ steps, active, onClose, resolvePath }: Props) {
   const [index, setIndex] = useState(0)
-  const [rect, setRect] = useState<Rect | null>(null)
-  const [ready, setReady] = useState(false)
+  // a card belongs to the step it was located for, so the next step never flashes the previous step's card
+  const [shown, setShown] = useState<{ index: number; rect: Rect | null } | null>(null)
+  const [pressing, setPressing] = useState(false)
+  const pressingRef = useRef(false)
   const navigate = useNavigate()
   const location = useLocation()
   const step = steps[index]
   const path = step ? resolvePath(step) : ''
+  const onPage = location.pathname === path.split('?')[0]
+  const ready = shown?.index === index
+  const rect = ready ? shown.rect : null
 
   useEffect(() => {
     if (active) {
       setIndex(0)
-      setRect(null)
-      setReady(false)
+      setShown(null)
+      pressingRef.current = false
+      setPressing(false)
     }
   }, [active])
 
+  // navigate once per step; the presenter can still click around the page without being pulled back
   useEffect(() => {
-    if (active && step && location.pathname !== path) navigate(path)
-  }, [active, step, path, location.pathname, navigate])
+    if (active && step && location.pathname + location.search !== path) navigate(path)
+  }, [active, index, path]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (!active || !step || location.pathname !== path) return
+    if (!active || !step || !onPage) return
     let cancelled = false
     let target: Element | null = null
-    setRect(null)
-    setReady(false)
+    let frame = 0
+    let last = ''
+    const find = () => document.querySelector(`[data-tour="${step.target}"]`)
     const clear = () => document.querySelectorAll('.tour-focus').forEach((n) => n.classList.remove('tour-focus'))
     const measure = () => {
-      if (cancelled) return
-      target = document.querySelector(`[data-tour="${step.target}"]`)
-      if (!target) {
-        setRect(null)
-        return
-      }
+      if (cancelled || !target) return
       const r = target.getBoundingClientRect()
+      const key = `${r.top}|${r.left}|${r.width}|${r.height}`
+      if (key === last) return
+      last = key
       const pad = 8
-      setRect({ top: r.top - pad, left: r.left - pad, width: r.width + pad * 2, height: r.height + pad * 2,
-        right: r.right + pad, bottom: r.bottom + pad })
+      setShown({ index, rect: { top: r.top - pad, left: r.left - pad, width: r.width + pad * 2, height: r.height + pad * 2,
+        right: r.right + pad, bottom: r.bottom + pad } })
     }
-    let tries = 0
-    const locate = () => {
-      if (cancelled) return
+    const focus = (el: Element) => {
+      target = el
       clear()
-      target = document.querySelector(`[data-tour="${step.target}"]`)
-      if (!target && tries++ < 25) {
-        window.setTimeout(locate, 200)
+      el.classList.add('tour-focus')
+      const r = el.getBoundingClientRect()
+      if (r.top >= 60 && r.bottom <= window.innerHeight - 16) {
+        measure()
         return
       }
-      if (target) {
-        target.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        window.setTimeout(() => {
-          target?.classList.add('tour-focus')
-          measure()
-          setReady(true)
-        }, 360)
-      } else {
-        setReady(true)
+      el.scrollIntoView({ behavior: 'smooth', block: r.height > window.innerHeight - 140 ? 'start' : 'center' })
+      let done = false
+      const settled = () => {
+        if (done) return
+        done = true
+        window.removeEventListener('scrollend', settled, true)
+        measure()
       }
+      window.addEventListener('scrollend', settled, true)
+      window.setTimeout(settled, 450)
     }
-    const timer = window.setTimeout(locate, 150)
+    // the target appears when the page's data arrives; watch for it instead of polling, and follow re-renders
+    const check = () => {
+      frame = 0
+      if (cancelled) return
+      const el = find()
+      // done when the button gives way to its finished state; an error toast means the press failed
+      if (pressingRef.current) {
+        const finished = !!el && el.tagName !== 'BUTTON'
+        if (finished || document.querySelector('.toast.error')) {
+          pressingRef.current = false
+          setPressing(false)
+          if (finished) setIndex((i) => Math.min(steps.length - 1, i + 1))
+        }
+      }
+      if (el && el !== target) focus(el)
+      else if (el) measure()
+    }
+    const observer = new MutationObserver(() => {
+      if (!frame) frame = window.requestAnimationFrame(check)
+    })
+    observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-tour'] })
+    const giveUp = window.setTimeout(() => {
+      if (!target && !cancelled) setShown({ index, rect: null })
+    }, 3000)
+    check()
     window.addEventListener('resize', measure)
     window.addEventListener('scroll', measure, true)
     return () => {
       cancelled = true
-      window.clearTimeout(timer)
+      observer.disconnect()
+      window.cancelAnimationFrame(frame)
+      window.clearTimeout(giveUp)
       window.removeEventListener('resize', measure)
       window.removeEventListener('scroll', measure, true)
       clear()
     }
-  }, [active, step, path, location.pathname])
+  }, [active, step, index, onPage, steps.length])
 
   useEffect(() => {
     if (!active) return
@@ -113,6 +145,21 @@ export default function Walkthrough({ steps, active, onClose, resolvePath }: Pro
   const position = useMemo(() => cardPosition(rect), [rect])
   if (!active || !step) return null
   const last = index === steps.length - 1
+  const pressable = step.press && ready
+    ? document.querySelector(`[data-tour="${step.target}"]`) : null
+  const canPress = pressable instanceof HTMLButtonElement && !pressable.disabled
+  const next = () => {
+    if (canPress) {
+      pressingRef.current = true
+      setPressing(true)
+      pressable.click()
+      window.setTimeout(() => {
+        pressingRef.current = false
+        setPressing(false)
+      }, 120000)
+    } else if (last) onClose()
+    else setIndex(index + 1)
+  }
 
   return (
     <div className="walkthrough-layer" role="dialog" aria-modal="true" aria-label="Guided walkthrough">
@@ -134,9 +181,9 @@ export default function Walkthrough({ steps, active, onClose, resolvePath }: Pro
           <footer>
             <button className="btn quiet small" type="button" onClick={onClose}>Skip</button>
             <div>
-              <button className="btn quiet small" type="button" disabled={index === 0} onClick={() => setIndex(index - 1)}>Back</button>
-              <button className="btn accent small" type="button" onClick={() => (last ? onClose() : setIndex(index + 1))}>
-                {last ? 'Finish' : 'Next'}
+              <button className="btn quiet small" type="button" disabled={index === 0 || pressing} onClick={() => setIndex(index - 1)}>Back</button>
+              <button className="btn accent small" type="button" onClick={next} disabled={pressing}>
+                {pressing ? 'Working…' : canPress ? 'Run and continue' : last ? 'Finish' : 'Next'}
               </button>
             </div>
           </footer>

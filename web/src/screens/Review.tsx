@@ -57,6 +57,10 @@ export default function Review() {
   const [running, setRunning] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [tab, setTab] = useState<'decision' | 'console' | 'audit'>('decision')
+  const askedTab = params.get('tab')
+  useEffect(() => {
+    if (askedTab === 'decision' || askedTab === 'console' || askedTab === 'audit') setTab(askedTab)
+  }, [askedTab, id])
   const [docTab, setDocTab] = useState<'pdf' | 'fields'>('pdf')
   const [audit, setAudit] = useState<Json[]>([])
   const [overriding, setOverriding] = useState<null | 'override' | 'reject'>(null)

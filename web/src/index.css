@@ -337,6 +337,7 @@ table.grid tr.story td:first-child { box-shadow: inset 2px 0 0 var(--orange); }
 
 /* ---------- walkthrough ---------- */
 .walkthrough-layer { position: fixed; inset: 0; z-index: 9998; pointer-events: none; }
+[data-tour] { scroll-margin-top: 72px; }
 .walkthrough-dim { position: fixed; inset: 0; background: rgba(27, 29, 33, 0.5); }
 .walkthrough-spotlight { position: fixed; border-radius: 10px; border: 2px solid var(--orange); transition: all 0.25s ease; }
 .walkthrough-card { position: fixed; z-index: 10002; width: min(380px, calc(100vw - 32px)); padding: 16px 18px; border-radius: var(--r-md);

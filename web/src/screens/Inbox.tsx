@@ -104,11 +104,11 @@ export default function Inbox() {
           <>
             <Section title="This morning's mailbox" why="Arrived since 06:00 and not yet worked by the agent."
               items={fresh.map((r) => inv(r))} empty="Everything received has been worked."
-              action={can('run_agent') && fresh.length > 0 && (
+              action={can('run_agent') && (fresh.length > 0 ? (
                 <button type="button" className="btn accent" onClick={runMailbox} disabled={mailbox.running} data-tour="run-mailbox">
                   {mailbox.running ? `Working ${mailbox.done} of ${mailbox.total}…` : `Run the agent on ${fresh.length}`}
                 </button>
-              )} />
+              ) : <span className="chip FAST_TRACK" data-tour="run-mailbox">Mailbox worked</span>)} />
             <Section title="Ready for your decision" why="Worked by the agent; accept, override with a reason, or reject."
               items={toDecide.map((r) => inv(r, `${r.account ?? '—'} · ${Math.round((r.confidence ?? 0) * 100)}% · ${r.invoice_num}`))}
               empty="Nothing waiting for a coding decision." />

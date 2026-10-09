@@ -7,6 +7,8 @@ export type TourStep = {
   talk?: string
   path?: string
   invoice?: string // storyboard key; resolved to /invoice/<intake id>
+  tab?: 'decision' | 'console' | 'audit' // invoice steps open this tab; the recommendation unless set
+  press?: boolean // Next presses the spotlighted button and waits for it to finish, so later steps have data
 }
 
 // The workshop storyboard (brief section 3), signed in as Alex Rivera (AP specialist) unless a step says otherwise.
@@ -16,14 +18,14 @@ export const TOUR: TourStep[] = [
     talk: '“This is CLEAR: coding, ledger, exceptions, approvals and reconciliation, worked by one agent with a person deciding. Synthetic data, built in a week, on the patterns we would build on your stack.”' },
   { id: 'inbox', scene: 'Set-up', path: '/', target: 'inbox', title: 'This morning’s mailbox, not yet worked',
     body: '102 invoices were worked by the agent as they arrived overnight. 40 more landed this morning and nobody has touched them, not even the agent.' },
-  { id: 'mailbox', scene: 'Set-up', path: '/', target: 'run-mailbox', title: 'Run the agent on the mailbox',
-    body: 'Press to work all 40. Each invoice runs every control in order; the queue fills in as each one finishes. A few seconds for the lot.' },
+  { id: 'mailbox', scene: 'Set-up', path: '/', target: 'run-mailbox', press: true, title: 'Run the agent on the mailbox',
+    body: 'Run and continue works all 40. Each invoice runs every control in order and the counter climbs as each one finishes; a few seconds for the lot. If the mailbox is already worked, carry on.' },
 
   { id: 'tel-new', scene: 'Scene 1 · Routine invoice', invoice: 'telecoms', target: 'run-line', title: 'One invoice, end to end',
     body: 'Northline Communications, $42,310.55. The line says when and how the agent worked it, how long it took and how many tool calls it made.' },
   { id: 'tel-run', scene: 'Scene 1 · Routine invoice', invoice: 'telecoms', target: 'run-agent', title: 'Run it again, live',
     body: 'Re-running shows the agent working: each step and each tool call arrives as it happens. Turn on Presentation pace in the header to slow the display; the label shows the real run time.' },
-  { id: 'tel-console', scene: 'Scene 1 · Routine invoice', invoice: 'telecoms', target: 'console', title: 'Every call is recorded',
+  { id: 'tel-console', scene: 'Scene 1 · Routine invoice', invoice: 'telecoms', tab: 'console', target: 'console', title: 'Every call is recorded',
     body: 'Supplier match, OFAC screen, VAT, duplicates across 18 months, PO policy, coding from history, receipt rule, payment risk, approval routing. Click any call to see its inputs.' },
   { id: 'tel-rec', scene: 'Scene 1 · Routine invoice', invoice: 'telecoms', target: 'recommendation', title: 'Coded from history, with a calibrated confidence',
     body: 'Telecommunications, infrastructure cost centre. The confidence is calibrated: on the hold-out, recommendations at this level were right that often.',
@@ -58,7 +60,7 @@ export const TOUR: TourStep[] = [
   { id: 'sod', scene: 'Scene 4 · Controls', invoice: 'sod', target: 'approval', title: 'Nobody approves their own spend',
     body: 'Diana Moreno requested the workshop and would be the default approver. The agent reroutes to her VP; only Grace Okafor can approve, and the server refuses anyone else.' },
 
-  { id: 'close', scene: 'Scene 6 · One engine, three processes', path: '/close', target: 'laptop-journal', title: 'Nazeer’s laptop, in a manual journal',
+  { id: 'close', scene: 'Scene 6 · One engine, three processes', path: '/close?status=All', target: 'laptop-journal', title: 'Nazeer’s laptop, in a manual journal',
     body: 'The same engine reads the September close and finds the laptop refresh in Repairs & Maintenance. It is a case with a drafted reclass: Ben Keller prepares it, Samuel Whitaker approves it, and it posts as a balanced GL_INTERFACE batch.' },
   { id: 'cash', scene: 'Scene 6 · One engine, three processes', path: '/close', target: 'cash-source', title: 'A day of cash application',
     body: '11,400 receipts. It finds the one applied to the wrong customer (transposed digits) and proposes matches for most unapplied cash.',

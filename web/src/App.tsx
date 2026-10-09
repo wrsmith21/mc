@@ -110,7 +110,8 @@ export default function App() {
 
   const roles = session.roles
   const has = (...r: string[]) => r.some((x) => roles.includes(x))
-  const resolvePath = (s: TourStep) => (s.invoice ? `/invoice/${meta?.storyboard?.[s.invoice] ?? ''}` : s.path ?? '/')
+  const resolvePath = (s: TourStep) =>
+    s.invoice ? `/invoice/${meta?.storyboard?.[s.invoice] ?? ''}?tab=${s.tab ?? 'decision'}` : s.path ?? '/'
 
   const reset = async () => {
     if (!window.confirm('Reset the demo to its starting state? Every decision, run and policy change made in this session is cleared.')) return

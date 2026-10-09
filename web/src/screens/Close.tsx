@@ -152,6 +152,10 @@ export default function Close() {
   const [source, setSource] = useState('journals')
   const [status, setStatus] = useState('Open')
   const open = params.get('case')
+  const askedStatus = params.get('status')
+  useEffect(() => {
+    if (askedStatus) setStatus(askedStatus)
+  }, [askedStatus])
 
   const load = () => {
     api.close().then(setDash)
