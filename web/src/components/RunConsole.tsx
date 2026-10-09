@@ -3,7 +3,7 @@ import type { Json } from '../api'
 
 const AGENT: Record<string, string> = {
   intake: 'Intake & extraction', supplier: 'Supplier & validity', coding: 'Coding & treatment', price: 'Price',
-  approval: 'Approval & receipt', risk: 'Payment risk', investigator: 'Investigator (Claude)', supervisor: 'Supervisor',
+  approval: 'Approval & receipt', risk: 'Payment risk', investigator: 'Investigator', supervisor: 'Supervisor',
 }
 const SOURCE: Record<string, string> = {
   live: 'live', cache: 'replayed', computed: 'computed', 'pre-extracted': 'intake', template: 'template',

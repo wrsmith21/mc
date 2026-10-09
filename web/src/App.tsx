@@ -127,7 +127,7 @@ export default function App() {
 
   const upload = async (file?: File) => {
     if (!file) return
-    toast(`Reading ${file.name} with Claude…`)
+    toast(`Reading ${file.name} with ${brand.product}…`)
     try {
       const r = await api.wildcard(file)
       bump()
@@ -160,8 +160,8 @@ export default function App() {
           <div className="spacer" />
           <span className="clock" title="Demo clock">{meta?.now ? `${meta.now.slice(0, 10)} ${meta.now.slice(11, 16)}` : ''}</span>
           {meta?.mode && (
-            <span className={`mode ${meta.mode === 'live' ? '' : 'replay'}`} title={meta.model}>
-              {meta.mode === 'live' ? 'Claude connected' : 'Replay mode'}
+            <span className={`mode ${meta.mode === 'live' ? '' : 'replay'}`} title={`Model: ${meta.model}`}>
+              {meta.mode === 'live' ? `${brand.product} live` : 'Replay mode'}
             </span>
           )}
           <label className="pace" title="Spaces out agent events on screen for presenting. The agent itself never waits.">

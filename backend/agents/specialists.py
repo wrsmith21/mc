@@ -6,6 +6,8 @@ run (unknown supplier, routed out of AP) by returning a terminal status.
 import re
 from datetime import date
 
+from ..brand import PRODUCT
+
 TIMEKEEPER = re.compile(r"^(Partner|Senior Associate|Associate|Paralegal|Principal|Senior Consultant|Consultant) – ")
 
 
@@ -53,8 +55,8 @@ class IntakeAgent:
             w.result["total_usd"] = w.usd(ctx, w.doc["total"])
             w.subtotal_usd = w.usd(ctx, w.doc["subtotal"])
             src = extraction["source"]
-            st["detail"] = {"live": f"Claude read the PDF in {extraction.get('latency_ms', 0) / 1000:.1f}s",
-                            "cache": "Claude's reading of this PDF, replayed from cache",
+            st["detail"] = {"live": f"{PRODUCT} read the PDF in {extraction.get('latency_ms', 0) / 1000:.1f}s",
+                            "cache": f"{PRODUCT}'s reading of this PDF, replayed from cache",
                             "pre-extracted": "Fields captured at intake"}.get(src, "Fields from intake record")
             st["facts"] = [f"{w.doc.get('vendor_name')} · {w.doc.get('invoice_num')} · {w.doc.get('invoice_date')}",
                            f"{len(w.doc['lines'])} line(s) · {w.doc['currency']} {w.doc['total']:,.2f}"]

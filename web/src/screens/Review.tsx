@@ -2,6 +2,7 @@ import { QRCodeSVG } from 'qrcode.react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { api, runStream, type Json } from '../api'
+import { brand } from '../brand'
 import ProcessRail from '../components/ProcessRail'
 import RunConsole from '../components/RunConsole'
 import StatusChip from '../components/StatusChip'
@@ -242,7 +243,7 @@ export default function Review() {
             </table>
             {r.extraction?.agreement && (
               <>
-                <h3 style={{ marginTop: 18 }}>Cross-check: intake record vs what Claude read</h3>
+                <h3 style={{ marginTop: 18 }}>Cross-check: intake record vs what {brand.product} read</h3>
                 <table>
                   <tbody>
                     {r.extraction.agreement.map((a: Json) => (
@@ -370,8 +371,8 @@ export default function Review() {
                     <p className="reason" data-tour="reason">
                       {r.explanation}
                       <span className="src">
-                        {explainSrc === 'live' ? `Written by ${r.explanation_meta.model} from the engine's findings` :
-                          explainSrc === 'cache' ? 'Written by Claude from the engine’s findings (replayed)' :
+                        {explainSrc === 'live' ? `Written by ${brand.product} from the engine’s findings` :
+                          explainSrc === 'cache' ? `Written by ${brand.product} from the engine’s findings (replayed)` :
                             'Reason assembled from the engine’s findings'} · the account is chosen by the scoring engine, not the language model
                       </span>
                     </p>
@@ -396,7 +397,7 @@ export default function Review() {
                   <div className="card investigation" data-tour="investigation">
                     <div className="card-head">
                       <h3>What the investigator found</h3>
-                      <span className="muted small">{inv.source === 'live' ? `Claude, ${inv.tool_calls?.length ?? 0} read-only tool calls` : inv.source === 'cache' ? 'Claude (replayed), read-only tools' : 'Deterministic summary (model not used)'}</span>
+                      <span className="muted small">{inv.source === 'live' ? `${brand.product}, ${inv.tool_calls?.length ?? 0} read-only tool calls` : inv.source === 'cache' ? `${brand.product} (replayed), read-only tools` : 'Deterministic summary (model not used)'}</span>
                     </div>
                     <p>{inv.summary}</p>
                     {inv.evidence?.length > 0 && (

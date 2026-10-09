@@ -54,7 +54,7 @@ export const TOUR: TourStep[] = [
     body: 'A 12-month subscription booked straight to expense would overstate October. Prepaid, with the amortisation journal drafted as a GL interface file.' },
 
   { id: 'bank-inv', scene: 'Scene 4 · Controls', invoice: 'bank_change', target: 'investigation', title: 'Held, and investigated',
-    body: 'Nearly three times the normal amount, bank details changed two days ago from a look-alike domain. Claude checked the bank log and vendor profile with read-only tools and says what to do next; every claim cites the call it came from. The vendor-master team acts on it.' },
+    body: 'Nearly three times the normal amount, bank details changed two days ago from a look-alike domain. CLEAR checked the bank log and vendor profile with read-only tools and says what to do next; every claim cites the call it came from. The vendor-master team acts on it.' },
   { id: 'dup', scene: 'Scene 4 · Controls', invoice: 'duplicate', target: 'flags', title: 'The same invoice, sent again',
     body: 'Different number format, same amount, date and matter. Held before it reaches a payment run.' },
   { id: 'sod', scene: 'Scene 4 · Controls', invoice: 'sod', target: 'approval', title: 'Nobody approves their own spend',
@@ -76,5 +76,5 @@ export const TOUR: TourStep[] = [
   { id: 'arch-wf', scene: 'Under the hood', path: '/architecture', target: 'arch-workflows', title: 'Each workflow, message by message',
     body: 'Who calls whom, with the endpoint behind each step, the alternative paths and the SLA timers. Press Play.' },
   { id: 'wild', scene: 'Try it', path: '/', target: 'wildcard', title: 'Bring your own invoice',
-    body: 'Upload any invoice PDF. Claude reads it live, uncached, and the same agent works it in front of you.' },
+    body: 'Upload any invoice PDF. CLEAR reads it live, uncached, and the same agent works it in front of you.' },
 ]

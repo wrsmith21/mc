@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { api, type Json } from '../api'
+import { brand } from '../brand'
 import { useApp, useCan } from '../context'
 import { dateShort, dateTime, money, num, pct } from '../format'
 
@@ -88,7 +89,7 @@ function CaseDrawer({ id, onClose, onChanged }: { id: string; onClose: () => voi
         <div className="card-head">
           <h3>Investigation</h3>
           {can('case_investigate') && <button type="button" className="btn small" disabled={busy}
-            onClick={() => act('investigate', {}, 'Investigation complete')}>{inv ? 'Investigate again' : 'Investigate with Claude'}</button>}
+            onClick={() => act('investigate', {}, 'Investigation complete')}>{inv ? 'Investigate again' : `Investigate with ${brand.product}`}</button>}
         </div>
         {inv ? (
           <>
@@ -96,7 +97,7 @@ function CaseDrawer({ id, onClose, onChanged }: { id: string; onClose: () => voi
             <ul className="cited">{inv.evidence.map((e: Json) => <li key={e.tool_call_id + e.text}><span className="cite">{e.tool_call_id}</span>{e.text}</li>)}</ul>
             <p className="next-action"><b>Recommended:</b> {inv.next_action} <span className="muted small">· {inv.source} · {inv.trace?.[0]?.tool_calls?.length ?? 0} read-only tool calls</span></p>
           </>
-        ) : <p className="muted small">Claude can check the entry, the supplier's history and the customer's open items before you decide. It reads; it cannot act.</p>}
+        ) : <p className="muted small">{brand.product} can check the entry, the supplier's history and the customer's open items before you decide. It reads; it cannot act.</p>}
       </div>
 
       {(c.status === 'Open' || c.status === 'Pending approval') && (
