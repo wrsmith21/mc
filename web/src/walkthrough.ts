@@ -78,3 +78,81 @@ export const TOUR: TourStep[] = [
   { id: 'wild', scene: 'Try it', path: '/', target: 'wildcard', title: 'Bring your own invoice',
     body: 'Upload any invoice PDF. CLEAR reads it live, uncached, and the same agent works it in front of you.' },
 ]
+
+const MAILBOX: TourStep = {
+  id: 'mailbox', scene: 'Set-up', path: '/', target: 'run-mailbox', press: true, title: 'Work this morning’s mailbox',
+  body: '40 invoices arrived this morning and nobody has touched them. Run and continue lets the agent work all of them; if the mailbox is already worked, carry on.',
+}
+
+// 1. Non-PO invoice: the Dell laptops, end to end, as Alex Rivera (AP specialist).
+const NON_PO: TourStep[] = [
+  MAILBOX,
+  { id: 'np-head', scene: 'The invoice', invoice: 'dell', target: 'invoice-head', title: 'Ten laptops, no purchase order',
+    body: 'Dell Technologies, $20,009.03, emailed to the AP inbox. With no PO there is nothing to match against: coding, receipt and approver all have to be worked out.' },
+  { id: 'np-run', scene: 'The invoice', invoice: 'dell', target: 'run-line', title: 'Worked in seconds, every call recorded',
+    body: 'When the agent ran, how long it took and how many tool calls it made. Re-run it to watch each check arrive live.' },
+  { id: 'np-override', scene: 'Coding', invoice: 'dell', target: 'default-override', title: 'The vendor default would have been wrong',
+    body: 'Dell is set up against 6420 Repairs & Maintenance because of its service contracts. The lines say laptops, so the agent recommends 1540 Computer Hardware.',
+    talk: '“Anyone keying this in a hurry takes the default. The agent doesn’t.”' },
+  { id: 'np-evidence', scene: 'Coding', invoice: 'dell', target: 'evidence', title: 'Evidence an accountant can check',
+    body: 'The closest past invoices, how they were coded and who approved them. 55 of Dell’s 60 invoices went to 1540; three keyed to the default were reclassified at month-end.' },
+  { id: 'np-cap', scene: 'Treatment', invoice: 'dell', target: 'treatment', title: 'Routed to Fixed Assets, not decided',
+    body: '$1,845 a unit clears the $1,000 per-unit threshold for computer hardware. The agent routes it; Fixed Asset Accounting makes the capitalisation call.' },
+  { id: 'np-po', scene: 'Controls', invoice: 'dell', target: 'flags', title: 'It should have been a PO',
+    body: 'IT hardware needs a purchase order. The invoice is still processed, and the breach is logged for procurement so non-PO volume shrinks at source.',
+    talk: 'Pause. Ask: “Is that the kind of thing your team catches today, and how late?”' },
+  { id: 'np-receipt', scene: 'Receipt', invoice: 'dell', target: 'receipt', title: 'Receipt already evidenced',
+    body: 'The asset-register scan of the ten serial numbers is the evidence of receipt. Nobody is asked to confirm what the system already knows.' },
+  { id: 'np-approval', scene: 'Approval', invoice: 'dell', target: 'approval', title: 'Routed by your approval matrix',
+    body: 'IT Procurement and Fixed Asset Accounting first, because category rules come before the amount tier, then the director, whose limit is checked.' },
+  { id: 'np-audit', scene: 'Governance', invoice: 'dell', tab: 'audit', target: 'audit', title: 'Every step is evidence',
+    body: 'What the agent read, recommended and why, who confirmed receipt and who approved, with timestamps. SOX evidence as a by-product.',
+    talk: '“The agent recommends; your people decide.”' },
+]
+
+// 2. Cash application: a day of settlement receipts and the one applied to the wrong customer.
+const CASH: TourStep[] = [
+  { id: 'ca-day', scene: 'The day', path: '/close?source=cash', target: 'cash-source', title: 'A day of settlement cash',
+    body: '11,400 receipts from 14 October. 98.4% were auto-applied by the existing rules; the agent checks those too, and works the exceptions the rules left behind.' },
+  { id: 'ca-cases', scene: 'The day', path: '/close?source=cash', target: 'case-table', title: 'Every finding is a case',
+    body: 'Cash applied to the wrong customer, a receipt applied to an invoice already paid, and proposed matches for most unapplied receipts. Each has an owner, an SLA and a drafted fix.',
+    talk: '“This is the 1–2% that doesn’t auto-apply today.”' },
+  { id: 'ca-what', scene: 'The misapplied receipt', path: '/close?type=MISAPPLIED', target: 'case-summary', title: 'Right money, wrong customer',
+    body: 'Lakeshore Federal Credit Union (30418) paid $48,220 and quoted their invoice 9100231877. A clerk applied it to 30481, Lakeside Community Bank: transposed digits.' },
+  { id: 'ca-fix', scene: 'The misapplied receipt', path: '/close?type=MISAPPLIED', target: 'case-fix', title: 'The fix, drafted',
+    body: 'Unapply from 30481, re-apply to 30418 against the invoice the remittance names. Nothing moves until a person approves it.' },
+  { id: 'ca-inv', scene: 'The misapplied receipt', path: '/close?type=MISAPPLIED', target: 'case-investigation', title: 'Investigated, read-only',
+    body: 'CLEAR checks the remittance, the payer’s aliases and both customers’ open items, and cites each call. It reads; it cannot act.' },
+  { id: 'ca-decide', scene: 'The misapplied receipt', path: '/close?type=MISAPPLIED', target: 'case-decide', title: 'Maker and checker',
+    body: 'Hana Zhang prepares the re-application, Priya Nair approves it, and approved fixes export as a re-application file. The preparer can’t approve their own work.' },
+  { id: 'ca-same', scene: 'One engine', path: '/close?source=cash', target: 'close-sources', title: 'The same engine as AP and the close',
+    body: 'The checks that code invoices also read the close journals and the AP subledger. Built once, used three times.' },
+]
+
+// 3. Procure to pay: keeping spend on purchase orders.
+const P2P: TourStep[] = [
+  MAILBOX,
+  { id: 'pp-head', scene: 'A PO that already exists', invoice: 'open_po', target: 'invoice-head', title: 'An invoice with no PO number',
+    body: 'Halden Consulting, $48,000, for phase 2 of a controls design review. The supplier didn’t quote a PO, so it landed in the non-PO queue.' },
+  { id: 'pp-match', scene: 'A PO that already exists', invoice: 'open_po', target: 'flags', title: 'Matched to the open PO',
+    body: 'An approved PO for exactly this work is open. The agent sends the invoice to three-way match instead of coding and approving it a second time.',
+    talk: '“The cheapest non-PO invoice is the one that turns out to have a PO.”' },
+  { id: 'pp-breach', scene: 'Spend that should have been a PO', invoice: 'po_breach_marketing', target: 'flags', title: 'Over the PO threshold, without a PO',
+    body: 'A $68,150 agency invoice. Marketing over $50k needs a PO: the invoice is still processed, and the breach goes on the procurement report.' },
+  { id: 'pp-cats', scene: 'Shrinking the problem', path: '/insights', target: 'category-breach', title: 'Where non-PO spend should have been on a PO',
+    body: '18 months of AP spend by category, with the part in categories your policy says need a purchase order.' },
+  { id: 'pp-blanket', scene: 'Shrinking the problem', path: '/insights', target: 'blanket-po', title: 'Turn repeat spend into a blanket PO',
+    body: 'Suppliers billing almost every month without a PO. One click sends procurement a request for a blanket PO or a standing approval rule.',
+    talk: '“Fewer non-PO invoices, not just faster ones.”' },
+  { id: 'pp-ledger', scene: 'Cleaning up what already posted', path: '/close?source=ap_ledger', target: 'ap-source', title: 'Miscodes already in the AP subledger',
+    body: 'Past invoices coded differently from every similar line, never reclassified. Each is a case with a drafted reclass for the GL team.' },
+]
+
+export type Tour = { id: string; title: string; summary: string; steps: TourStep[] }
+
+export const TOURS: Tour[] = [
+  { id: 'non-po', title: 'Non-PO invoice', summary: 'Dell laptops, from the mailbox to an approved, audited posting.', steps: NON_PO },
+  { id: 'cash', title: 'Cash application', summary: 'A day of settlement receipts and the one applied to the wrong customer.', steps: CASH },
+  { id: 'p2p', title: 'Procure to pay', summary: 'Keeping spend on purchase orders, and cleaning up what already posted.', steps: P2P },
+  { id: 'storyboard', title: 'Full workshop storyboard', summary: 'Every scene in order, including under the hood.', steps: TOUR },
+]

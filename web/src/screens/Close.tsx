@@ -65,9 +65,12 @@ function CaseDrawer({ id, onClose, onChanged }: { id: string; onClose: () => voi
         <span>Owner {c.owner_name}</span>
         <span className={c.overdue ? 'late' : ''}>SLA {dateShort(c.sla_due)}{c.overdue ? ' · overdue' : ''}</span>
       </div>
+      <div data-tour="case-summary">
       <p>{c.detail}</p>
       {f.description && <p className="muted small">“{f.description}”{f.created_by ? ` · posted by ${f.created_by}` : ''}{f.approved_by ? `, approved by ${f.approved_by}` : ''}{f.applied_by ? ` · applied by ${f.applied_by}` : ''}</p>}
+      </div>
 
+      <div data-tour="case-fix">
       <h3>Fix drafted by the agent</h3>
       {c.fix.lines.length > 0 ? (
         <table className="evidence">
@@ -84,8 +87,9 @@ function CaseDrawer({ id, onClose, onChanged }: { id: string; onClose: () => voi
         </table>
       ) : <p className="muted">No ledger entry: {c.fix.note}</p>}
       {c.fix.lines.length > 0 && <p className="muted small">{c.fix.note}</p>}
+      </div>
 
-      <div className="drawer-section">
+      <div className="drawer-section" data-tour="case-investigation">
         <div className="card-head">
           <h3>Investigation</h3>
           {can('case_investigate') && <button type="button" className="btn small" disabled={busy}
@@ -101,7 +105,7 @@ function CaseDrawer({ id, onClose, onChanged }: { id: string; onClose: () => voi
       </div>
 
       {(c.status === 'Open' || c.status === 'Pending approval') && (
-        <div className="drawer-section">
+        <div className="drawer-section" data-tour="case-decide">
           <h3>Decide</h3>
           <label className="field">Note for the record<textarea rows={2} value={note} onChange={(e) => setNote(e.target.value)} /></label>
           <div className="drawer-actions">
@@ -150,13 +154,19 @@ export default function Close() {
   const [params, setParams] = useSearchParams()
   const [dash, setDash] = useState<Json | null>(null)
   const [cases, setCases] = useState<Json[]>([])
-  const [source, setSource] = useState('journals')
+  const askedSource = params.get('source')
+  const [source, setSource] = useState(askedSource ?? 'journals')
   const [status, setStatus] = useState('Open')
-  const open = params.get('case')
+  // ?type=MISAPPLIED opens the first case of that type, so a walkthrough can link to a case without knowing its id
+  const askedType = params.get('type')
+  const open = params.get('case') ?? (askedType ? cases.find((c) => c.type === askedType)?.case_id ?? null : null)
   const askedStatus = params.get('status')
   useEffect(() => {
     if (askedStatus) setStatus(askedStatus)
   }, [askedStatus])
+  useEffect(() => {
+    if (askedSource) setSource(askedSource)
+  }, [askedSource])
 
   const load = () => {
     api.close().then(setDash)
@@ -210,7 +220,7 @@ export default function Close() {
           const d = dash?.by_source?.[s.key]
           return (
             <button key={s.key} type="button" className={`source ${source === s.key ? 'on' : ''}`} onClick={() => { setSource(s.key); setStatus('Open') }}
-              data-tour={s.key === 'cash' ? 'cash-source' : s.key === 'journals' ? 'journal-source' : undefined}>
+              data-tour={s.key === 'cash' ? 'cash-source' : s.key === 'journals' ? 'journal-source' : 'ap-source'}>
               <h3>{s.label}</h3>
               <div className="big">{d?.open ?? '—'}<span>open · {money(d?.value_at_risk ?? 0, 'USD', 0)} at risk</span></div>
               <div className="scan">{s.sub} · {d?.pending_approval ?? 0} awaiting approval · {d?.exported ?? 0} posted{d?.overdue ? ` · ${d.overdue} overdue` : ''}</div>

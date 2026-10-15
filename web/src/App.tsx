@@ -15,7 +15,7 @@ import Queue from './screens/Queue'
 import Requester from './screens/Requester'
 import Review from './screens/Review'
 import SignIn from './screens/SignIn'
-import { TOUR, type TourStep } from './walkthrough'
+import { TOURS, type TourStep } from './walkthrough'
 
 const Insights = lazy(() => import('./screens/Insights'))
 const Architecture = lazy(() => import('./screens/Architecture'))
@@ -30,7 +30,8 @@ export default function App() {
   const [choosing, setChoosing] = useState(false)
   const [toastMsg, setToastMsg] = useState<{ msg: string; kind: string } | null>(null)
   const [version, setVersion] = useState(0)
-  const [tour, setTour] = useState(false)
+  const [tourId, setTourId] = useState<string | null>(null)
+  const [picking, setPicking] = useState(false)
   const [counts, setCounts] = useState({ fresh: 0, mine: 0 })
   const [slow, setSlow] = useState(() => {
     try {
@@ -192,7 +193,7 @@ export default function App() {
           <a href="/requester" target="_blank" rel="noreferrer"><Icon name="phone" /><span className="label">Requester phone view</span></a>
           <div className="sep" />
           <div className="tools">
-            <button type="button" className="tour" onClick={() => setTour(true)}><Icon name="play" />Start walkthrough</button>
+            <button type="button" className="tour" onClick={() => setPicking(true)}><Icon name="play" />Start walkthrough</button>
             {meta?.wildcard && has('ap_specialist', 'admin') && (
               <label data-tour="wildcard">
                 <Icon name="upload" />Process a new invoice…
@@ -220,7 +221,27 @@ export default function App() {
           </Routes>
         </main>
       </div>
-      <Walkthrough steps={TOUR} active={tour} onClose={() => setTour(false)} resolvePath={resolvePath} />
+      {picking && (
+        <div className="tour-picker-layer" role="dialog" aria-modal="true" aria-label="Choose a walkthrough" onClick={() => setPicking(false)}>
+          <div className="tour-picker" onClick={(e) => e.stopPropagation()}>
+            <h2>Choose a walkthrough</h2>
+            <div className="tour-options">
+              {TOURS.map((t, i) => (
+                <button key={t.id} type="button" className={`tour-option${t.id === 'storyboard' ? ' secondary' : ''}`} autoFocus={i === 0}
+                  onClick={() => { setPicking(false); setTourId(t.id) }}>
+                  <b>{t.title}</b>
+                  <span>{t.summary}</span>
+                  <em>{t.steps.length} steps</em>
+                </button>
+              ))}
+            </div>
+            <button type="button" className="btn quiet small" onClick={() => setPicking(false)}>Cancel</button>
+          </div>
+        </div>
+      )}
+      {TOURS.map((t) => (
+        <Walkthrough key={t.id} steps={t.steps} active={tourId === t.id} onClose={() => setTourId(null)} resolvePath={resolvePath} />
+      ))}
       {toastMsg && <div className={`toast ${toastMsg.kind}`} role="status">{toastMsg.msg}</div>}
     </AppCtx.Provider>
   )

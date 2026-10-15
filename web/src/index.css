@@ -784,3 +784,18 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--i
   .cd-flows { grid-template-columns: 1fr; }
 }
 .tool-table td:first-child { white-space: nowrap; }
+
+/* walkthrough picker */
+.tour-picker-layer { position: fixed; inset: 0; z-index: 10003; background: rgba(20, 20, 19, 0.45); display: grid; place-items: center; padding: 16px; }
+.tour-picker { background: var(--panel); border-radius: var(--r-md); padding: 22px; width: min(560px, 100%); display: flex; flex-direction: column; gap: 14px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28); }
+.tour-picker h2 { font-size: 1.15rem; }
+.tour-options { display: flex; flex-direction: column; gap: 8px; }
+.tour-option { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; text-align: left; border: 1px solid var(--line); border-radius: var(--r-md);
+  background: var(--panel); padding: 12px 14px; cursor: pointer; }
+.tour-option:hover, .tour-option:focus-visible { border-color: var(--orange); background: var(--orange-wash); }
+.tour-option b { font-size: 1rem; }
+.tour-option span { grid-column: 1; color: var(--muted); font-size: 0.88rem; }
+.tour-option em { grid-column: 2; grid-row: 1 / span 2; align-self: center; font-style: normal; font-size: 0.8rem; color: var(--muted); }
+.tour-option.secondary { border-style: dashed; }
+.tour-picker > .btn { align-self: flex-end; }
