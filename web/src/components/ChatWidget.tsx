@@ -79,7 +79,7 @@ export default function ChatWidget() {
   const first = session?.person?.name?.split(' ')[0]
   const greeting: Msg = {
     role: 'assistant', greeting: true,
-    content: `Hi${first ? ` ${first}` : ''}, I’m the ${brand.product} assistant. Ask me anything about this morning’s non-PO invoices, the close or cash application: why something was coded or held, who approves it, what the agent found. I can also run the agent or send a receipt request when you ask; approvals and postings stay with you.`,
+    content: `Hi${first ? ` ${first}` : ''}, I’m the ${brand.product} assistant. Ask me anything about this morning’s non-PO invoices, the close or cash application: why something was coded or held, who approves it, what the agent found. I can also run the agent, send a receipt request, or sign off your own step when CLEAR’s checks leave nothing to do — only when you ask, and only what your role allows.`,
   }
   const [open, setOpen] = useState(false)
   const [msgs, setMsgs] = useState<Msg[]>([greeting])

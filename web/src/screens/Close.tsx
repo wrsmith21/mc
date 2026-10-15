@@ -28,6 +28,14 @@ function CaseDrawer({ id, onClose, onChanged }: { id: string; onClose: () => voi
     setAccount(x.fix?.lines?.[0]?.account ?? '')
   })
   useEffect(() => { load() }, [id]) // eslint-disable-line react-hooks/exhaustive-deps
+  // The assistant can investigate, prepare or approve this case; show the change when it does.
+  useEffect(() => {
+    const onChanged = (e: Event) => {
+      if ((e as CustomEvent).detail?.case_id === id) load()
+    }
+    window.addEventListener('mc-data-changed', onChanged)
+    return () => window.removeEventListener('mc-data-changed', onChanged)
+  }, [id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const act = async (action: string, body: Json, ok: string) => {
     setBusy(true)

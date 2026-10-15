@@ -7,7 +7,7 @@ answer so the panel can show what was checked.
 import json
 import time
 
-from .. import clock, llm
+from .. import auth, clock, llm
 from .base import RunContext
 
 MAX_TOOL_ROUNDS = 6
@@ -51,8 +51,15 @@ only when the person's latest message explicitly asks for that action or says ye
 act on your own initiative, and never act on an invoice other than the one they mean. The server checks their \
 role; if it refuses, say who can do it. After acting, say what you did and what came out (status, recommendation, \
 flags) in two or three sentences.
-- You cannot approve, reject, override coding, post or change master data: those decisions stay with a person in \
-the app. Say which button and which person.
+- Approving through chat: only when the person explicitly asks you to approve (or says yes after you offered), \
+and only when there is nothing left to do. Call approval_readiness first; if it lists blockers, do not call \
+approve: explain each blocker and who acts on it. The approve tool takes the signed-in person's own step and no \
+other: an AP specialist accepts and sends for approval, the next approver approves their step, a case preparer \
+prepares and submits, a case approver approves. For a close case, CLEAR must have investigated it and agreed with \
+the drafted fix; if it hasn't been investigated and the person asked you to investigate and approve, investigate \
+first, then check readiness again. Say exactly which step you took and what happens next (who approves after you).
+- You cannot reject, override coding, post batches or change master data: those stay with a person in the app. \
+Say which button and which person.
 - This is a demonstration on synthetic data built by Ciklum. Do not claim live integration with Mastercard's \
 Oracle R12, Coupa or AppZen; CLEAR works through standard extracts and upload files. Do not quote accuracy as a \
 product claim: confidence figures are measured on synthetic data.
@@ -137,7 +144,67 @@ def _case_view(c, people, full=False):
     return v
 
 
+# Warnings the agent has already acted on: recorded for the record, nothing for a person to do.
+RESOLVED_WARNINGS = {"PO_POLICY", "SOD_REROUTE"}
+# A close case is clear to sign off when CLEAR's investigation recommends exactly the drafted fix.
+FIX_ACTION = {"MISCODED": "Approve the proposed reclass", "AP_MISCODE": "Approve the proposed reclass",
+              "DUPLICATE_ENTRY": "Reverse the duplicate accrual",
+              "MISAPPLIED": "Re-apply the receipt to the correct customer",
+              "UNAPPLIED_MATCH": "Re-apply the receipt to the correct customer"}
+BLOCKING_STATUS = {"NEW": "the agent hasn't worked it yet", "HELD": "it is held by a control",
+                   "MATCH_TO_PO": "it belongs in three-way match against the open PO",
+                   "VENDOR_ONBOARDING": "the supplier isn't in the vendor master",
+                   "AWAITING_CONFIRMATION": "the requester hasn't confirmed receipt",
+                   "NEEDS_CODING": "the coding needs a person", "ROUTED_OUT": "it was routed out of non-PO AP",
+                   "APPROVED": "it is already approved", "REJECTED": "it was rejected"}
+
+
+def invoice_blockers(r):
+    """Everything that still needs a person before this invoice can be signed off. Empty means nothing to do."""
+    out = []
+    for st in {r.get("status"), r.get("agent_status")}:
+        if st in BLOCKING_STATUS:
+            out.append(f"Status: {BLOCKING_STATUS[st]}.")
+    if r.get("stale"):
+        out.append("Its last run is out of date (something changed since); re-run the agent first.")
+    if (r.get("coding") or {}).get("band") == "manual":
+        out.append("Coding confidence is too low to approve without a person coding it.")
+    for f in r.get("flags", []):
+        if f["severity"] == "hold" or (f["severity"] == "warn" and f["code"] not in RESOLVED_WARNINGS):
+            out.append(f"{f['title']}: {f['detail']}")
+    inv = r.get("investigation")
+    if inv and inv.get("next_action") != "Release after the check is cleared":
+        out.append(f"CLEAR's investigation recommends: {inv.get('next_action')}.")
+    return out
+
+
+def case_blockers(c, inv):
+    out = []
+    if c["status"] not in ("Open", "Pending approval"):
+        out.append(f"The case is {c['status'].lower()}.")
+    expected = FIX_ACTION.get(c["type"])
+    if not expected:
+        out.append(f"{c['type_label']} cases need a person's judgement; there is no drafted fix to sign off.")
+    elif not inv:
+        out.append("CLEAR hasn't investigated it yet.")
+    elif inv.get("next_action") != expected:
+        out.append(f"CLEAR's investigation recommends “{inv.get('next_action')}”, not the drafted fix.")
+    return out
+
+
+READINESS_TOOL = {
+    "name": "approval_readiness", "description": "Check whether an invoice (intake_id) or close case (case_id) can "
+    "be signed off now: lists anything still needing a person, and what the signed-in person's own step would be.",
+    "input_schema": {"type": "object", "properties": {"intake_id": {"type": "string"}, "case_id": {"type": "string"}}}}
+
 ACTION_TOOLS = [
+    {"name": "approve", "description": "ACTION. Sign off an invoice or a close case as the signed-in person: their "
+     "own step only (AP specialist accepts and sends for approval; next approver approves; case preparer prepares "
+     "and submits; case approver approves). Refused unless approval_readiness shows nothing left to do. Use only "
+     "when the person explicitly asks to approve.",
+     "input_schema": {"type": "object", "properties": {
+         "intake_id": {"type": "string"}, "case_id": {"type": "string"},
+         "note": {"type": "string", "description": "Short note for the record"}}}},
     {"name": "run_agent", "description": "ACTION. Run the agent on one invoice now (all checks, coding, routing), "
      "as the signed-in person. Use only when they ask for it. Returns the new result.",
      "input_schema": {"type": "object", "properties": {"intake_id": {"type": "string"}}, "required": ["intake_id"]}},
@@ -210,6 +277,77 @@ class Assistant:
                     "blanket_po_candidates": p["blanket_po_candidates"][:10]}
         raise KeyError(name)
 
+    def readiness(self, args, actor):
+        """Role-aware: what the signed-in person may do now, and anything that still needs a person."""
+        s = self.svc
+        name = lambda pid: (s.s.people.get(pid) or {}).get("name", pid)
+        if args.get("case_id"):
+            c = s.cases.get(args["case_id"].strip().upper())
+            inv = s.state.get(f"caseinv:{c['case_id']}")
+            blockers = case_blockers(c, inv)
+            if c["status"] == "Open":
+                step = "prepare and submit the drafted fix"
+                allowed = auth.allowed(s.s, actor, f"case_prepare_{c['source']}")
+                who_acts = c.get("owner_name")
+            elif c["status"] == "Pending approval":
+                step = "approve the prepared fix"
+                allowed = auth.allowed(s.s, actor, f"case_approve_{c['source']}") and actor != c.get("preparer")
+                who_acts = name(c.get("approver_role"))
+            else:
+                step, allowed, who_acts = None, False, None
+            return {"target": c["case_id"], "kind": "case", "status": c["status"], "blockers": blockers,
+                    "your_step": step if allowed else None, "who_acts": who_acts,
+                    "investigation": {k: inv.get(k) for k in ("summary", "next_action")} if inv else None,
+                    "ready": not blockers and allowed}
+        iid = (args.get("intake_id") or "").strip().upper()
+        r = s.result(iid)
+        d = r.get("decision") or {}
+        if not d:
+            step, allowed, who_acts = ("accept the recommendation and send it for approval",
+                                       auth.allowed(s.s, actor, "decide"), "an AP specialist")
+        elif d.get("status") == "IN_APPROVAL":
+            nxt = d["chain"][len(d["approvals"])]
+            delegate = s.s.people[nxt].get("delegate_id") if s.s.people[nxt].get("out_of_office") else None
+            step, allowed, who_acts = "approve your step in the approval chain", actor in (nxt, delegate), name(nxt)
+        else:
+            step, allowed, who_acts = None, False, None
+        blockers = invoice_blockers(r)
+        return {"target": iid, "kind": "invoice", "status": r.get("status_label"), "blockers": blockers,
+                "your_step": step if allowed else None, "who_acts": who_acts,
+                "approval_chain": [x["person"]["name"] for x in (r.get("approval") or {}).get("steps", [])],
+                "ready": not blockers and allowed}
+
+    def _approve(self, args, actor):
+        """The gate is enforced here, not only in the prompt: blockers or someone else's step means no sign-off."""
+        s = self.svc
+        note = (args.get("note") or "Signed off in chat: nothing left to do after CLEAR's checks.")[:300]
+        ready = self.readiness(args, actor)
+        if ready["blockers"]:
+            raise ValueError("Not approved, still needs a person: " + " ".join(ready["blockers"]))
+        if not ready["your_step"]:
+            raise PermissionError(f"This step isn't yours: it is for {ready['who_acts'] or 'nobody right now'}.")
+        if ready["kind"] == "case":
+            cid = ready["target"]
+            if s.cases.get(cid)["status"] == "Open":
+                out = s.cases.prepare(cid, actor, note)
+                label = f"Prepared and submitted {cid} for approval"
+            else:
+                out = s.cases.approve(cid, actor, note)
+                label = f"Approved {cid}"
+            return ({"case_id": cid, "status": out["status"]}, {"type": "approve", "case_id": cid, "label": label})
+        iid = ready["target"]
+        if not s.result(iid).get("decision"):
+            r = s.submit(iid, "accept", actor, note)
+            label = f"Accepted {iid} and sent it for approval"
+        else:
+            r = s.approve_step(iid, actor)
+            label = f"Approved {iid}" + ("" if r["status"] == "APPROVED" else " (your step)")
+        d = r.get("decision") or {}
+        nxt = d["chain"][len(d["approvals"])] if d.get("status") == "IN_APPROVAL" else None
+        return ({"intake_id": iid, "status": r.get("status_label"),
+                 "next_approver": (s.s.people.get(nxt) or {}).get("name") if nxt else None},
+                {"type": "approve", "intake_id": iid, "label": label})
+
     def _action(self, name, args, actor):
         """Write actions run as the signed-in person; the service enforces their permissions and logs them."""
         s = self.svc
@@ -234,6 +372,8 @@ class Assistant:
             task = s.request_receipt(iid, actor=actor)
             return task, {"type": "request_receipt", "intake_id": iid,
                           "label": f"Asked {task.get('assignee_name', 'the requester')} to confirm receipt"}
+        if name == "approve":
+            return self._approve(args, actor)
         if name == "investigate_case":
             cid = args["case_id"].strip().upper()
             out = s.investigate_case(cid, actor)
@@ -257,7 +397,7 @@ class Assistant:
                            f"The demo clock reads {clock.now_iso()}.")
 
         ctx = RunContext(self.svc.agent.registry, "CHAT", "chat", actor)
-        tools = APP_TOOLS + ACTION_TOOLS + self._registry_defs()
+        tools = APP_TOOLS + [READINESS_TOOL] + ACTION_TOOLS + self._registry_defs()
         checked, actions, t0, rounds = [], [], time.time(), 0
         client = llm._client()
         while True:
@@ -285,6 +425,9 @@ class Assistant:
                         result, action = self._action(b.name, args, actor)
                         actions.append({**action, "ok": True})
                         summary = action["label"]
+                    elif b.name == "approval_readiness":
+                        result = self.readiness(args, actor)
+                        summary = "approval readiness"
                     elif b.name in {t["name"] for t in APP_TOOLS}:
                         result = self._app_tool(b.name, args)
                         summary = b.name.replace("_", " ")
