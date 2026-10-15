@@ -3,6 +3,7 @@ import { NavLink, Navigate, Route, Routes, useLocation, useNavigate } from 'reac
 import { api, ApiError, type Json } from './api'
 import { brand } from './brand'
 import Icon from './components/Icon'
+import ChatWidget from './components/ChatWidget'
 import Walkthrough from './components/Walkthrough'
 import { AppCtx, type Session } from './context'
 import Audit from './screens/Audit'
@@ -239,6 +240,7 @@ export default function App() {
           </div>
         </div>
       )}
+      <ChatWidget />
       {TOURS.map((t) => (
         <Walkthrough key={t.id} steps={t.steps} active={tourId === t.id} onClose={() => setTourId(null)} resolvePath={resolvePath} />
       ))}

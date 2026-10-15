@@ -13,6 +13,9 @@ const PATHS: Record<string, string> = {
   upload: 'M12 16V4m0 0l-4 4m4-4l4 4M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3',
   clock: 'M12 7v5l3 2M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z',
   reset: 'M4 12a8 8 0 1 0 2.5-5.8M4 4v4h4',
+  chat: 'M4 5h16v11H10l-6 4zM8 9.5h8M8 12.5h5',
+  send: 'M4 12l16-8-6 16-2.5-6.5z',
+  dismiss: 'M6 6l12 12M18 6L6 18',
 }
 
 export default function Icon({ name }: { name: string }) {

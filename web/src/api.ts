@@ -70,6 +70,7 @@ export const api = {
   procurement: () => call('/api/insights/procurement'),
   vendor: (id: string) => call(`/api/vendors/${id}`),
   reset: () => post('/api/reset'),
+  chat: (messages: { role: string; content: string }[], context?: Json) => post('/api/chat', { messages, context }),
   login: (passcode: string) => post('/api/login', { passcode }),
   wildcard: async (file: File) => {
     const fd = new FormData()

@@ -4,12 +4,14 @@ import hmac
 import json
 import os
 
+import anthropic
 from fastapi import Body, FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTextResponse, StreamingResponse
 
 from . import auth, brand, clock, llm
 from . import model as ds
+from .agents.assistant import Assistant
 from .integrations import external
 from .service import DemoService
 from .store import ROOT
@@ -258,6 +260,26 @@ def case_action(case_id: str, action: str, request: Request, body: dict = Body(.
     if action == "investigate":
         return _case_call(svc().investigate_case, case_id, by)
     raise HTTPException(404, "Unknown action")
+
+
+@app.post("/api/chat")
+def chat(request: Request, body: dict = Body(...)):
+    """The in-app assistant. Live Claude call on every question; read-only tools over the demo state."""
+    by = who(request, body.get("by"))
+    if os.environ.get("DEMO_OFFLINE") == "1":
+        raise HTTPException(503, "The assistant needs a connection to Claude, and the demo is running offline.")
+    try:
+        return Assistant(svc()).answer(body.get("messages") or [], by, body.get("context"))
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    except anthropic.AuthenticationError:
+        raise HTTPException(503, "The assistant can’t reach Claude: no valid API key is configured on the server.")
+    except (anthropic.APIConnectionError, anthropic.APITimeoutError):
+        raise HTTPException(503, "Claude didn’t respond in time. Try the question again.")
+    except anthropic.RateLimitError:
+        raise HTTPException(503, "Claude is busy right now. Try again in a few seconds.")
+    except anthropic.APIStatusError as e:
+        raise HTTPException(503, f"Claude returned an error ({e.status_code}). Try again.")
 
 
 @app.get("/api/operations")
