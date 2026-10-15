@@ -844,3 +844,7 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--i
 .chat-send:disabled { opacity: 0.4; cursor: not-allowed; }
 .chat-send svg { width: 18px; height: 18px; }
 .app .actions { margin-right: 64px; }
+.chat-actions { display: flex; flex-direction: column; gap: 4px; margin-bottom: 6px; }
+.chat-action { align-self: flex-start; font-size: 0.78rem; font-weight: 600; color: var(--green, #1a7f4b);
+  background: var(--green-wash, #e8f5ee); border-radius: var(--r-pill); padding: 2px 10px; }
+.chat-action.failed { color: var(--red-ink); background: var(--red-wash); }

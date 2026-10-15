@@ -5,8 +5,14 @@ import { brand } from '../brand'
 import { useApp } from '../context'
 import Icon from './Icon'
 
-type Msg = { role: 'user' | 'assistant'; content: string; checked?: string[]; error?: boolean; greeting?: boolean }
+type Action = { type: string; label: string; ok: boolean; intake_id?: string; case_id?: string }
+type Msg = { role: 'user' | 'assistant'; content: string; checked?: string[]; actions?: Action[]; error?: boolean; greeting?: boolean }
 
+const INVOICE_SUGGESTIONS = [
+  'Run the agent on this invoice and tell me what it found',
+  'Why was this coded the way it was?',
+  'Who has to approve this, and why?',
+]
 const SUGGESTIONS = [
   'What’s held today, and why?',
   'Why is the Dell invoice going to 1540, not 6420?',
@@ -68,12 +74,12 @@ function pageContext(pathname: string, search: string) {
 }
 
 export default function ChatWidget() {
-  const { session } = useApp()
+  const { session, bump } = useApp()
   const location = useLocation()
   const first = session?.person?.name?.split(' ')[0]
   const greeting: Msg = {
     role: 'assistant', greeting: true,
-    content: `Hi${first ? ` ${first}` : ''}, I’m the ${brand.product} assistant. Ask me anything about this morning’s non-PO invoices, the close or cash application: why something was coded or held, who approves it, what the agent found. I read the same data the agent works from; a person still makes every decision.`,
+    content: `Hi${first ? ` ${first}` : ''}, I’m the ${brand.product} assistant. Ask me anything about this morning’s non-PO invoices, the close or cash application: why something was coded or held, who approves it, what the agent found. I can also run the agent or send a receipt request when you ask; approvals and postings stay with you.`,
   }
   const [open, setOpen] = useState(false)
   const [msgs, setMsgs] = useState<Msg[]>([greeting])
@@ -99,8 +105,16 @@ export default function ChatWidget() {
     try {
       const history = next.filter((m) => !m.greeting && !m.error).map(({ role, content }) => ({ role, content }))
       const r = await api.chat(history, pageContext(location.pathname, location.search))
-      const checked = [...new Set<string>(r.checked.map((c: { tool: string }) => c.tool.replace(/_/g, ' ')))]
-      setMsgs((m) => [...m, { role: 'assistant', content: r.reply, checked }])
+      const actions: Action[] = r.actions ?? []
+      const acted = new Set(actions.map((a) => a.type))
+      const checked = [...new Set<string>(r.checked.map((c: { tool: string }) => c.tool)
+        .filter((t: string) => !acted.has(t)).map((t: string) => t.replace(/_/g, ' ')))]
+      setMsgs((m) => [...m, { role: 'assistant', content: r.reply, checked, actions }])
+      if (actions.some((a) => a.ok)) {
+        bump()
+        actions.filter((a) => a.ok).forEach((a) =>
+          window.dispatchEvent(new CustomEvent('mc-data-changed', { detail: a })))
+      }
     } catch (e) {
       setMsgs((m) => [...m, { role: 'assistant', content: (e as Error).message, error: true }])
     } finally {
@@ -123,7 +137,7 @@ export default function ChatWidget() {
           <header className="chat-head">
             <div>
               <b>Ask {brand.product}</b>
-              <span>Answers from today’s invoices, close and cash · read-only</span>
+              <span>Answers from today’s invoices, close and cash · acts only when you ask</span>
             </div>
             <button type="button" className="chat-icon-btn" onClick={() => setOpen(false)} aria-label="Close assistant">
               <Icon name="dismiss" />
@@ -133,12 +147,19 @@ export default function ChatWidget() {
             {msgs.map((m, i) => (
               <Fragment key={i}>
                 <div className={`chat-msg ${m.role}${m.error ? ' error' : ''}`}>
+                  {m.actions && m.actions.length > 0 && (
+                    <div className="chat-actions">
+                      {m.actions.map((a, k) => <span key={k} className={`chat-action${a.ok ? '' : ' failed'}`}>{a.ok ? '✓ ' : ''}{a.label}</span>)}
+                    </div>
+                  )}
                   {m.role === 'assistant' ? <Rich text={m.content} /> : <p>{m.content}</p>}
                   {m.checked && m.checked.length > 0 && <span className="chat-checked">Checked: {m.checked.join(' · ')}</span>}
                 </div>
                 {m.greeting && msgs.length === 1 && (
                   <div className="chat-suggestions">
-                    {SUGGESTIONS.map((s) => <button key={s} type="button" onClick={() => ask(s)}>{s}</button>)}
+                    {(location.pathname.startsWith('/invoice/') ? INVOICE_SUGGESTIONS : SUGGESTIONS).map((s) => (
+                      <button key={s} type="button" onClick={() => ask(s)}>{s}</button>
+                    ))}
                   </div>
                 )}
               </Fragment>

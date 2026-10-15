@@ -148,6 +148,19 @@ export default function Review() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 
+  // The assistant can run the agent or send a receipt request; show the result here when it does.
+  useEffect(() => {
+    const onChanged = (e: Event) => {
+      const a = (e as CustomEvent).detail
+      if (a?.intake_id !== id && a?.type !== 'run_mailbox') return
+      load()
+      loadAudit()
+      if (a.type === 'run_agent') setTab('console')
+    }
+    window.addEventListener('mc-data-changed', onChanged)
+    return () => window.removeEventListener('mc-data-changed', onChanged)
+  }, [id, load, loadAudit])
+
   useEffect(() => {
     if (r?.status !== 'AWAITING_CONFIRMATION') return
     const t = window.setInterval(async () => {
